@@ -235,8 +235,8 @@ class SpecificationBookingCreateView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(SpecificationBookingCreateView, self).get_context_data(**kwargs)
-        ProductStoreBookFormSet = formset_factory(SpecificationBookingForm, extra=0)
-        formset = ProductStoreBookFormSet(initial=[{
+        product_store_book_form_set = formset_factory(SpecificationBookingForm, extra=0)
+        formset = product_store_book_form_set(initial=[{
             'specification': kwargs.get('specification_id')
         }])
         context['formset'] = formset
@@ -245,8 +245,8 @@ class SpecificationBookingCreateView(LoginRequiredMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
-        ProductStoreBookFormSet = formset_factory(SpecificationBookingForm)
-        formset = ProductStoreBookFormSet(request.POST)
+        product_store_book_form_set = formset_factory(SpecificationBookingForm)
+        formset = product_store_book_form_set(request.POST)
         if formset.is_valid():
             for i, form in enumerate(formset):
                 data = formset.cleaned_data[i]
@@ -263,6 +263,7 @@ class SpecificationBookingCreateView(LoginRequiredMixin, TemplateView):
             context['formset'] = formset
             context['errors'] = formset.errors
         return self.render_to_response(context)
+
 
 class SpecificationBookingDeleteView(LoginRequiredMixin, DeleteView):
 

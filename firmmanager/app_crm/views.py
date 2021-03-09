@@ -1,7 +1,9 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.forms import formset_factory
+from django.shortcuts import redirect
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, TemplateView
 
-from app_crm.forms import ContractorFilterForm, ContractorCommentForm
+from app_crm.forms import ContractorFilterForm, ContractorCommentForm, ContractorForm, ContractorContactForm
 from app_crm.models import Contractor, ContractorComment
 from app_documents.models import Contract, Specification, Invoice
 
@@ -62,12 +64,28 @@ class ContractorDetailView(LoginRequiredMixin, DetailView):
         return self.render_to_response(context)
 
 
-class ContractorCreateView(LoginRequiredMixin, CreateView):
+class ContractorCreateView(LoginRequiredMixin, TemplateView):
     template_name = 'app_crm/contractors/contractor_create.html'
-    model = Contractor
-    fields = ['title', 'status', 'type_of_contractor', 'field_of_activity', 'position', 'appeal', 'name', 'second_name',
-              'last_name', 'country', 'phone', 'email', 'requisites']
-    success_url = '/crm/contractors'
+    # success_url = '/crm/contractors'
+
+    def get_context_data(self, **kwargs):
+        context = super(ContractorCreateView, self).get_context_data(**kwargs)
+        form = ContractorForm()
+        formset = formset_factory(ContractorContactForm)
+        context['formset'] = formset
+        context['form'] = form
+        return context
+
+    def post(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        form = ContractorForm(request.POST)
+        if form.is_valid():
+            contractor = form.save()
+            return redirect('contractor_detail', pk=contractor.pk)
+        else:
+            context['form'] = form
+            return self.render_to_response(context)
+
 
 
 class ContractorEditView(LoginRequiredMixin, UpdateView):
