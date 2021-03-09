@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ object.title }}{% endblock %}
+
+{% block content %}
+<a href="{% url 'stores_list' %}" class="btn btn-primary mb-2 mt-2">К списку складов</a>
+<div class="mb-5 col-12">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ object.title }}</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">Адрес: {{ object.address }}</li>
+        </ul>
+    </div>
+</div>
+{% if products_in_store %}
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">Продукция</th>
+            <th scope="col">Количество на складе</th>
+            <th scope="col">Забронировано на складе</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for product_in_store in products_in_store %}
+        <tr>
+            <td>
+                <a href="{% url 'product_detail' product_in_store.product.id %}">{{ product_in_store.product }}</a>
+            </td>
+            <td>{{ product_in_store.quantity }}</td>
+            <td>{{ product_in_store.booked }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+{% endblock %}

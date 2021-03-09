@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Валюты{% endblock %}
+
+{% block content %}
+
+<ul class="nav nav-pills pt-2 pb-2">
+  <li class="nav-item">
+    <a class="nav-link" href="{% url 'contracts_list' %}">Договоры</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="{% url 'contract_types_list' %}">Типы договоров</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active" aria-current="page" href="{% url 'currencies_list' %}">Валюты</a>
+  </li>
+</ul>
+
+<h1>Валюты</h1>
+
+{% if currencies %}
+<div class="row">
+    {% for currency in currencies %}
+    <div class="mb-5 col-3">
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">{{ currency.title }}</h5>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Стоимость валюты к 1 рублю: {{ currency.cost }}</li>
+            </ul>
+            <div class="card-body">
+                <a href="{% url 'currency_detail' currency.id %}" class="btn btn-primary">Открыть</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

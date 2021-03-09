@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Спецификации{% endblock %}
+
+{% block content %}
+
+<ul class="nav nav-pills pt-2 pb-2">
+    <li class="col-2">
+        <a href="{% url 'contractor_detail' contractor_id %}" class="btn btn-primary col-11">Контрагент</a>
+    </li>
+
+    <li class="col-2">
+        <a href="{% url 'contractor_contracts_list' contractor_id %}" class="btn btn-primary col-11">Договоры</a>
+    </li>
+
+    <li class="col-2">
+        <a href="{% url 'contractor_invoices_list' contractor_id %}" class="btn btn-primary col-11">Инвойсы</a>
+    </li>
+</ul>
+
+<h1>Спецификации</h1>
+
+{% if specifications %}
+<div class="row">
+    {% for specification in specifications %}
+    <div class="mb-5 col-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Спецификация №{{ specification.number }}</h5>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Договор: {{ specification.contract }}</li>
+            </ul>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Клиент: {{ specification.contract.contractor }}</li>
+            </ul>
+            <div class="card-body">
+                <a href="{% url 'specification_detail' specification.id %}" class="btn btn-primary">Открыть</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

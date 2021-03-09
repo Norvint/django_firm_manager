@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Добавить новую продукцию{% endblock %}
+
+{% block content %}
+
+<a href="{% url 'products_list' %}" class="btn btn-primary mt-2">К списку продукции</a>
+<a href="{% url 'product_create' formset.forms|length|add:1 %}" class="btn btn-success col-8 mt-2">Добавить карточку</a>
+
+<h1>Новая продукция</h1>
+{% if answer %}
+<p>
+    Продукция с артикулом: {{ answer }} была добавлена в базу данных!
+</p>
+{% endif %}
+<form name="product-create-form" method="post" class="d-flex justify-content-evenly col-12 row">
+    {{ formset.management_form }}
+    {% for form in formset %}
+    <div class="card p-3 mb-2 col-5">
+        <h2>Карточка продукции #{{ form.prefix|slice:"5:7"|add:1}}</h2>
+        {% csrf_token %}
+        {{ form.as_table }}
+    </div>
+    {% endfor %}
+    <input type="submit" value="Сохранить" class="btn btn-primary col-8 mb-3">
+</form>
+
+{% endblock %}

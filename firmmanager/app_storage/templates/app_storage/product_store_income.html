@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Приход продукции на склад{% endblock %}
+
+{% block content %}
+<h1>Приход продукции на склад</h1>
+<form name="product-income-create-form" method="post" action="{% url 'product_store_income' %}" class="card col-12 row">
+    <div class="mt-3 mb-3">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Применить" class="btn btn-primary">
+    </div>
+</form>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Уловия поставки{% endblock %}
+
+{% block content %}
+
+<ul class="nav nav-pills pt-2 pb-2">
+  <li class="nav-item">
+    <a class="nav-link" aria-current="page" href="{% url 'specifications_list' %}">Спецификации</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active" href="{% url 'contract_types_list' %}">Условия поставки</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="{% url 'payment_conditions_list' %}">Условия оплаты</a>
+  </li>
+</ul>
+
+<h1>Условия поставки</h1>
+
+{% if delivery_conditions %}
+    {% for delivery_condition in delivery_conditions %}
+    <div class="mb-5 col-3">
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">{{ delivery_condition.title }}</h5>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Срок поставки, дней: {{ delivery_condition.delivery_time }}</li>
+            </ul>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Описание: {{ delivery_condition.description }}</li>
+            </ul>
+            <div class="card-body">
+                <a href="{% url 'delivery_condition_detail' delivery_condition.id %}" class="btn btn-primary">Открыть</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+{% endif %}
+{% endblock %}

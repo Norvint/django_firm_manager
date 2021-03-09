@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Добавить новую спецификацию{% endblock %}
+
+{% block content %}
+
+<a href="{% url 'specifications_list' %}" class="btn btn-primary mt-2">К списку спецификаций</a>
+
+<p>
+    {{ errors }}
+</p>
+<form name="specification-create-form" method="post">
+    {% csrf_token %}
+    <div class="card col-7">
+        <div class="card-body">
+            <h5 class="card-title">Новая спецификация</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item d-flex justify-content-between">
+                {{ form.number.label }}
+                {{ form.number }}
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between">
+                {{ form.contract.label }}
+                {{ form.contract }}
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between">
+                <div>
+                    {{ form.delivery_conditions.label }}
+                    {{ form.delivery_conditions }}
+                </div>
+                <div>
+                    {{ form.loading_place.label }}
+                    {{ form.loading_place }}
+                </div>
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between">
+                {{ form.payment_conditions.label }}
+                {{ form.payment_conditions }}
+            </li>
+        </ul>
+        <div class="card-body">
+            <input type="submit" value="Сохранить" class="btn btn-primary col-4">
+        </div>
+    </div>
+</form>
+
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}Добавить новую организацию{% endblock %}
+
+{% block content %}
+<h1>Новая организация</h1>
+<form name="organization-create-form" method="post" action="{% url 'organization_create' %}" class="card p-2 col-4 row">
+    {% csrf_token %}
+    {{ form.as_table }}
+    <input type="submit" value="Добавить" class="btn btn-primary mt-2">
+</form>
+{% endblock %}

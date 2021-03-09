@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Список продукции{% endblock %}
+
+{% block content %}
+<form action="" method="post">
+    {% csrf_token %}
+    <div  class="d-flex flex-row col-10 justify-content-between mb-2 flex-wrap">
+        <div class="d-flex flex-column col-2 mt-2">
+            {{ filter.type_of_product.errors }}
+            {{ filter.type_of_product.label }}
+            {{ filter.type_of_product }}
+        </div>
+
+        <div class="d-flex flex-column col-2">
+            {{ filter.model.errors }}
+            {{ filter.model.label }}
+            {{ filter.model }}
+        </div>
+
+        <div class="d-flex flex-column col-1">
+            {{ filter.version.errors }}
+            {{ filter.version.label }}
+            {{ filter.version }}
+        </div>
+
+        <div class="d-flex flex-column col-2">
+            {{ filter.size.errors }}
+            {{ filter.size.label }}
+            {{ filter.size }}
+        </div>
+
+        <div class="d-flex flex-column col-2">
+            {{ filter.color.errors }}
+            {{ filter.color.label }}
+            {{ filter.color }}
+        </div>
+
+        <div class="d-flex flex-column col-2 mt-3">
+            <button type="submit" class="btn btn-secondary">Отсортировать</button>
+        </div>
+    </div>
+</form>
+
+<h1>Продукция</h1>
+<a href="{% url 'product_create' 1 %}" class="btn btn-primary mb-3">Добавить продукцию</a>
+
+{% if products_list %}
+    <div class="row">
+    {% for product in products_list %}
+        <div class="mb-5 col-4">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">{{ product.type_of_product }}</h5>
+              </div>
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item">Артикул: {{ product.number }}</li>
+                <li class="list-group-item">Модель: {{ product.model }}</li>
+                <li class="list-group-item">Версия: {{ product.version }}</li>
+                <li class="list-group-item">Страна: {{ product.country }}</li>
+              </ul>
+              <div class="card-body">
+                <a href="{% url 'product_detail' product.id %}" class="btn btn-primary">Открыть</a>
+              </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,57 @@
+from datetime import datetime
+
+from django.contrib.auth.models import User
+from django.db import models
+
+
+class Organization(models.Model):
+    title = models.CharField('Наименование', max_length=30)
+    address = models.CharField('Адрес', max_length=100)
+    tin = models.CharField('ИНН(TIN)', max_length=12)
+    pprnie = models.CharField('ОГРИП(PPRNIE)', max_length=15)
+    registration = models.CharField('Уведомление о постановке на учет', max_length=100)
+
+    class Meta:
+        verbose_name = 'Организация'
+        verbose_name_plural = 'Организации'
+
+    def __str__(self):
+        return f'{self.pk}. {self.title}'
+
+
+class Bank(models.Model):
+    title = models.CharField('Наименование', max_length=100)
+    short_code = models.CharField('Кодовое обозначение(SWIFT)', max_length=30)
+    address = models.CharField('Адрес', max_length=100)
+    payment_account = models.CharField('Расчетный счет', max_length=30)
+    correspondent_account = models.CharField('Корреспондентный счет', max_length=30, blank=True)
+    recipient = models.ForeignKey(Organization, on_delete=models.CASCADE, verbose_name='Получатель')
+
+    class Meta:
+        verbose_name = 'Банк'
+        verbose_name_plural = 'Банки'
+
+    def __str__(self):
+        return self.title
+
+
+class Worker(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True, verbose_name='Пользователь')
+    name = models.CharField('Имя', max_length=30)
+    second_name = models.CharField('Отчество', max_length=30)
+    last_name = models.CharField('Фамилия', max_length=30)
+    position = models.CharField('Должность', max_length=30)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, verbose_name='Организация')
+    serial_number = models.CharField('Серия', max_length=4, blank=True)
+    number = models.CharField('Номер', max_length=6, blank=True)
+    issued_by = models.CharField('Кем выдан', max_length=100, blank=True)
+    date = models.DateField('Дата выдачи', default=datetime(year=1970, month=1, day=1), blank=True)
+    date_of_birth = models.DateField('Дата рождения', default=datetime(year=1970, month=1, day=1), blank=True)
+    department_code = models.CharField('Код подразделения', max_length=20, blank=True)
+
+    class Meta:
+        verbose_name = 'Сотрудник'
+        verbose_name_plural = 'Сотрудники'
+
+    def __str__(self):
+        return f'{self.pk}. {self.name} {self.second_name} {self.last_name}'

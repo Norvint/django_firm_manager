@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Добавить новую продукцию{% endblock %}
+
+{% block content %}
+
+<a href="{% url 'specifications_list' %}" class="btn btn-primary mt-2 col-3">К списку спецификаций</a>
+<a href="{% url 'specification_detail' specification_id %}" class="btn btn-primary mt-2 col-3">В карточку
+    спецификации</a>
+<p>
+    {{ answer }}
+</p>
+<p>
+    {{ errors }}
+</p>
+<h1>Выпуск продукции по спецификации</h1>
+<form name="specification-create-form" method="post" class="d-flex justify-content-start row">
+    {% csrf_token %}
+    <div class="col-5">
+        <a href="#" id="add_booking" class="btn btn-success col-1 mb-3 fw-bold">
+            +
+        </a>
+        <input type="submit" value="Сохранить" class="btn btn-primary col-3 mb-3">
+    </div>
+    <div id="booking-form-wrapper" class="row d-flex justify-content-around">
+        {{ formset.management_form }}
+        {% for form in formset %}
+        <div class="card booking-form-container p-3 mb-2 col-3">
+            <label>
+                {{ form.specification.label }}
+            </label>
+            {{ form.specification }}
+            <label>
+                {{ form.product.label }}
+            </label>
+            {{ form.product }}
+            <label>
+                {{ form.store.label }}
+            </label>
+            {{ form.store }}
+            <label>
+                {{ form.quantity.label }}
+            </label>
+            {{ form.quantity }}
+        </div>
+        {% endfor %}
+    </div>
+</form>
+
+{% block extrascripts %}
+<script type="text/JavaScript" src="{%  static 'app_documents/js/booking.js' %}"></script>
+{% endblock %}
+
+{% endblock %}

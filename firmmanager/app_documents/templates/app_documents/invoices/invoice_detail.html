@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Инвойс{% endblock %}
+
+{% block content %}
+<h1>Инвойс</h1>
+<a href="{% url 'contractor_invoices_list' object.specification.contract.contractor.id %}" class="btn btn-primary mb-3">К списку инвойсов контрагента</a>
+
+<div class="mb-5 col-6">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Инвойс №{{ object.number }}</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">Спецификация: {{ object.specification }}</li>
+            <li class="list-group-item">Отгрузочные метки: {{ object.shipment_mark }}</li>
+            <li class="list-group-item">Дата создания: {{ object.created }}</li>
+        </ul>
+        <div class="card-body row">
+            <form name="invoice-create-form" method="post" action="" class="col-5">
+                {% csrf_token %}
+                <input type="submit" value="Сгенерировать документ" class="btn btn-primary col-12">
+            </form>
+            {% if file %}
+            <a href="{% url 'download_invoice' %}" download class="btn btn-success col-3">Скачать</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

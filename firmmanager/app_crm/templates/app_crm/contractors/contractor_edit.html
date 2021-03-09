@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ object.title }}{% endblock %}
+
+{% block content %}
+<h1>Редактирование контрагента</h1>
+<form action="{% url 'contractor_edit' object.id %}" method="post" name="contractor-edit" class="card p-2 col-6 row">
+        {% csrf_token %}
+        {{ form.as_table }}
+        <input type="submit" value="Сохранить" class="btn btn-primary mt-2">
+</form>
+<a href="{% url 'contractor_detail' object.id %}" class="mt-2 mb-2 btn btn-primary">Отмена</a>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Договоры{% endblock %}
+
+{% block content %}
+
+<ul class="nav nav-pills pt-2 pb-2">
+    <li class="col-2">
+        <a href="{% url 'contractor_detail' contractor_id %}" class="btn btn-primary col-11">Контрагент</a>
+    </li>
+
+    <li class="col-2">
+        <a href="{% url 'contractor_specifications_list' contractor_id %}" class="btn btn-primary col-11">Спецификации</a>
+    </li>
+
+    <li class="col-2">
+        <a href="{% url 'contractor_invoices_list' contractor_id %}" class="btn btn-primary col-11">Инвойсы</a>
+    </li>
+</ul>
+
+<h1>Договоры</h1>
+
+<a href="{% url 'contract_create' %}" class="btn btn-primary mb-3">Добавить договор</a>
+
+{% if contracts %}
+<div class="row">
+    {% for contract in contracts %}
+    <div class="mb-5 col-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ contract.contractor }}</h5>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Номер: {{ contract.number }}</li>
+                <li class="list-group-item">Дата создания: {{ contract.created }}</li>
+            </ul>
+            <div class="card-body">
+                <a href="{% url 'contract_detail' contract.id %}" class="btn btn-primary">Открыть</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

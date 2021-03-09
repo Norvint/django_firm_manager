@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Информация о банке{% endblock %}
+
+{% block content %}
+<h1>Информация о банке</h1>
+<a href="{% url 'banks_list' %}" class="btn btn-primary mb-3">Назад</a>
+
+<div class="mb-5 col-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">{{ object.title }}</h5>
+      </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">Код: {{ object.short_code }}</li>
+        <li class="list-group-item">Адрес: {{ object.address }}</li>
+        <li class="list-group-item">Расчетный счет: {{ object.payment_account }}</li>
+        <li class="list-group-item">Кореспондентный счет: {{ object.correspondent_account }}</li>
+        <li class="list-group-item">Получатель: {{ object.recipient }}</li>
+      </ul>
+      <div class="card-body">
+<!--        <a href="{% url 'bank_detail' bank.id %}" class="btn btn-primary">Редактировать</a>-->
+      </div>
+    </div>
+</div>
+{% endblock %}

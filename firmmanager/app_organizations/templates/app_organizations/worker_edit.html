@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактирование информации о сотруднике{% endblock %}
+
+{% block content %}
+<h1>Редактирование информации о сотруднике</h1>
+<form name="worker-edit-form" method="post" action="{% url 'worker_edit' object.id %}" class="card col-11 p-2">
+    {% csrf_token %}
+    <div class="d-flex flex-row justify-content-around">
+        <div class="col-6 d-flex flex-column">
+            <h4>Основная информация</h4>
+            {{ form.user.errors }}
+            {{ form.user.label }}
+            {{ form.user }}
+            {{ form.name.errors }}
+            {{ form.name.label }}
+            {{ form.name }}
+            {{ form.second_name.errors }}
+            {{ form.second_name.label }}
+            {{ form.second_name }}
+            {{ form.last_name.errors }}
+            {{ form.last_name.label }}
+            {{ form.last_name }}
+            {{ form.position.errors }}
+            {{ form.position.label }}
+            {{ form.position }}
+            {{ form.organization.errors }}
+            {{ form.organization.label }}
+            {{ form.organization }}
+        </div>
+
+        <div class="col-5 d-flex flex-column">
+            <h4>Паспортные данные</h4>
+            {{ form.serial_number.errors }}
+            {{ form.serial_number.label }}
+            {{ form.serial_number }}
+            {{ form.number.errors }}
+            {{ form.number.label }}
+            {{ form.number }}
+            {{ form.issued_by.errors }}
+            {{ form.issued_by.label }}
+            {{ form.issued_by }}
+            {{ form.date.errors }}
+            {{ form.date.label }}
+            {{ form.date }}
+            {{ form.date_of_birth.errors }}
+            {{ form.date_of_birth.label }}
+            {{ form.date_of_birth }}
+            {{ form.department_code.errors }}
+            {{ form.department_code.label }}
+            {{ form.department_code }}
+        </div>
+    </div>
+    <input type="submit" value="Сохранить" class="btn btn-primary mt-4 align-self-center col-3">
+</form>
+{% endblock %}

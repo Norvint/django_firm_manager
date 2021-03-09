@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Все сотрудники{% endblock %}
+
+{% block content %}
+<h1>Сотрудники</h1>
+<a href="{% url 'worker_create' %}" class="btn btn-primary mb-3">Добавить сотрудника</a>
+
+{% if workers %}
+    <div class="row">
+    {% for worker in workers %}
+        <div class="mb-5 col-4">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title">{{ worker.name }} {{ worker.second_name }} {{ worker.last_name }}</h5>
+              </div>
+              <ul class="list-group list-group-flush">
+                  <li class="list-group-item">Должность: {{ worker.position }}</li>
+                  <li class="list-group-item">Организация: {{ worker.organization.title }}</li>
+              </ul>
+              <div class="card-body">
+                <a href="{% url 'worker_detail' worker.id %}" class="btn btn-primary">Открыть</a>
+              </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endblock %}

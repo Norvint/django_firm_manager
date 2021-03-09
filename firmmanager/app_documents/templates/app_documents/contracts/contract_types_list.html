@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Типы договоров{% endblock %}
+
+{% block content %}
+
+<ul class="nav nav-pills pt-2 pb-2">
+  <li class="nav-item">
+    <a class="nav-link" href="{% url 'contracts_list' %}">Договоры</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active" aria-current="page" href="{% url 'contract_types_list' %}">Типы договоров</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="{% url 'currencies_list' %}">Валюты</a>
+  </li>
+</ul>
+
+<h1>Типы договоров</h1>
+
+{% if contract_types %}
+<div class="row">
+    {% for contract_type in contract_types %}
+    <div class="mb-5 col-3">
+        <div class="card" style="width: 18rem;">
+            <div class="card-body">
+                <h5 class="card-title">{{ contract_type.title }}</h5>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

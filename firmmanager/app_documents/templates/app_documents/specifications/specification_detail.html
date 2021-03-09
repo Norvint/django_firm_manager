@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Спецификация{% endblock %}
+
+{% block content %}
+<h1>Спецификация</h1>
+<a href="{% url 'contractor_specifications_list' object.contract.contractor.id %}" class="btn btn-primary mb-3">К списку спецификаций контрагента</a>
+{% load static %}
+<div class="mb-5 col-6">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Спецификация №{{ object.number }}</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">Договор: {{ object.contract }}</li>
+            <li class="list-group-item">Условия поставки: {{ object.delivery_conditions }}</li>
+            <li class="list-group-item">Место загрузки: {{ object.loading_place }}</li>
+            <li class="list-group-item">Условия оплаты: {{ object.payment_conditions }}</li>
+            <li class="list-group-item">Дата создания: {{ object.created }}</li>
+        </ul>
+        <div class="card-body p-4 row d-flex justify-content-between">
+            <a href="{% url 'specification_booking' object.id %}" class="btn btn-primary col-5 mb-2">Выпустить продукцию</a>
+            <a href="{% url 'invoice_create' object.id %}" class="btn btn-primary col-5 ml-2 mb-2">Создать инвойс</a>
+            <form name="specification-create-form" method="post" action="" class="col-5">
+                {% csrf_token %}
+                <input type="submit" value="Сгенерировать документ" class="btn btn-primary">
+            </form>
+            {% if file %}
+            <a href="{% url 'download_specification' %}" download class="btn btn-success col-5">Скачать</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if specification_booking %}
+<h2>Выпускаемая продукция</h2>
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">Продукция</th>
+        <th scope="col">Склад</th>
+        <th scope="col">Количество</th>
+        <th scope="col">Стоимость 1 ед.</th>
+        <th scope="col">Сумма</th>
+        <th scope="col">Редактировать</th>
+        <th scope="col">Удалить</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for document in specification_booking %}
+    <tr>
+        <td>
+            <a href="{% url 'product_detail' document.product.id %}">{{ document.product }}</a>
+        </td>
+        <td>{{ document.store }}</td>
+        <td>{{ document.quantity }}</td>
+        <td>{{ document.product.cost }}</td>
+        <td>{{ document.sum }}</td>
+        <td>
+            <a href="{% url 'specification_booking_edit' document.id %}">
+                <img src="{% static 'app_documents/images/edit.png' %}" alt="edit icon">
+            </a>
+        </td>
+        <td>
+            <a href="{% url 'specification_booking_delete' document.id %}">
+                <img src="{% static 'app_documents/images/delete.png' %}" alt="delete icon">
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+{% if invoices %}
+<h2>Инвойсы</h2>
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">Инвойс №</th>
+        <th scope="col">Клиент</th>
+        <th scope="col">Дата создания</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for invoice in invoices %}
+    <tr>
+        <td>
+            <a href="{% url 'invoice_detail' invoice.id %}">{{ invoice.number }}</a>
+        </td>
+        <td>{{ invoice.specification.contract.contractor }}</td>
+        <td>{{ invoice.created }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}

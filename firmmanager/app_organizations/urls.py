@@ -1,0 +1,17 @@
+from django.urls import path
+
+from app_organizations.views import BankCreateView, BankDetailView, BankListView, OrganizationCreateView, \
+    OrganizationDetailView, OrganizationListView, WorkerCreateView, WorkerDetailView, WorkerListView, WorkerEditView
+
+urlpatterns = [
+    path('', OrganizationListView.as_view(), name='organizations_list'),
+    path('create-organization/', OrganizationCreateView.as_view(), name='organization_create'),
+    path('<int:pk>', OrganizationDetailView.as_view(), name='organization_detail'),
+    path('banks/', BankListView.as_view(), name='banks_list'),
+    path('banks/create-bank/', BankCreateView.as_view(), name='bank_create'),
+    path('banks/<int:pk>', BankDetailView.as_view(), name='bank_detail'),
+    path('workers/', WorkerListView.as_view(), name='workers_list'),
+    path('workers/create-worker/', WorkerCreateView.as_view(), name='worker_create'),
+    path('workers/<int:pk>', WorkerDetailView.as_view(), name='worker_detail'),
+    path('workers/<int:pk>/edit', WorkerEditView.as_view(), name='worker_edit'),
+]

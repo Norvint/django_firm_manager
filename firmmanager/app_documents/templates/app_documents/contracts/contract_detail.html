@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}Детали договора{% endblock %}
+
+{% block content %}
+<a href="{% url 'contractor_contracts_list' object.contractor.id %}" class="btn btn-primary mb-2 mt-2">К списку договоров контрагента</a>
+<h1>Договор</h1>
+
+<div class="mb-5 col-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">{{ object.contractor.title }}</h5>
+      </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">Тип договора: {{ object.type }}</li>
+        <li class="list-group-item">Номер: {{ object.number }}</li>
+        <li class="list-group-item">Дата создания: {{ object.created }}</li>
+        <li class="list-group-item">Организация продавец: {{ object.organization }}</li>
+        <li class="list-group-item">Место поставки: {{ object.delivery_address }}</li>
+        <li class="list-group-item">Валюта: {{ object.currency }}</li>
+      </ul>
+      <div class="card-body row">
+          <a href="{% url 'specification_create' object.id %}" class="btn btn-primary col-6">Добавить спецификацию</a>
+          <form name="contract-create-form" method="post" action="" class="col-5">
+                {% csrf_token %}
+                <input type="submit" value="Сгенерировать документ" class="btn btn-primary">
+          </form>
+          {% if file %}
+          <a href="{% url 'download_contract' %}" download class="btn btn-success col-3">Скачать</a>
+          {% endif %}
+      </div>
+    </div>
+</div>
+
+{% if specifications %}
+    <h2>Спецификации</h2>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">Номер спецификации</th>
+            <th scope="col">Контрагент</th>
+            <th scope="col">Дата создания</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for specification in specifications %}
+        <tr>
+            <td>
+                <a href="{% url 'specification_detail' specification.id %}">{{ specification.number }}</a>
+            </td>
+            <td>{{ specification.contract.contractor }}</td>
+            <td>{{ specification.created }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+{% endblock %}

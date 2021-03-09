@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ object.title }}{% endblock %}
+
+{% block content %}
+<a href="{% url 'products_list' %}" class="btn btn-primary mb-2 mt-2">К списку продукции</a>
+<div class="mb-5 col-12">
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ object.type_of_product.title }}</h5>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">Артикул: {{ object.number }}</li>
+            <li class="list-group-item">Модель: {{ object.model }}</li>
+            <li class="list-group-item">Размер: {{ object.size }}</li>
+            <li class="list-group-item">Версия: {{ object.version }}</li>
+            <li class="list-group-item">Материалы: {{ object.materials }}</li>
+            <li class="list-group-item">Цвет: {{ object.color }}</li>
+            <li class="list-group-item">Внутренняя упаковка: {{ object.packing_inside }}</li>
+            <li class="list-group-item">Внешняя упаковка: {{ object.packing_outside }}</li>
+            <li class="list-group-item">Страна: {{ object.country }}</li>
+        </ul>
+        <div class="card-body">
+            <a href="{% url 'product_edit' object.id %}" class="btn btn-primary">Редактировать</a>
+        </div>
+    </div>
+</div>
+
+{% if stores_with_product %}
+    <h2>Продукции на складах</h2>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">Склад</th>
+            <th scope="col">Количество на складе</th>
+            <th scope="col">Забронировано на складе</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for store_with_product in stores_with_product %}
+        <tr>
+            <td>
+                <a href="{% url 'store_detail' store_with_product.store.id %}">{{ store_with_product.store }}</a>
+            </td>
+            <td>{{ store_with_product.quantity }}</td>
+            <td>{{ store_with_product.booked }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+{% endblock %}

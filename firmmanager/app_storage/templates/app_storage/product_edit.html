@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ object.title }}{% endblock %}
+
+{% block content %}
+<h1>Редактирование продукции</h1>
+<form action="{% url 'client_edit' object.id %}" method="post" name="client-edit" class="card col-5 row">
+    <div class="mt-3 mb-3">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Сохранить" class="btn btn-primary">
+    </div>
+</form>
+<a href="{% url 'client_detail' object.id %}" class="mt-2 mb-2 btn btn-primary">Отмена</a>
+{% endblock %}

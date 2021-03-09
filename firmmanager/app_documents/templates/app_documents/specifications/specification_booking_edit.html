@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактировать бронь продукции{% endblock %}
+
+{% block content %}
+
+<a href="{% url 'specifications_list' %}" class="btn btn-primary mt-2 col-3">К списку спецификаций</a>
+
+<p>
+    {{ answer }}
+</p>
+<p>
+    {{ errors }}
+</p>
+
+<h1>Редактирование брони продукции по спецификации</h1>
+<form name="specification-create-form" method="post" class="d-flex justify-content-evenly col-12 row">
+    <div class="card p-3 mb-2 col-5">
+        {% csrf_token %}
+        <label>
+            {{ form.specification.label }}
+        </label>
+        {{ form.specification }}
+        <label>
+            {{ form.product.label }}
+        </label>
+        {{ form.product }}
+        <label>
+            {{ form.store.label }}
+        </label>
+        {{ form.store }}
+        <label>
+            {{ form.quantity.label }}
+        </label>
+        {{ form.quantity }}
+    </div>
+    <input type="submit" value="Сохранить" class="btn btn-primary col-8 mb-3">
+</form>
+
+{% endblock %}

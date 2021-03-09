@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Валюта{% endblock %}
+
+{% block content %}
+<h1>Валюта</h1>
+<a href="{% url 'currencies_list' %}" class="btn btn-primary mb-3">Назад</a>
+
+<div class="mb-5 col-6">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">{{ object.title }}</h5>
+      </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">Стоимость к 1 рублю: {{ object.cost }}</li>
+      </ul>
+      <div class="card-body">
+      </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ object.name }} {{ object.second_name }} {{ object.last_name }}{% endblock %}
+
+{% block content %}
+<h1>Информация о сотруднике</h1>
+<a href="{% url 'workers_list' %}" class="btn btn-primary mb-3">Назад</a>
+
+<div class="mb-5 col-8">
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title">Основная информация</h4>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">Логин: {{ object.user }}</li>
+            <li class="list-group-item">Имя: {{ object.name }}</li>
+            <li class="list-group-item">Отчество: {{ object.second_name }}</li>
+            <li class="list-group-item">Фамилия: {{ object.last_name }}</li>
+            <li class="list-group-item">Должность: {{ object.position }}</li>
+            <li class="list-group-item">Организация: {{ object.organization.title }}</li>
+        </ul>
+        <div class="card-body">
+            <h4 class="card-title">Паспортные данные</h4>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">Серийный номер: {{ object.serial_number }}</li>
+            <li class="list-group-item">Номер: {{ object.number }}</li>
+            <li class="list-group-item">Выдан: {{ object.issued_by }}</li>
+            <li class="list-group-item">Дата выдачи: {{ object.date }}</li>
+            <li class="list-group-item">Дата рождения: {{ object.date_of_birth }}</li>
+            <li class="list-group-item">Код подразделения: {{ object.department_code }}</li>
+        </ul>
+        <div class="card-body">
+            <a href="{% url 'worker_edit' worker.id %}" class="btn btn-primary">Редактировать</a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

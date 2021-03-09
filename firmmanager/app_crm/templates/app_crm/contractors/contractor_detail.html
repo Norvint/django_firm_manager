@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ object.title }}{% endblock %}
+
+{% block content %}
+<ul class="nav nav-pills pt-2 pb-2 d-flex">
+    <li class="col-2">
+         <a href="{% url 'contractors_list' %}" class="btn btn-primary col-11">К списку контрагентов</a>
+    </li>
+
+    <li class="col-2">
+         <a href="{% url 'contractor_contracts_list' object.id %}" class="btn btn-primary col-11">Договоры</a>
+    </li>
+
+    <li class="col-2">
+        <a href="{% url 'contractor_specifications_list' object.id %}" class="btn btn-primary col-11">Спецификации</a>
+    </li>
+
+    <li class="col-2">
+        <a href="{% url 'contractor_invoices_list' object.id %}" class="btn btn-primary col-11">Инвойсы</a>
+    </li>
+</ul>
+
+<h1>Информация о контрагенте</h1>
+<div class="mb-5 col-12">
+    <div class="card">
+        <div class="card-body d-flex justify-content-between">
+            <h5 class="card-title">{{ object.title }}</h5>
+            <p class="text-success">{{ object.status }}</p>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">Должность: {{ object.position }}</li>
+            <li class="list-group-item">Обращение: {{ object.appeal }}</li>
+            <li class="list-group-item">Имя: {{ object.name }}</li>
+            <li class="list-group-item">Отчество\Второе имя: {{ object.second_name }}</li>
+            <li class="list-group-item">Фамилия: {{ object.last_name }}</li>
+            <li class="list-group-item">Страна: {{ object.country }}</li>
+            <li class="list-group-item">Телефон: {{ object.phone }}</li>
+            <li class="list-group-item">Электронная почта: {{ object.email }}</li>
+            <li class="list-group-item">Реквизиты: {{ object.requisites }}</li>
+        </ul>
+        <div class="card-body">
+            <a href="{% url 'contractor_edit' object.id %}" class="btn btn-primary">Редактировать</a>
+        </div>
+    </div>
+</div>
+
+{% if comments %}
+<h2>Комментарии к контрагенту</h2>
+{% for comment in comments %}
+<div class="row">
+    <div class="col-5">
+        <div class="card mb-2">
+            <div class="card-body">
+                <h5 class="card-title">{{ comment.user }}</h5>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">{{ comment.text }}</li>
+                <li class="list-group-item">Дата создания: {{ comment.created }}</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endif %}
+
+<form class="card col-4 mb-2" name="comment-form" method="post" action="{% url 'contractor_detail' object.id %}">
+    <div class="card-body">
+        <h5 class="card-title">Оставить комментарий</h5>
+    </div>
+    {% csrf_token %}
+    <ul class="list-group list-group-flush">
+        {{ comment_form.text.errors }}
+        <li class="list-group-item">{{ comment_form.text }}</li>
+    </ul>
+    <div class="card-body">
+        <input class="btn btn-primary col-3" type="submit" value="Добавить">
+    </div>
+</form>
+{% endblock %}
