@@ -1,12 +1,142 @@
 {% extends 'base.html' %}
 
 {% block title %}Добавить нового клиента{% endblock %}
-
+{% load static %}
 {% block content %}
 <h1>Новый клиент</h1>
-<form name="client-create-form" method="post" action="{% url 'contractor_create' %}" class="card p-2 col-6 row">
+<form name="client-create-form" method="post" action="{% url 'contractor_create' %}" class="row">
     {% csrf_token %}
-    {{ form.as_table }}
-    <input type="submit" value="Добавить" class="btn btn-primary mt-2">
+    <div class="card d-flex justify-content-around p-2">
+        <div class="d-flex justify-content-between">
+            <div class="col-3">
+                <div class="d-flex justify-content-between mb-1">
+                    <label class="fw-bold">
+                        {{ form.title.label }}
+                    </label>
+                    {{ form.title }}
+                </div>
+
+                <div class="d-flex justify-content-between mb-1">
+                    <label class="fw-bold">
+                        {{ form.status.label }}
+                    </label>
+                    {{ form.status }}
+                </div>
+
+                <div class="d-flex justify-content-between mb-1">
+                    <label class="fw-bold">
+                        {{ form.type_of_contractor.label }}
+                    </label>
+                    {{ form.type_of_contractor }}
+                </div>
+
+                <div class="d-flex justify-content-between mb-1">
+                    <label class="fw-bold">
+                        {{ form.field_of_activity.label }}
+                    </label>
+                    {{ form.field_of_activity }}
+                </div>
+            </div>
+
+            <div class="col-3">
+                <div class="d-flex justify-content-between mb-1">
+                    <label class="fw-bold">
+                        {{ form.position.label }}
+                    </label>
+                    {{ form.position }}
+                </div>
+
+                <div class="d-flex justify-content-between mb-1">
+                    <label class="fw-bold">
+                        {{ form.appeal.label }}
+                    </label>
+                    {{ form.appeal }}
+                </div>
+
+                <div class="d-flex justify-content-between mb-1">
+                    <label class="fw-bold">
+                        {{ form.country.label }}
+                    </label>
+                    {{ form.country }}
+                </div>
+            </div>
+
+            <div class="col-3">
+                <div class="d-flex justify-content-between mb-1">
+                    <label class="fw-bold">
+                        {{ form.name.label }}
+                    </label>
+                    {{ form.name }}
+                </div>
+
+                <div class="d-flex justify-content-between mb-1">
+                    <label class="fw-bold">
+                        {{ form.second_name.label }}
+                    </label>
+                    {{ form.second_name }}
+                </div>
+
+                <div class="d-flex justify-content-between mb-1">
+                    <label class="fw-bold">
+                        {{ form.last_name.label }}
+                    </label>
+                    {{ form.last_name }}
+                </div>
+            </div>
+        </div>
+        <label class="border-top text-center fw-bold">
+            {{ form.requisites.label }}
+        </label>
+        {{ form.requisites }}
+    </div>
+    <p>
+        {{ errors }}
+    </p>
+    <table class="table" id="contact-form-wrapper">
+        {{ formset.management_form }}
+        <thead>
+        <tr>
+            <th scope="col">Тип контакта</th>
+            <th scope="col">Контактные данные</th>
+            <th scope="col">Имя контакта</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for contact_form in formset %}
+        <tr class="contact-form-container">
+            <td>{{ contact_form.type_of_contact }}</td>
+            <td>{{ contact_form.contact }}</td>
+            <td>{{ contact_form.contact_name }}</td>
+        </tr>
+        {% endfor %}
+
+        </tbody>
+        <tfoot>
+        <tr>
+            <td>
+                <a href="#" id="add_contact" class="btn btn-success col-1 mt-2 fw-bold">
+                    +
+                </a>
+            </td>
+
+            <td>
+
+            </td>
+
+            <td>
+
+            </td>
+        </tr>
+        </tfoot>
+    </table>
+    <div>
+        <input type="submit" value="Сохранить контрагента" class="btn btn-primary mt-2">
+    </div>
+
 </form>
+
+{% block extrascripts %}
+<script type="text/JavaScript" src="{%  static 'app_crm/js/contact.js' %}"></script>
+{% endblock %}
+
 {% endblock %}

@@ -250,7 +250,6 @@ class SpecificationBookingCreateView(LoginRequiredMixin, TemplateView):
         if formset.is_valid():
             for i, form in enumerate(formset):
                 data = formset.cleaned_data[i]
-                print(data)
                 if form.is_valid() and data:
                     products_on_store = ProductStore.objects.filter(product=data['product'], store=data['store'])
                     for product_on_store in products_on_store:

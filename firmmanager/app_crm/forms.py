@@ -1,7 +1,8 @@
 from django import forms
 from django.contrib.auth.models import User
 
-from app_crm.models import TypeOfContractor, FieldOfActivity, ContractorComment, ContractorContact, Contractor
+from app_crm.models import TypeOfContractor, FieldOfActivity, ContractorComment, ContractorContact, Contractor, \
+    ContactType
 
 
 class ContractorFilterForm(forms.Form):
@@ -19,13 +20,18 @@ class ContractorCommentForm(forms.ModelForm):
 
 
 class ContractorForm(forms.ModelForm):
+
     class Meta:
         model = Contractor
         fields = ['title', 'status', 'type_of_contractor', 'field_of_activity', 'position', 'appeal', 'name',
                   'second_name', 'last_name', 'country', 'requisites']
+        widgets = {
+            'requisites': forms.Textarea(attrs={'rows': 3, 'cols': 20}),
+        }
 
 
-class ContractorContactForm(forms.ModelForm):
-    class Meta:
-        model = ContractorContact
-        fields = ['contractor', 'type_of_contact', 'contact', 'contact_name']
+class ContractorContactForm(forms.Form):
+    contractor = forms.ModelChoiceField(Contractor.objects.all(), required=False)
+    type_of_contact = forms.ModelChoiceField(ContactType.objects.all(), label='Тип контакта')
+    contact = forms.CharField(max_length=50, label='Контактные данные')
+    contact_name = forms.CharField(max_length=90, label='Имя контакта')

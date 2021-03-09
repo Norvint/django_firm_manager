@@ -85,7 +85,8 @@ class ContactType(models.Model):
 
 
 class ContractorContact(models.Model):
-    contractor = models.ForeignKey(Contractor, on_delete=models.CASCADE, verbose_name='Контрагент')
+    contractor = models.ForeignKey(Contractor, on_delete=models.CASCADE, blank=True, null=True,
+                                   verbose_name='Контрагент')
     type_of_contact = models.ForeignKey(ContactType, on_delete=models.CASCADE, verbose_name='Вид контакта')
     contact = models.CharField('Контактные данные', max_length=50)
     contact_name = models.CharField('Имя контакта', max_length=90)
