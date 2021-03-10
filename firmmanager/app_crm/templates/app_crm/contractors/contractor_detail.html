@@ -21,6 +21,9 @@
 <div class="card">
     <div class="card-body d-flex justify-content-between">
         <h5 class="card-title">{{ object.title }}</h5>
+        {% if contractor.to_delete %}
+        <p class="text-danger fw-bold">Помечен на удаление</p>
+        {% endif %}
         <p class="text-success">{{ object.status }}</p>
     </div>
     <ul class="list-group list-group-flush">
@@ -34,6 +37,11 @@
     </ul>
     <div class="card-body">
         <a href="{% url 'contractor_edit' object.id %}" class="btn btn-primary">Редактировать</a>
+        {% if contractor.to_delete %}
+        <a href="{% url 'contractor_to_delete' object.id %}" class="btn btn-danger">Снять пометку на удаление</a>
+        {% else %}
+        <a href="{% url 'contractor_to_delete' object.id %}" class="btn btn-danger">Пометить на удаление</a>
+        {% endif %}
     </div>
 </div>
 

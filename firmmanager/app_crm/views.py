@@ -110,6 +110,19 @@ class ContractorEditView(LoginRequiredMixin, UpdateView):
     success_url = '/crm/contractors'
 
 
+class ContractorToDeleteView(LoginRequiredMixin, TemplateView):
+    template_name = ''
+
+    def get(self, request, *args, **kwargs):
+        obj = Contractor.objects.get(pk=kwargs.get('pk'))
+        if obj:
+            if obj.to_delete:
+                obj.to_delete = False
+            else:
+                obj.to_delete = True
+            obj.save()
+            return redirect('contractor_detail', pk=kwargs.get('pk'))
+
 class ContractorContractListView(LoginRequiredMixin, TemplateView):
     template_name = 'app_crm/contractors/contractor_contracts_list.html'
 

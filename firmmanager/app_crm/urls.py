@@ -1,7 +1,7 @@
 from django.urls import path
 
 from app_crm.views import ContractorCreateView, ContractorListView, ContractorDetailView, ContractorEditView, \
-    ContractorContractListView, ContractorSpecificationListView, ContractorInvoiceListView
+    ContractorContractListView, ContractorSpecificationListView, ContractorInvoiceListView, ContractorToDeleteView
 
 urlpatterns = [
     path('contractors', ContractorListView.as_view(), name='contractors_list'),
@@ -14,4 +14,5 @@ urlpatterns = [
          name='contractor_specifications_list'),
     path('contractors/<int:contractor_id>/invoices', ContractorInvoiceListView.as_view(),
          name='contractor_invoices_list'),
+    path('contractors/<int:pk>/to-delete/', ContractorToDeleteView.as_view(), name='contractor_to_delete'),
 ]

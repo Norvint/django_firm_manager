@@ -62,6 +62,7 @@ class Contract(models.Model):
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, verbose_name='Организация поставщик')
     delivery_address = models.CharField('Место поставки', max_length=50)
     currency = models.ForeignKey(Currency, on_delete=models.CASCADE, verbose_name='Валюта')
+    to_delete = models.BooleanField('К удалению', default=False)
 
     class Meta:
         verbose_name = 'Договор'
@@ -80,6 +81,7 @@ class Specification(models.Model):
     loading_place = models.CharField('Место загрузки', max_length=100)
     payment_conditions = models.ForeignKey(PaymentConditions, on_delete=models.CASCADE,
                                            verbose_name='Условия оплаты')
+    to_delete = models.BooleanField('К удалению', default=False)
 
     class Meta:
         verbose_name = 'Спецификация'
@@ -94,6 +96,7 @@ class Invoice(models.Model):
     created = models.DateField(auto_now_add=True)
     specification = models.ForeignKey(Specification, on_delete=models.CASCADE, verbose_name='Спецификация')
     shipment_mark = models.CharField('Отгрузочная метка', max_length=100)
+    to_delete = models.BooleanField('К удалению', default=False)
 
     class Meta:
         verbose_name = 'Инвойс'
