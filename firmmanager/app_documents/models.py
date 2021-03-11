@@ -39,7 +39,7 @@ class DeliveryConditions(models.Model):
         verbose_name_plural = 'Условия поставки'
 
     def __str__(self):
-        return f'{self.pk}. {self.title}, срок поставки {self.delivery_time} дней'
+        return f'{self.title}, срок поставки {self.delivery_time} дней'
 
 
 class PaymentConditions(models.Model):
@@ -69,7 +69,7 @@ class Contract(models.Model):
         verbose_name_plural = 'Договоры'
 
     def __str__(self):
-        return f'Договор #{self.pk} - {self.contractor}'
+        return f'{self.pk} - {self.contractor}'
 
 
 class Specification(models.Model):

@@ -2,6 +2,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import formset_factory
 from django.shortcuts import redirect
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, TemplateView
+from django.views.generic.base import View
 
 from app_crm.forms import ContractorFilterForm, ContractorCommentForm, ContractorForm, ContractorContactForm
 from app_crm.models import Contractor, ContractorComment, ContractorContact
@@ -106,12 +107,11 @@ class ContractorEditView(LoginRequiredMixin, UpdateView):
     template_name = 'app_crm/contractors/contractor_edit.html'
     model = Contractor
     fields = ['title', 'status', 'type_of_contractor', 'field_of_activity', 'position', 'appeal', 'name', 'second_name',
-              'last_name', 'country', 'phone', 'email', 'requisites']
+              'last_name', 'country', 'requisites']
     success_url = '/crm/contractors'
 
 
-class ContractorToDeleteView(LoginRequiredMixin, TemplateView):
-    template_name = ''
+class ContractorToDeleteView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         obj = Contractor.objects.get(pk=kwargs.get('pk'))
@@ -122,6 +122,7 @@ class ContractorToDeleteView(LoginRequiredMixin, TemplateView):
                 obj.to_delete = True
             obj.save()
             return redirect('contractor_detail', pk=kwargs.get('pk'))
+
 
 class ContractorContractListView(LoginRequiredMixin, TemplateView):
     template_name = 'app_crm/contractors/contractor_contracts_list.html'
