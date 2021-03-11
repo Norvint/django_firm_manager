@@ -30,25 +30,42 @@
 <a href="{% url 'contractor_create' %}" class="btn btn-primary mb-3">Добавить контрагента</a>
 
 {% if clients_list %}
-    <div class="row">
+<div class="row">
     {% for contractor in clients_list %}
-        <div class="mb-5 col-4">
-            <div class="card">
-              <div class="card-body">
+    <div class="mb-5 col-4">
+        {% if contractor.to_delete %}
+        <div class="card text-white bg-secondary">
+            <div class="card-body">
                 <h5 class="card-title">{{ contractor.title }}</h5>
-              </div>
-              <ul class="list-group list-group-flush">
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item bg-secondary">Должность: {{ contractor.position }}</li>
+                <li class="list-group-item bg-secondary">Имя: {{ contractor.name }}</li>
+                <li class="list-group-item bg-secondary">Фамилия: {{ contractor.last_name }}</li>
+                <li class="list-group-item bg-secondary">Страна: {{ contractor.country }}</li>
+            </ul>
+            <div class="card-body">
+                <a href="{% url 'contractor_detail' contractor.id %}" class="btn btn-primary">Открыть</a>
+            </div>
+        </div>
+        {% else %}
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">{{ contractor.title }}</h5>
+            </div>
+            <ul class="list-group list-group-flush">
                 <li class="list-group-item">Должность: {{ contractor.position }}</li>
                 <li class="list-group-item">Имя: {{ contractor.name }}</li>
                 <li class="list-group-item">Фамилия: {{ contractor.last_name }}</li>
                 <li class="list-group-item">Страна: {{ contractor.country }}</li>
-              </ul>
-              <div class="card-body">
+            </ul>
+            <div class="card-body">
                 <a href="{% url 'contractor_detail' contractor.id %}" class="btn btn-primary">Открыть</a>
-              </div>
             </div>
         </div>
-    {% endfor %}
+        {% endif %}
     </div>
+    {% endfor %}
+</div>
 {% endif %}
 {% endblock %}

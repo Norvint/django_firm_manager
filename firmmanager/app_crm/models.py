@@ -50,6 +50,7 @@ class Contractor(models.Model):
     last_name = models.CharField('Фамилия', max_length=30)
     country = models.CharField('Страна', max_length=30)
     requisites = models.TextField('Реквизиты', max_length=500)
+    to_delete = models.BooleanField('К удалению', default=False)
 
     class Meta:
         verbose_name = 'Контрагент'

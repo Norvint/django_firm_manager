@@ -98,6 +98,19 @@ class ContractDetailView(LoginRequiredMixin, DetailView):
         return self.render_to_response(context)
 
 
+class ContractToDeleteView(LoginRequiredMixin, View):
+
+    def get(self, request, *args, **kwargs):
+        obj = Contract.objects.get(pk=kwargs.get('pk'))
+        if obj:
+            if obj.to_delete:
+                obj.to_delete = False
+            else:
+                obj.to_delete = True
+            obj.save()
+            return redirect('contract_detail', pk=kwargs.get('pk'))
+
+
 def download_contract(request):
     fl_path = os.path.join(BASE_DIR, 'static', 'app_documents', 'layouts', 'contract.docx')
     filename = 'contract.docx'
@@ -218,6 +231,19 @@ class SpecificationDetailView(LoginRequiredMixin, DetailView):
         specification_creator.create_specification()
         context['file'] = True
         return self.render_to_response(context)
+
+
+class SpecificationToDeleteView(LoginRequiredMixin, View):
+
+    def get(self, request, *args, **kwargs):
+        obj = Specification.objects.get(pk=kwargs.get('pk'))
+        if obj:
+            if obj.to_delete:
+                obj.to_delete = False
+            else:
+                obj.to_delete = True
+            obj.save()
+            return redirect('specification_detail', pk=kwargs.get('pk'))
 
 
 def download_specification(request):
@@ -384,6 +410,19 @@ class InvoiceDetailView(LoginRequiredMixin, DetailView):
         specification_creator.create_invoice()
         context['file'] = True
         return self.render_to_response(context)
+
+
+class InvoiceToDeleteView(LoginRequiredMixin, View):
+
+    def get(self, request, *args, **kwargs):
+        obj = Invoice.objects.get(pk=kwargs.get('pk'))
+        if obj:
+            if obj.to_delete:
+                obj.to_delete = False
+            else:
+                obj.to_delete = True
+            obj.save()
+            return redirect('invoice_detail', pk=kwargs.get('pk'))
 
 
 def download_invoice(request):
