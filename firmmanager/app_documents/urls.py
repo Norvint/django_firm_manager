@@ -5,7 +5,8 @@ from app_documents.views import DeliveryConditionsDetailView, DeliveryConditions
     ContractTypeDetailView, ContractTypeListView, CurrencyDetailView, CurrencyListView, download_contract, \
     SpecificationCreateView, SpecificationBookingCreateView, SpecificationDetailView, SpecificationListView, \
     PaymentConditionsListView, download_specification, InvoiceCreateView, InvoiceDetailView, InvoiceListView, \
-    download_invoice, SpecificationBookingDeleteView, SpecificationBookingEditView
+    download_invoice, SpecificationBookingDeleteView, SpecificationBookingEditView, ContractToDeleteView, \
+    SpecificationToDeleteView, InvoiceToDeleteView
 
 # contracts
 urlpatterns = [
@@ -18,6 +19,7 @@ urlpatterns = [
     path('contracts/currencies/', CurrencyListView.as_view(), name='currencies_list'),
     path('contracts/currencies/<int:pk>', CurrencyDetailView.as_view(),
          name='currency_detail'),
+    path('contracts/<int:pk>/to-delete/', ContractToDeleteView.as_view(), name='contract_to_delete'),
 ]
 
 # specification
@@ -31,12 +33,13 @@ urlpatterns += [
     path('specifications/delivery-conditions/<int:pk>', DeliveryConditionsDetailView.as_view(),
          name='delivery_condition_detail'),
     path('specifications/payment-conditions', PaymentConditionsListView.as_view(), name='payment_conditions_list'),
-    path('specifications/<int:specification_id>/create-booking', SpecificationBookingCreateView.as_view(),
+    path('specifications/bookings/<int:specification_id>/create', SpecificationBookingCreateView.as_view(),
          name='specification_booking'),
-    path('specifications/delete_booking/<int:specification_booking_id>', SpecificationBookingDeleteView.as_view(),
+    path('specifications/bookings/<int:specification_booking_id>/delete', SpecificationBookingDeleteView.as_view(),
          name='specification_booking_delete'),
-path('specifications/edit_booking/<int:specification_booking_id>', SpecificationBookingEditView.as_view(),
-         name='specification_booking_edit')
+    path('specifications/bookings/<int:specification_booking_id>/edit', SpecificationBookingEditView.as_view(),
+         name='specification_booking_edit'),
+    path('specifications/<int:pk>/to-delete/', SpecificationToDeleteView.as_view(), name='specification_to_delete'),
 ]
 
 # invoices
@@ -45,4 +48,5 @@ urlpatterns += [
     path('invoices/create-invoice/<int:specification_id>', InvoiceCreateView.as_view(), name='invoice_create'),
     path('invoices/<int:pk>', InvoiceDetailView.as_view(), name='invoice_detail'),
     path('invoices/download-invoice/', download_invoice, name='download_invoice'),
+    path('invoices/<int:pk>/to-delete/', InvoiceToDeleteView.as_view(), name='invoice_to_delete'),
 ]

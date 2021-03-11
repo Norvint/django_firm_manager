@@ -10,7 +10,8 @@
     </li>
 
     <li class="col-2">
-        <a href="{% url 'contractor_specifications_list' contractor_id %}" class="btn btn-primary col-11">Спецификации</a>
+        <a href="{% url 'contractor_specifications_list' contractor_id %}"
+           class="btn btn-primary col-11">Спецификации</a>
     </li>
 
     <li class="col-2">
@@ -25,6 +26,22 @@
 {% if contracts %}
 <div class="row">
     {% for contract in contracts %}
+    {% if contract.to_delete %}
+    <div class="mb-5 col-4">
+        <div class="card text-white bg-secondary">
+            <div class="card-body">
+                <h5 class="card-title">{{ contract.contractor }}</h5>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item bg-secondary">Номер: {{ contract.number }}</li>
+                <li class="list-group-item bg-secondary">Дата создания: {{ contract.created }}</li>
+            </ul>
+            <div class="card-body">
+                <a href="{% url 'contract_detail' contract.id %}" class="btn btn-primary">Открыть</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
     <div class="mb-5 col-4">
         <div class="card">
             <div class="card-body">
@@ -39,6 +56,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
     {% endfor %}
 </div>
 {% endif %}

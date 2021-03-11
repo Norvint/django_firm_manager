@@ -141,7 +141,6 @@ class InvoiceCreator:
                         'name': self.invoice.specification.contract.contractor.name,
                         'last_name': self.invoice.specification.contract.contractor.last_name,
                         'address': self.invoice.specification.contract.contractor.country,
-                        'phone': self.invoice.specification.contract.contractor.phone
                     },
                     'organization': {
                         'title': self.invoice.specification.contract.organization.title,

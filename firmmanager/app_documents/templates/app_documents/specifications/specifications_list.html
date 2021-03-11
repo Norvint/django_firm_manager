@@ -49,6 +49,24 @@
 {% if specifications %}
 <div class="row">
     {% for specification in specifications %}
+    {% if specification.to_delete %}
+    <div class="mb-5 col-4">
+        <div class="card text-white bg-secondary">
+            <div class="card-body">
+                <h5 class="card-title">Спецификация №{{ specification.number }}</h5>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item bg-secondary">Договор: {{ specification.contract }}</li>
+            </ul>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item bg-secondary">Клиент: {{ specification.contract.contractor }}</li>
+            </ul>
+            <div class="card-body">
+                <a href="{% url 'specification_detail' specification.id %}" class="btn btn-primary">Открыть</a>
+            </div>
+        </div>
+    </div>
+    {% else %}
     <div class="mb-5 col-4">
         <div class="card">
             <div class="card-body">
@@ -65,6 +83,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
     {% endfor %}
 </div>
 {% endif %}

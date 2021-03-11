@@ -98,6 +98,19 @@ class ContractDetailView(LoginRequiredMixin, DetailView):
         return self.render_to_response(context)
 
 
+class ContractToDeleteView(LoginRequiredMixin, View):
+
+    def get(self, request, *args, **kwargs):
+        obj = Contract.objects.get(pk=kwargs.get('pk'))
+        if obj:
+            if obj.to_delete:
+                obj.to_delete = False
+            else:
+                obj.to_delete = True
+            obj.save()
+            return redirect('contract_detail', pk=kwargs.get('pk'))
+
+
 def download_contract(request):
     fl_path = os.path.join(BASE_DIR, 'static', 'app_documents', 'layouts', 'contract.docx')
     filename = 'contract.docx'
@@ -220,6 +233,19 @@ class SpecificationDetailView(LoginRequiredMixin, DetailView):
         return self.render_to_response(context)
 
 
+class SpecificationToDeleteView(LoginRequiredMixin, View):
+
+    def get(self, request, *args, **kwargs):
+        obj = Specification.objects.get(pk=kwargs.get('pk'))
+        if obj:
+            if obj.to_delete:
+                obj.to_delete = False
+            else:
+                obj.to_delete = True
+            obj.save()
+            return redirect('specification_detail', pk=kwargs.get('pk'))
+
+
 def download_specification(request):
     fl_path = os.path.join(BASE_DIR, 'static', 'app_documents', 'layouts', 'specification.docx')
     filename = 'specification.docx'
@@ -235,8 +261,8 @@ class SpecificationBookingCreateView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(SpecificationBookingCreateView, self).get_context_data(**kwargs)
-        ProductStoreBookFormSet = formset_factory(SpecificationBookingForm, extra=0)
-        formset = ProductStoreBookFormSet(initial=[{
+        product_store_book_form_set = formset_factory(SpecificationBookingForm, extra=0)
+        formset = product_store_book_form_set(initial=[{
             'specification': kwargs.get('specification_id')
         }])
         context['formset'] = formset
@@ -245,12 +271,11 @@ class SpecificationBookingCreateView(LoginRequiredMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
-        ProductStoreBookFormSet = formset_factory(SpecificationBookingForm)
-        formset = ProductStoreBookFormSet(request.POST)
+        product_store_book_form_set = formset_factory(SpecificationBookingForm)
+        formset = product_store_book_form_set(request.POST)
         if formset.is_valid():
             for i, form in enumerate(formset):
                 data = formset.cleaned_data[i]
-                print(data)
                 if form.is_valid() and data:
                     products_on_store = ProductStore.objects.filter(product=data['product'], store=data['store'])
                     for product_on_store in products_on_store:
@@ -263,6 +288,7 @@ class SpecificationBookingCreateView(LoginRequiredMixin, TemplateView):
             context['formset'] = formset
             context['errors'] = formset.errors
         return self.render_to_response(context)
+
 
 class SpecificationBookingDeleteView(LoginRequiredMixin, DeleteView):
 
@@ -384,6 +410,19 @@ class InvoiceDetailView(LoginRequiredMixin, DetailView):
         specification_creator.create_invoice()
         context['file'] = True
         return self.render_to_response(context)
+
+
+class InvoiceToDeleteView(LoginRequiredMixin, View):
+
+    def get(self, request, *args, **kwargs):
+        obj = Invoice.objects.get(pk=kwargs.get('pk'))
+        if obj:
+            if obj.to_delete:
+                obj.to_delete = False
+            else:
+                obj.to_delete = True
+            obj.save()
+            return redirect('invoice_detail', pk=kwargs.get('pk'))
 
 
 def download_invoice(request):

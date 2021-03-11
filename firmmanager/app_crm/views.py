@@ -1,8 +1,11 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.forms import formset_factory
+from django.shortcuts import redirect
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, TemplateView
+from django.views.generic.base import View
 
-from app_crm.forms import ContractorFilterForm, ContractorCommentForm
-from app_crm.models import Contractor, ContractorComment
+from app_crm.forms import ContractorFilterForm, ContractorCommentForm, ContractorForm, ContractorContactForm
+from app_crm.models import Contractor, ContractorComment, ContractorContact
 from app_documents.models import Contract, Specification, Invoice
 
 
@@ -42,6 +45,8 @@ class ContractorDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(ContractorDetailView, self).get_context_data(**kwargs)
         comments = ContractorComment.objects.filter(contractor=self.get_object()).order_by('-created')
+        contacts = ContractorContact.objects.filter(contractor=self.get_object())
+        context['contacts'] = contacts
         context['comments'] = comments
         comment_form = ContractorCommentForm()
         context['comment_form'] = comment_form
@@ -62,20 +67,61 @@ class ContractorDetailView(LoginRequiredMixin, DetailView):
         return self.render_to_response(context)
 
 
-class ContractorCreateView(LoginRequiredMixin, CreateView):
+class ContractorCreateView(LoginRequiredMixin, TemplateView):
     template_name = 'app_crm/contractors/contractor_create.html'
-    model = Contractor
-    fields = ['title', 'status', 'type_of_contractor', 'field_of_activity', 'position', 'appeal', 'name', 'second_name',
-              'last_name', 'country', 'phone', 'email', 'requisites']
-    success_url = '/crm/contractors'
+
+    def get_context_data(self, **kwargs):
+        context = super(ContractorCreateView, self).get_context_data(**kwargs)
+        form = ContractorForm()
+        formset = formset_factory(ContractorContactForm)
+        context['formset'] = formset
+        context['form'] = form
+        return context
+
+    def post(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        form = ContractorForm(request.POST)
+        contacts_formset = formset_factory(ContractorContactForm)
+        formset = contacts_formset(request.POST)
+        if form.is_valid():
+            if formset.is_valid():
+                contractor = form.save()
+                for i, form in enumerate(formset):
+                    data = formset.cleaned_data[i]
+                    print(data)
+                    if form.is_valid() and data:
+                        print(data)
+                        contact = ContractorContact(contractor=contractor, type_of_contact=data['type_of_contact'],
+                                                    contact=data['contact'], contact_name=data['contact_name'])
+                        contact.save()
+                return redirect('contractor_detail', pk=contractor.pk)
+            else:
+                context['formset'] = formset
+                context['errors'] = formset.errors
+        else:
+            context['form'] = form
+            return self.render_to_response(context)
 
 
 class ContractorEditView(LoginRequiredMixin, UpdateView):
     template_name = 'app_crm/contractors/contractor_edit.html'
     model = Contractor
     fields = ['title', 'status', 'type_of_contractor', 'field_of_activity', 'position', 'appeal', 'name', 'second_name',
-              'last_name', 'country', 'phone', 'email', 'requisites']
+              'last_name', 'country', 'requisites']
     success_url = '/crm/contractors'
+
+
+class ContractorToDeleteView(LoginRequiredMixin, View):
+
+    def get(self, request, *args, **kwargs):
+        obj = Contractor.objects.get(pk=kwargs.get('pk'))
+        if obj:
+            if obj.to_delete:
+                obj.to_delete = False
+            else:
+                obj.to_delete = True
+            obj.save()
+            return redirect('contractor_detail', pk=kwargs.get('pk'))
 
 
 class ContractorContractListView(LoginRequiredMixin, TemplateView):
