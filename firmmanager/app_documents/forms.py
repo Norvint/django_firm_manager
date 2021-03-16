@@ -1,14 +1,14 @@
 from django import forms
 
 from app_crm.models import Contractor
-from app_documents.models import Invoice, Specification, Contract
+from app_documents.models import Order, Contract
 from app_storage.models import ProductStoreBooking
 
 
-class SpecificationBookingForm(forms.ModelForm):
+class OrderBookingForm(forms.ModelForm):
     class Meta:
         model = ProductStoreBooking
-        fields = ['specification', 'product', 'store', 'quantity', 'sum']
+        fields = ['order', 'product', 'store', 'quantity', 'sum']
 
     def save(self, commit=True):
         data = self.cleaned_data
@@ -25,16 +25,11 @@ class ContractForm(forms.ModelForm):
         fields = ['number', 'type', 'contractor', 'organization', 'delivery_address', 'currency']
 
 
-class InvoiceForm(forms.ModelForm):
-    class Meta:
-        model = Invoice
-        fields = ['number', 'specification', 'shipment_mark']
 
-
-class SpecificationForm(forms.ModelForm):
+class OrderForm(forms.ModelForm):
     class Meta:
-        model = Specification
-        fields = ['number', 'contract', 'delivery_conditions', 'loading_place', 'payment_conditions']
+        model = Order
+        fields = ['number', 'contract', 'delivery_conditions', 'loading_place', 'payment_conditions', 'shipment_mark']
 
 
 class ContractFilterForm(forms.Form):
@@ -43,13 +38,7 @@ class ContractFilterForm(forms.Form):
     contractor = forms.ModelChoiceField(Contractor.objects.all(), required=False, label='Контрагент')
 
 
-class SpecificationFilterForm(forms.Form):
-    contractor = forms.ModelChoiceField(Contractor.objects.all(), required=False, label='Контрагент')
-    created_after = forms.DateField(widget=forms.DateInput, required=False, label='От')
-    created_before = forms.DateField(widget=forms.DateInput, required=False, label='До')
-
-
-class InvoiceFilterForm(forms.Form):
+class OrderFilterForm(forms.Form):
     contractor = forms.ModelChoiceField(Contractor.objects.all(), required=False, label='Контрагент')
     created_after = forms.DateField(widget=forms.DateInput, required=False, label='От')
     created_before = forms.DateField(widget=forms.DateInput, required=False, label='До')

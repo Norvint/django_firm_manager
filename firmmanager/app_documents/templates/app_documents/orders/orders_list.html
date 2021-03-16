@@ -6,7 +6,7 @@
 
 <ul class="nav nav-pills pt-2 pb-2">
   <li class="nav-item">
-    <a class="nav-link active mr-2" aria-current="page" href="{% url 'specifications_list' %}">Спецификации</a>
+    <a class="nav-link active mr-2" aria-current="page" href="{% url 'orders_list' %}">Заказы</a>
   </li>
   <li class="nav-item">
     <a class="nav-link" aria-current="page" href="{% url 'delivery_conditions_list' %}">Условия поставки</a>
@@ -43,26 +43,26 @@
     </div>
 </form>
 
-<h1>Спецификации</h1>
-<a href="{% url 'specification_create' 0 %}" class="btn btn-primary mb-3">Добавить спецификацию</a>
+<h1>Заказы</h1>
+<a href="{% url 'order_create' 0 %}" class="btn btn-primary mb-3">Добавить заказ</a>
 
-{% if specifications %}
+{% if orders %}
 <div class="row">
-    {% for specification in specifications %}
-    {% if specification.to_delete %}
+    {% for order in orders %}
+    {% if order.to_delete %}
     <div class="mb-5 col-4">
         <div class="card text-white bg-secondary">
             <div class="card-body">
-                <h5 class="card-title">Спецификация №{{ specification.number }}</h5>
+                <h5 class="card-title">Заказ №{{ order.number }}</h5>
             </div>
             <ul class="list-group list-group-flush">
-                <li class="list-group-item bg-secondary">Договор: {{ specification.contract }}</li>
+                <li class="list-group-item bg-secondary">Договор: {{ order.contract }}</li>
             </ul>
             <ul class="list-group list-group-flush">
-                <li class="list-group-item bg-secondary">Клиент: {{ specification.contract.contractor }}</li>
+                <li class="list-group-item bg-secondary">Клиент: {{ order.contract.contractor }}</li>
             </ul>
             <div class="card-body">
-                <a href="{% url 'specification_detail' specification.id %}" class="btn btn-primary">Открыть</a>
+                <a href="{% url 'order_detail' order.id %}" class="btn btn-primary">Открыть</a>
             </div>
         </div>
     </div>
@@ -70,16 +70,16 @@
     <div class="mb-5 col-4">
         <div class="card">
             <div class="card-body">
-                <h5 class="card-title">Спецификация №{{ specification.number }}</h5>
+                <h5 class="card-title">Заказ №{{ order.number }}</h5>
             </div>
             <ul class="list-group list-group-flush">
-                <li class="list-group-item">Договор: {{ specification.contract }}</li>
+                <li class="list-group-item">Договор: {{ order.contract }}</li>
             </ul>
             <ul class="list-group list-group-flush">
-                <li class="list-group-item">Клиент: {{ specification.contract.contractor }}</li>
+                <li class="list-group-item">Клиент: {{ order.contract.contractor }}</li>
             </ul>
             <div class="card-body">
-                <a href="{% url 'specification_detail' specification.id %}" class="btn btn-primary">Открыть</a>
+                <a href="{% url 'order_detail' order.id %}" class="btn btn-primary">Открыть</a>
             </div>
         </div>
     </div>

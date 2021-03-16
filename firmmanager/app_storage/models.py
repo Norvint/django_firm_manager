@@ -1,6 +1,6 @@
 from django.db import models
 
-from app_documents.models import Specification
+from app_documents.models import Order
 
 
 class ProductType(models.Model):
@@ -91,7 +91,7 @@ class ProductStoreIncome(models.Model):
 
 
 class ProductStoreBooking(models.Model):
-    specification = models.ForeignKey(Specification, on_delete=models.CASCADE, verbose_name='Спецификация')
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, verbose_name='Заказ')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Продукция')
     store = models.ForeignKey(Store, on_delete=models.CASCADE, verbose_name='Склад')
     quantity = models.IntegerField('Количество')

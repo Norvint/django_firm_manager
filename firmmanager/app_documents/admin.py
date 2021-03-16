@@ -2,8 +2,7 @@ from django.contrib import admin
 from django.forms import TextInput, Textarea
 from django.db import models
 
-from app_documents.models import Contract, ContractType, Currency, DeliveryConditions, PaymentConditions, Specification, \
-    Invoice
+from app_documents.models import Contract, ContractType, Currency, DeliveryConditions, PaymentConditions, Order
 from app_storage.models import ProductStoreBooking
 
 
@@ -14,7 +13,7 @@ class ContractAdmin(admin.ModelAdmin):
     search_fields = ('number', 'client', 'organization')
 
 
-@admin.register(Specification)
+@admin.register(Order)
 class SpecificationAdmin(admin.ModelAdmin):
     pass
 
@@ -47,8 +46,3 @@ class PaymentConditionsAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.CharField: {'widget': TextInput(attrs={'size': '150em'})},
     }
-
-
-@admin.register(Invoice)
-class InvoiceAdmin(admin.ModelAdmin):
-    pass

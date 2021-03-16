@@ -7,12 +7,11 @@ from django.forms import formset_factory
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.views import View
-from django.views.generic import CreateView, DetailView, ListView, TemplateView, DeleteView, UpdateView
+from django.views.generic import DetailView, ListView, TemplateView, DeleteView
 
-from app_documents.forms import SpecificationBookingForm, InvoiceForm, SpecificationForm, ContractFilterForm, \
-    ContractForm, SpecificationFilterForm, InvoiceFilterForm
-from app_documents.models import Contract, ContractType, Currency, DeliveryConditions, PaymentConditions, Specification, \
-    Invoice
+from app_documents.forms import OrderBookingForm, OrderForm, ContractFilterForm, \
+    ContractForm, OrderFilterForm
+from app_documents.models import Contract, ContractType, Currency, DeliveryConditions, PaymentConditions, Order
 from app_documents.utilities.docx_creator import ContractCreator, SpecificationCreator, InvoiceCreator
 from app_storage.models import ProductStore, ProductStoreBooking
 from firmmanager.settings import BASE_DIR
@@ -84,8 +83,8 @@ class ContractDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(ContractDetailView, self).get_context_data(**kwargs)
         contract = self.get_object()
-        specifications = Specification.objects.filter(contract=contract)
-        context['specifications'] = specifications
+        orders = Order.objects.filter(contract=contract)
+        context['orders'] = orders
         return context
 
     def post(self, request, *args, **kwargs):
@@ -133,13 +132,13 @@ class ContractTypeDetailView(LoginRequiredMixin, DetailView):
 
 
 class DeliveryConditionsListView(LoginRequiredMixin, ListView):
-    template_name = 'app_documents/specifications/delivery_conditions_list.html'
+    template_name = 'app_documents/orders/delivery_conditions_list.html'
     queryset = DeliveryConditions.objects.all()
     context_object_name = 'delivery_conditions'
 
 
 class DeliveryConditionsDetailView(LoginRequiredMixin, DetailView):
-    template_name = 'app_documents/specifications/delivery_condition_detail.html'
+    template_name = 'app_documents/orders/delivery_condition_detail.html'
     model = DeliveryConditions
 
 
@@ -155,24 +154,24 @@ class CurrencyDetailView(LoginRequiredMixin, DetailView):
 
 
 class PaymentConditionsListView(LoginRequiredMixin, ListView):
-    template_name = 'app_documents/specifications/payment_conditions_list.html'
+    template_name = 'app_documents/orders/payment_conditions_list.html'
     queryset = PaymentConditions.objects.all()
     context_object_name = 'payment_conditions'
 
 
-class SpecificationListView(LoginRequiredMixin, ListView):
-    template_name = 'app_documents/specifications/specifications_list.html'
-    queryset = Specification.objects.all()
-    context_object_name = 'specifications'
+class OrderListView(LoginRequiredMixin, ListView):
+    template_name = 'app_documents/orders/orders_list.html'
+    queryset = Order.objects.all()
+    context_object_name = 'orders'
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        context = super(SpecificationListView, self).get_context_data()
-        filter_data = SpecificationFilterForm()
+        context = super(OrderListView, self).get_context_data()
+        filter_data = OrderFilterForm()
         context['filter'] = filter_data
         return context
 
     def post(self, request, *args, **kwargs):
-        filter_data = SpecificationFilterForm(request.POST)
+        filter_data = OrderFilterForm(request.POST)
         self.object_list = self.get_queryset()
         if filter_data.is_valid():
             contractor = filter_data.cleaned_data['contractor']
@@ -189,39 +188,37 @@ class SpecificationListView(LoginRequiredMixin, ListView):
         return self.render_to_response(context)
 
 
-class SpecificationCreateView(LoginRequiredMixin, TemplateView):
-    template_name = 'app_documents/specifications/specification_create.html'
+class OrderCreateView(LoginRequiredMixin, TemplateView):
+    template_name = 'app_documents/orders/order_create.html'
 
     def get_context_data(self, **kwargs):
-        context = super(SpecificationCreateView, self).get_context_data(**kwargs)
-        number = len(Specification.objects.filter(contract=kwargs.get('contract_id'))) + 1
-        specification_form = SpecificationForm(initial={'number': number, 'contract': kwargs.get('contract_id')})
-        context['form'] = specification_form
+        context = super(OrderCreateView, self).get_context_data(**kwargs)
+        number = len(Order.objects.filter(contract=kwargs.get('contract_id'))) + 1
+        order_form = OrderForm(initial={'number': number, 'contract': kwargs.get('contract_id')})
+        context['form'] = order_form
         return context
 
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
-        specification_form = SpecificationForm(request.POST)
-        if specification_form.is_valid():
-            specification_form.save()
-            return redirect('specifications_list')
+        order_form = OrderForm(request.POST)
+        if order_form.is_valid():
+            order_form.save()
+            return redirect('orders_list')
         else:
-            context['form'] = specification_form
-            context['errors'] = specification_form.errors
+            context['form'] = order_form
+            context['errors'] = order_form.errors
         return self.render_to_response(context)
 
 
-class SpecificationDetailView(LoginRequiredMixin, DetailView):
-    template_name = 'app_documents/specifications/specification_detail.html'
-    model = Specification
+class OrderDetailView(LoginRequiredMixin, DetailView):
+    template_name = 'app_documents/orders/order_detail.html'
+    model = Order
 
     def get_context_data(self, **kwargs):
-        context = super(SpecificationDetailView, self).get_context_data(**kwargs)
-        specification = self.get_object()
-        specification_booking = ProductStoreBooking.objects.filter(specification=specification)
-        context['specification_booking'] = specification_booking
-        invoices = Invoice.objects.filter(specification=specification)
-        context['invoices'] = invoices
+        context = super(OrderDetailView, self).get_context_data(**kwargs)
+        order = self.get_object()
+        order_booking = ProductStoreBooking.objects.filter(order=order)
+        context['order_booking'] = order_booking
         return context
 
     def post(self, request, *args, **kwargs):
@@ -229,21 +226,23 @@ class SpecificationDetailView(LoginRequiredMixin, DetailView):
         context = self.get_context_data()
         specification_creator = SpecificationCreator(self.object)
         specification_creator.create_specification()
+        invoice_creator = InvoiceCreator(self.object)
+        invoice_creator.create_invoice()
         context['file'] = True
         return self.render_to_response(context)
 
 
-class SpecificationToDeleteView(LoginRequiredMixin, View):
+class OrderToDeleteView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
-        obj = Specification.objects.get(pk=kwargs.get('pk'))
+        obj = Order.objects.get(pk=kwargs.get('pk'))
         if obj:
             if obj.to_delete:
                 obj.to_delete = False
             else:
                 obj.to_delete = True
             obj.save()
-            return redirect('specification_detail', pk=kwargs.get('pk'))
+            return redirect('order_detail', pk=kwargs.get('pk'))
 
 
 def download_specification(request):
@@ -256,14 +255,14 @@ def download_specification(request):
     return response
 
 
-class SpecificationBookingCreateView(LoginRequiredMixin, TemplateView):
-    template_name = 'app_documents/specifications/specification_booking.html'
+class OrderBookingCreateView(LoginRequiredMixin, TemplateView):
+    template_name = 'app_documents/orders/order_booking.html'
 
     def get_context_data(self, **kwargs):
-        context = super(SpecificationBookingCreateView, self).get_context_data(**kwargs)
-        product_store_book_form_set = formset_factory(SpecificationBookingForm, extra=0)
+        context = super(OrderBookingCreateView, self).get_context_data(**kwargs)
+        product_store_book_form_set = formset_factory(OrderBookingForm, extra=0)
         formset = product_store_book_form_set(initial=[{
-            'specification': kwargs.get('specification_id')
+            'order': kwargs.get('order_id')
         }])
         context['formset'] = formset
         context['answer'] = kwargs
@@ -271,7 +270,7 @@ class SpecificationBookingCreateView(LoginRequiredMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
-        product_store_book_form_set = formset_factory(SpecificationBookingForm)
+        product_store_book_form_set = formset_factory(OrderBookingForm)
         formset = product_store_book_form_set(request.POST)
         if formset.is_valid():
             for i, form in enumerate(formset):
@@ -283,45 +282,45 @@ class SpecificationBookingCreateView(LoginRequiredMixin, TemplateView):
                         product_on_store.booked += data['quantity']
                         product_on_store.save()
                     form.save()
-            return redirect('specification_detail', pk=kwargs.get('specification_id'))
+            return redirect('order_detail', pk=kwargs.get('order_id'))
         else:
             context['formset'] = formset
             context['errors'] = formset.errors
         return self.render_to_response(context)
 
 
-class SpecificationBookingDeleteView(LoginRequiredMixin, DeleteView):
+class OrderBookingDeleteView(LoginRequiredMixin, DeleteView):
 
     def get(self, request, *args, **kwargs):
-        obj = ProductStoreBooking.objects.get(pk=kwargs.get('specification_booking_id'))
+        obj = ProductStoreBooking.objects.get(pk=kwargs.get('order_booking_id'))
         if obj:
             product_on_store = ProductStore.objects.get(product=obj.product, store=obj.store)
             product_on_store.booked -= obj.quantity
             product_on_store.quantity += obj.quantity
             product_on_store.save()
             obj.delete()
-            return redirect('specification_detail', pk=obj.specification.pk)
+            return redirect('order_detail', pk=obj.order.pk)
 
 
-class SpecificationBookingEditView(LoginRequiredMixin, TemplateView):
-    template_name = 'app_documents/specifications/specification_booking_edit.html'
+class OrderBookingEditView(LoginRequiredMixin, TemplateView):
+    template_name = 'app_documents/orders/order_booking_edit.html'
 
     def get_context_data(self, **kwargs):
-        context = super(SpecificationBookingEditView, self).get_context_data(**kwargs)
-        object = ProductStoreBooking.objects.get(pk=kwargs.get('specification_booking_id'))
-        form = SpecificationBookingForm(initial={'specification': object.specification,
-                                                 'product': object.product,
-                                                 'store': object.store,
-                                                 'quantity': object.quantity,
-                                                 'sum': object.sum}
-                                        )
+        context = super(OrderBookingEditView, self).get_context_data(**kwargs)
+        object = ProductStoreBooking.objects.get(pk=kwargs.get('order_booking_id'))
+        form = OrderBookingForm(initial={'order': object.order,
+                                         'product': object.product,
+                                         'store': object.store,
+                                         'quantity': object.quantity,
+                                         'sum': object.sum}
+                                )
         context['form'] = form
         return context
 
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
-        form = SpecificationBookingForm(request.POST)
-        product_booking =  ProductStoreBooking.objects.get(pk=kwargs.get('specification_booking_id'))
+        form = OrderBookingForm(request.POST)
+        product_booking = ProductStoreBooking.objects.get(pk=kwargs.get('order_booking_id'))
         if form.is_valid():
             data = form.cleaned_data
             product_on_store = ProductStore.objects.get(product=product_booking.product, store=product_booking.store)
@@ -331,98 +330,15 @@ class SpecificationBookingEditView(LoginRequiredMixin, TemplateView):
             product_on_store.booked += data['quantity']
             product_on_store.save()
             product_booking.product = data['product']
-            product_booking.specification = data['specification']
+            product_booking.order = data['order']
             product_booking.store = data['store']
             product_booking.quantity = data['quantity']
             product_booking.sum = product_booking.product.cost * product_booking.quantity
             product_booking.save()
-            return redirect('specification_detail', pk=product_booking.specification.pk)
+            return redirect('order_detail', pk=product_booking.order.pk)
         else:
             context['errors'] = form.errors
         return self.render_to_response(context)
-
-
-class InvoiceCreateView(LoginRequiredMixin, TemplateView):
-    template_name = 'app_documents/invoices/invoice_create.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(InvoiceCreateView, self).get_context_data(**kwargs)
-        try:
-            specification = Specification.objects.get(id=kwargs.get('specification_id'))
-            invoice_form = InvoiceForm(
-                initial={'number': specification.number, 'specification': kwargs.get('specification_id')})
-        except Specification.DoesNotExist:
-            invoice_form = InvoiceForm()
-        context['form'] = invoice_form
-        context['specification_id'] = kwargs.get('specification_id')
-        context['answer'] = kwargs
-        return context
-
-    def post(self, request, *args, **kwargs):
-        context = self.get_context_data(**kwargs)
-        invoice_form = InvoiceForm(request.POST)
-        if invoice_form.is_valid():
-            invoice_form.save()
-            return redirect('invoices_list')
-        else:
-            context['form'] = invoice_form
-            context['errors'] = invoice_form.errors
-        return self.render_to_response(context)
-
-
-class InvoiceListView(LoginRequiredMixin, ListView):
-    template_name = 'app_documents/invoices/invoices_list.html'
-    queryset = Invoice.objects.all()
-    context_object_name = 'invoices'
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super(InvoiceListView, self).get_context_data()
-        filter_data = InvoiceFilterForm()
-        context['filter'] = filter_data
-        return context
-
-    def post(self, request, *args, **kwargs):
-        filter_data = InvoiceFilterForm(request.POST)
-        self.object_list = self.get_queryset()
-        if filter_data.is_valid():
-            contractor = filter_data.cleaned_data['contractor']
-            created_before = filter_data.cleaned_data['created_before']
-            created_after = filter_data.cleaned_data['created_after']
-            if contractor:
-                self.object_list = self.object_list.filter(specification__contract__contractor=contractor)
-            if created_after:
-                self.object_list = self.object_list.filter(created__gt=created_after)
-            if created_before:
-                self.object_list = self.object_list.filter(created__lt=created_before)
-        context = self.get_context_data()
-        context['filter'] = filter_data
-        return self.render_to_response(context)
-
-
-class InvoiceDetailView(LoginRequiredMixin, DetailView):
-    template_name = 'app_documents/invoices/invoice_detail.html'
-    model = Invoice
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        context = self.get_context_data()
-        specification_creator = InvoiceCreator(self.object)
-        specification_creator.create_invoice()
-        context['file'] = True
-        return self.render_to_response(context)
-
-
-class InvoiceToDeleteView(LoginRequiredMixin, View):
-
-    def get(self, request, *args, **kwargs):
-        obj = Invoice.objects.get(pk=kwargs.get('pk'))
-        if obj:
-            if obj.to_delete:
-                obj.to_delete = False
-            else:
-                obj.to_delete = True
-            obj.save()
-            return redirect('invoice_detail', pk=kwargs.get('pk'))
 
 
 def download_invoice(request):
