@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import os
 from pathlib import Path
 
-from firmmanager.local_settings import LOCAL_ALLOWED_HOSTS, LOCAL_KEY
+from firmmanager.local_settings import LOCAL_ALLOWED_HOSTS, LOCAL_KEY, LOCAL_DATABASE
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -88,10 +88,7 @@ WSGI_APPLICATION = 'firmmanager.wsgi.application'
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': LOCAL_DATABASE
 }
 
 
