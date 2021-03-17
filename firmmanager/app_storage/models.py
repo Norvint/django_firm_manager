@@ -48,6 +48,7 @@ class Product(models.Model):
     packing_outside = models.ForeignKey(PackageOutsideType, on_delete=models.CASCADE, verbose_name='Внешнняя упаковка')
     country = models.CharField('Страна', max_length=50)
     cost = models.DecimalField('Цена за 1 ед. в рублях', decimal_places=2, max_digits=15)
+    description = models.TextField('Описание', max_length=800, blank=True)
 
     class Meta:
         verbose_name = 'Продукция'
