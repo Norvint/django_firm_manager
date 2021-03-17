@@ -24,7 +24,7 @@ class ContractorForm(forms.ModelForm):
     class Meta:
         model = Contractor
         fields = ['title', 'status', 'type_of_contractor', 'field_of_activity', 'position', 'appeal', 'name',
-                  'second_name', 'last_name', 'country', 'requisites']
+                  'second_name', 'last_name', 'country', 'legal_address', 'actual_address', 'requisites']
         widgets = {
             'requisites': forms.Textarea(attrs={'rows': 3, 'cols': 20}),
         }
