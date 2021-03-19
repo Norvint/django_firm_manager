@@ -1,9 +1,16 @@
+import mimetypes
+import os
+from wsgiref.util import FileWrapper
+
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponse
 from django.shortcuts import redirect
+from django.utils.encoding import smart_str
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, TemplateView
 
-from app_organizations.forms import WorkerForm
-from app_organizations.models import Organization, Bank, Worker
+from app_organizations.forms import WorkerForm, OrganizationFileForm
+from app_organizations.models import Organization, Bank, Worker, OrganizationFile
+from firmmanager import settings
 
 
 class OrganizationCreateView(LoginRequiredMixin, CreateView):
@@ -22,6 +29,55 @@ class OrganizationListView(LoginRequiredMixin, ListView):
 class OrganizationDetailView(LoginRequiredMixin, DetailView):
     template_name = 'app_organizations/organization_detail.html'
     model = Organization
+
+
+class OrganizationFileList(LoginRequiredMixin, TemplateView):
+    template_name = 'app_organizations/organization_files.html'
+
+    def get_context_data(self,  **kwargs):
+        context = super(OrganizationFileList, self).get_context_data(**kwargs)
+        organization = Organization.objects.get(pk=kwargs.get('pk'))
+        files = OrganizationFile.objects.all().filter(organization=organization)
+        context['files'] = files
+        context['organization'] = organization
+        return context
+
+    def post(self, request, *args, **kwargs):
+        pass
+
+
+class OrganizationFileCreate(LoginRequiredMixin, TemplateView):
+    template_name = 'app_organizations/organization_file_create.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(OrganizationFileCreate, self).get_context_data(**kwargs)
+        organization = Organization.objects.get(pk=kwargs.get('pk'))
+        form = OrganizationFileForm(initial={'organization': organization})
+        context['form'] = form
+        return context
+
+    def post(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        form = OrganizationFileForm(request.POST, request.FILES)
+        print(request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('organization_files_list', kwargs.get('pk'))
+        else:
+            context['form'] = form
+            context['errors'] = form.errors
+        return self.render_to_response(context)
+
+
+def download_organization_file(request, **kwargs):
+    file_object = OrganizationFile.objects.get(pk=kwargs.get('pk'))
+    file = file_object.file
+    fl_path = os.path.join(settings.MEDIA_ROOT, 'app_organizations', 'organization_files', file.name)
+    fl = open(fl_path, 'rb')
+    mime_type, _ = mimetypes.guess_type(fl_path)
+    response = HttpResponse(fl, content_type=mime_type)
+    response['Content-Disposition'] = "attachment; filename=%s" % file.name
+    return response
 
 
 class BankListView(LoginRequiredMixin, ListView):

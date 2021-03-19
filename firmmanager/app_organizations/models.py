@@ -83,3 +83,6 @@ class OrganizationFile(models.Model):
     class Meta:
         verbose_name = 'Файл'
         verbose_name_plural = 'Файлы'
+
+    def __str__(self):
+        return self.title
