@@ -72,8 +72,8 @@ class Contract(models.Model):
         return f'{self.pk} - {self.contractor}'
 
 
-class Specification(models.Model):
-    number = models.CharField('Номер спецификации', max_length=30, blank=True)
+class Order(models.Model):
+    number = models.CharField('Номер заказа', max_length=30, blank=True)
     contract = models.ForeignKey(Contract, on_delete=models.CASCADE, verbose_name='Договор')
     created = models.DateField(auto_now_add=True)
     delivery_conditions = models.ForeignKey(DeliveryConditions, on_delete=models.CASCADE,
@@ -81,26 +81,12 @@ class Specification(models.Model):
     loading_place = models.CharField('Место загрузки', max_length=100)
     payment_conditions = models.ForeignKey(PaymentConditions, on_delete=models.CASCADE,
                                            verbose_name='Условия оплаты')
-    to_delete = models.BooleanField('К удалению', default=False)
-
-    class Meta:
-        verbose_name = 'Спецификация'
-        verbose_name_plural = 'Спецификации'
-
-    def __str__(self):
-        return f'№{self.number} - {self.contract.contractor.title}'
-
-
-class Invoice(models.Model):
-    number = models.CharField('Номер', max_length=30, blank=True)
-    created = models.DateField(auto_now_add=True)
-    specification = models.ForeignKey(Specification, on_delete=models.CASCADE, verbose_name='Спецификация')
     shipment_mark = models.CharField('Отгрузочная метка', max_length=100)
     to_delete = models.BooleanField('К удалению', default=False)
 
     class Meta:
-        verbose_name = 'Инвойс'
-        verbose_name_plural = 'Инвойсы'
+        verbose_name = 'Заказ'
+        verbose_name_plural = 'Заказы'
 
     def __str__(self):
-        return f'№{self.number} - {self.specification.contract.contractor.title}'
+        return f'№{self.number} - {self.contract.contractor.title}'

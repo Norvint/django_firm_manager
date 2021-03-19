@@ -4,7 +4,7 @@
 
 {% block content %}
 <h1>Информация о организации</h1>
-<a href="{% url 'organizations_list' %}" class="btn btn-primary mb-3">Назад</a>
+<a href="{% url 'organization_files_list' object.id %}" class="btn btn-primary mb-3">Прикрепленные файлы</a>
 
 <div class="mb-5 col-8">
     <div class="card">

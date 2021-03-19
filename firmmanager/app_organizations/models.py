@@ -1,7 +1,11 @@
+import os
 from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils.deconstruct import deconstructible
+
+from firmmanager.settings import MEDIA_ROOT
 
 
 class Organization(models.Model):
@@ -55,3 +59,30 @@ class Worker(models.Model):
 
     def __str__(self):
         return f'{self.pk}. {self.name} {self.second_name} {self.last_name}'
+
+
+@deconstructible
+class UploadToPathAndRename(object):
+
+    def __init__(self, path):
+        self.sub_path = path
+
+    def __call__(self, instance, filename):
+        filename = f'{datetime.now().strftime("%m%d%Y-%H-%M-%S")}_{filename}'
+        return os.path.join(self.sub_path, filename)
+
+
+class OrganizationFile(models.Model):
+    title = models.CharField('Название', max_length=100)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, verbose_name='Организация')
+    file = models.FileField('Файл', upload_to=UploadToPathAndRename(
+        os.path.join(MEDIA_ROOT, 'app_organizations', 'organization_files')), max_length=500)
+    description = models.TextField('Описание', blank=True)
+    created_at = models.DateTimeField('Создан', auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Файл'
+        verbose_name_plural = 'Файлы'
+
+    def __str__(self):
+        return self.title

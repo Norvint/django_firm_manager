@@ -38,7 +38,7 @@
                 </div>
             </div>
 
-            <div class="col-3">
+            <div class="col-4">
                 <div class="d-flex justify-content-between mb-1">
                     <label class="fw-bold">
                         {{ form.position.label }}
@@ -48,10 +48,18 @@
 
                 <div class="d-flex justify-content-between mb-1">
                     <label class="fw-bold">
-                        {{ form.appeal.label }}
+                        {{ form.legal_address.label }}
                     </label>
-                    {{ form.appeal }}
+                    {{ form.legal_address }}
                 </div>
+
+                <div class="d-flex justify-content-between mb-1">
+                    <label class="fw-bold">
+                        {{ form.actual_address.label }}
+                    </label>
+                    {{ form.actual_address }}
+                </div>
+
 
                 <div class="d-flex justify-content-between mb-1">
                     <label class="fw-bold">
@@ -62,6 +70,13 @@
             </div>
 
             <div class="col-3">
+                <div class="d-flex justify-content-between mb-1">
+                    <label class="fw-bold">
+                        {{ form.appeal.label }}
+                    </label>
+                    {{ form.appeal }}
+                </div>
+
                 <div class="d-flex justify-content-between mb-1">
                     <label class="fw-bold">
                         {{ form.name.label }}

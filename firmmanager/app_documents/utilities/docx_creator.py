@@ -56,50 +56,51 @@ class SpecificationCreator:
     def __init__(self, context):
         self.template = os.path.join(self.BASE_DIR, 'static', 'app_documents', 'layouts', 'specification_template.docx')
         self.output_file_path = os.path.join(self.BASE_DIR, 'static', 'app_documents', 'layouts', 'specification.docx')
-        self.specification = context
+        self.order = context
 
     def create_specification(self):
         doc = DocxTemplate(self.template)
         context = {
-            'number': self.specification.number,
+            'number': self.order.number,
             'payment_conditions': {
-                'description': self.specification.payment_conditions.description
+                'description': self.order.payment_conditions.description
             },
             'delivery_conditions':
                 {
-                    'title': self.specification.delivery_conditions.title,
-                    'time_of_delivery': self.specification.delivery_conditions.delivery_time
+                    'title': self.order.delivery_conditions.title,
+                    'time_of_delivery': self.order.delivery_conditions.delivery_time
                 },
             'contract': {
-                'number': self.specification.contract.number,
+                'number': self.order.contract.number,
                 'client': {
-                    'title': self.specification.contract.contractor.title,
-                    'position': self.specification.contract.contractor.position,
-                    'name': self.specification.contract.contractor.name,
-                    'last_name': self.specification.contract.contractor.last_name,
-                    'address': self.specification.contract.contractor.country,
+                    'title': self.order.contract.contractor.title,
+                    'position': self.order.contract.contractor.position,
+                    'name': self.order.contract.contractor.name,
+                    'last_name': self.order.contract.contractor.last_name,
+                    'address': self.order.contract.contractor.country,
                 },
                 'organization': {
-                    'title': self.specification.contract.organization.title,
-                    'registration': self.specification.contract.organization.registration,
-                    'address': self.specification.contract.organization.address,
-                    'tin': self.specification.contract.organization.tin,
-                    'pprnie': self.specification.contract.organization.pprnie,
+                    'title': self.order.contract.organization.title,
+                    'registration': self.order.contract.organization.registration,
+                    'address': self.order.contract.organization.address,
+                    'tin': self.order.contract.organization.tin,
+                    'pprnie': self.order.contract.organization.pprnie,
                 },
                 'currency': {
-                    'title': self.specification.contract.currency.title,
+                    'title': self.order.contract.currency.title,
                 }
             },
             'booked_products': []
         }
         total_sum = Decimal(0)
-        for booked_product in ProductStoreBooking.objects.all().filter(specification=self.specification):
+        for booked_product in ProductStoreBooking.objects.all().filter(order=self.order):
             context['booked_products'].append({
                 'product': {
                     'title': booked_product.product.type_of_product,
                     'color': booked_product.product.color,
                     'model': booked_product.product.model,
                     'cost': booked_product.product.cost,
+                    'description': booked_product.product.description,
                 },
                 'total_sum': booked_product.sum,
                 'quantity': booked_product.quantity,
@@ -116,50 +117,49 @@ class InvoiceCreator:
     def __init__(self, context):
         self.template = os.path.join(self.BASE_DIR, 'static', 'app_documents', 'layouts', 'invoice_template.docx')
         self.output_file_path = os.path.join(self.BASE_DIR, 'static', 'app_documents', 'layouts', 'invoice.docx')
-        self.invoice = context
+        self.order = context
 
     def create_invoice(self):
         doc = DocxTemplate(self.template)
         context = {
-            'number': self.invoice.number,
-            'specification': {
-                'payment_conditions': {
-                    'description': self.invoice.specification.payment_conditions.description
-                },
-                'delivery_conditions':
-                    {
-                        'title': self.invoice.specification.delivery_conditions.title,
-                        'time_of_delivery': self.invoice.specification.delivery_conditions.delivery_time,
-                        'description': self.invoice.specification.delivery_conditions.description
-                    },
-                'contract': {
-                    'created': self.invoice.specification.contract.created,
-                    'number': self.invoice.specification.contract.number,
-                    'client': {
-                        'title': self.invoice.specification.contract.contractor.title,
-                        'position': self.invoice.specification.contract.contractor.position,
-                        'name': self.invoice.specification.contract.contractor.name,
-                        'last_name': self.invoice.specification.contract.contractor.last_name,
-                        'address': self.invoice.specification.contract.contractor.country,
-                    },
-                    'organization': {
-                        'title': self.invoice.specification.contract.organization.title,
-                        'registration': self.invoice.specification.contract.organization.registration,
-                        'address': self.invoice.specification.contract.organization.address,
-                        'tin': self.invoice.specification.contract.organization.tin,
-                        'pprnie': self.invoice.specification.contract.organization.pprnie,
-                    },
-                    'currency': {
-                        'title': self.invoice.specification.contract.currency.title,
-                    }
-                },
+            'number': self.order.number,
+            'payment_conditions': {
+                'description': self.order.payment_conditions.description
             },
-            'shipment_mark': self.invoice.shipment_mark,
-            'loading_place': self.invoice.specification.loading_place,
+            'delivery_conditions':
+                {
+                    'title': self.order.delivery_conditions.title,
+                    'time_of_delivery': self.order.delivery_conditions.delivery_time,
+                    'description': self.order.delivery_conditions.description
+                },
+            'contract': {
+                'created': self.order.contract.created,
+                'number': self.order.contract.number,
+                'client': {
+                    'title': self.order.contract.contractor.title,
+                    'position': self.order.contract.contractor.position,
+                    'name': self.order.contract.contractor.name,
+                    'last_name': self.order.contract.contractor.last_name,
+                    'address': self.order.contract.contractor.country,
+                },
+                'organization': {
+                    'title': self.order.contract.organization.title,
+                    'registration': self.order.contract.organization.registration,
+                    'address': self.order.contract.organization.address,
+                    'tin': self.order.contract.organization.tin,
+                    'pprnie': self.order.contract.organization.pprnie,
+                },
+                'currency': {
+                    'title': self.order.contract.currency.title,
+                }
+
+            },
+            'shipment_mark': self.order.shipment_mark,
+            'loading_place': self.order.loading_place,
             'booked_products': []
         }
         total_sum = Decimal(0)
-        for i, booked_product in enumerate(ProductStoreBooking.objects.all().filter(specification=self.invoice.specification)):
+        for i, booked_product in enumerate(ProductStoreBooking.objects.all().filter(order=self.order)):
             context['booked_products'].append({
                 'number': i + 1,
                 'product': {
@@ -167,6 +167,7 @@ class InvoiceCreator:
                     'color': booked_product.product.color,
                     'model': booked_product.product.model,
                     'cost': booked_product.product.cost,
+                    'description': booked_product.product.description,
                 },
                 'total_sum': booked_product.sum,
                 'quantity': booked_product.quantity,

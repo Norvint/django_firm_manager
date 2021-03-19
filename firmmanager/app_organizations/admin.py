@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from app_organizations.models import Worker, Organization, Bank
+from app_organizations.models import Worker, Organization, Bank, OrganizationFile
 
 
 @admin.register(Worker)
@@ -16,3 +16,8 @@ class OrganizationAdmin(admin.ModelAdmin):
 @admin.register(Bank)
 class BankAdmin(admin.ModelAdmin):
     list_display = ('title', 'short_code', 'payment_account', 'recipient')
+
+
+@admin.register(OrganizationFile)
+class OrganizationFileAdmin(admin.ModelAdmin):
+    pass
