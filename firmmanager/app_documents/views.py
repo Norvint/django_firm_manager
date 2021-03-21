@@ -12,6 +12,7 @@ from django.views.generic import DetailView, ListView, TemplateView, DeleteView
 from app_documents.forms import OrderBookingForm, OrderForm, ContractFilterForm, \
     ContractForm, OrderFilterForm
 from app_documents.models import Contract, ContractType, Currency, DeliveryConditions, PaymentConditions, Order
+from app_documents.utilities.currencies_parser import CurrenciesUpdater
 from app_documents.utilities.docx_creator import ContractCreator, SpecificationCreator, InvoiceCreator
 from app_storage.models import ProductStore, ProductStoreBooking
 from firmmanager.settings import BASE_DIR
@@ -153,6 +154,17 @@ class CurrencyDetailView(LoginRequiredMixin, DetailView):
     model = Currency
 
 
+class CurrencyUpdate(LoginRequiredMixin, TemplateView):
+    template_name = ''
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        currencies_updater = CurrenciesUpdater()
+        currencies_updater.get_currencies()
+        currencies_updater.update_currencies()
+        return redirect('currencies_list')
+
+
 class PaymentConditionsListView(LoginRequiredMixin, ListView):
     template_name = 'app_documents/orders/payment_conditions_list.html'
     queryset = PaymentConditions.objects.all()
@@ -276,10 +288,14 @@ class OrderBookingCreateView(LoginRequiredMixin, TemplateView):
             for i, form in enumerate(formset):
                 data = formset.cleaned_data[i]
                 if form.is_valid() and data:
+                    product = data['product']
                     products_on_store = ProductStore.objects.filter(product=data['product'], store=data['store'])
+                    order = Order.objects.get(pk=kwargs.get('order_id'))
                     for product_on_store in products_on_store:
                         product_on_store.quantity -= data['quantity']
                         product_on_store.booked += data['quantity']
+                        order.total_sum += int(data['quantity']) * product.cost
+                        order.save()
                         product_on_store.save()
                     form.save()
             return redirect('order_detail', pk=kwargs.get('order_id'))
@@ -293,11 +309,14 @@ class OrderBookingDeleteView(LoginRequiredMixin, DeleteView):
 
     def get(self, request, *args, **kwargs):
         obj = ProductStoreBooking.objects.get(pk=kwargs.get('order_booking_id'))
+        order = obj.order
         if obj:
             product_on_store = ProductStore.objects.get(product=obj.product, store=obj.store)
             product_on_store.booked -= obj.quantity
             product_on_store.quantity += obj.quantity
             product_on_store.save()
+            order.total_sum -= int(obj.quantity) * obj.product.cost
+            order.save()
             obj.delete()
             return redirect('order_detail', pk=obj.order.pk)
 
@@ -321,13 +340,18 @@ class OrderBookingEditView(LoginRequiredMixin, TemplateView):
         context = self.get_context_data(**kwargs)
         form = OrderBookingForm(request.POST)
         product_booking = ProductStoreBooking.objects.get(pk=kwargs.get('order_booking_id'))
+        order = product_booking.order
         if form.is_valid():
             data = form.cleaned_data
             product_on_store = ProductStore.objects.get(product=product_booking.product, store=product_booking.store)
             product_on_store.booked -= product_booking.quantity
             product_on_store.quantity += product_booking.quantity
+            order.total_sum -= int(product_booking.quantity) * product_booking.product.cost
+            order.save()
             product_on_store.quantity -= data['quantity']
             product_on_store.booked += data['quantity']
+            order.total_sum += int(data['quantity']) * product_booking.product.cost
+            order.save()
             product_on_store.save()
             product_booking.product = data['product']
             product_booking.order = data['order']

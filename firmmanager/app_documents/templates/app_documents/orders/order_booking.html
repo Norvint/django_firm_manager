@@ -4,9 +4,8 @@
 
 {% block content %}
 
-<a href="{% url 'specifications_list' %}" class="btn btn-primary mt-2 col-3">К списку спецификаций</a>
-<a href="{% url 'specification_detail' specification_id %}" class="btn btn-primary mt-2 col-3">В карточку
-    спецификации</a>
+<a href="{% url 'order_detail' order_id %}" class="btn btn-primary mt-2 col-3">В карточку
+    заказа</a>
 <p>
     {{ answer }}
 </p>
@@ -27,9 +26,9 @@
         {% for form in formset %}
         <div class="card booking-form-container p-3 mb-2 col-3">
             <label>
-                {{ form.specification.label }}
+                {{ form.order.label }}
             </label>
-            {{ form.specification }}
+            {{ form.order }}
             <label>
                 {{ form.product.label }}
             </label>

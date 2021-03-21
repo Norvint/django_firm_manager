@@ -72,7 +72,7 @@
     </div>
 </div>
 
-{% if specification_booking %}
+{% if order_booking %}
 <h2>Выпускаемая продукция</h2>
 <table class="table">
     <thead>
@@ -87,7 +87,7 @@
     </tr>
     </thead>
     <tbody>
-    {% for document in specification_booking %}
+    {% for document in order_booking %}
     <tr>
         <td>
             <a href="{% url 'product_detail' document.product.id %}">{{ document.product }}</a>
@@ -97,12 +97,12 @@
         <td>{{ document.product.cost }}</td>
         <td>{{ document.sum }}</td>
         <td>
-            <a href="{% url 'specification_booking_edit' document.id %}">
+            <a href="{% url 'order_booking_edit' document.id %}">
                 <img src="{% static 'app_documents/images/edit.png' %}" alt="edit icon">
             </a>
         </td>
         <td>
-            <a href="{% url 'specification_booking_delete' document.id %}">
+            <a href="{% url 'order_booking_delete' document.id %}">
                 <img src="{% static 'app_documents/images/delete.png' %}" alt="delete icon">
             </a>
         </td>
@@ -135,4 +135,5 @@
     </tbody>
 </table>
 {% endif %}
+<h3>Итоговая сумма заказа: {{ object.total_sum }}</h3>
 {% endblock %}
