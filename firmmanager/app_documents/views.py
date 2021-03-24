@@ -231,6 +231,9 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
         order = self.get_object()
         order_booking = ProductStoreBooking.objects.filter(order=order)
         context['order_booking'] = order_booking
+        currency_total_sum = round(order.total_sum * (order.contract.currency.nominal / order.contract.currency.cost))
+        if currency_total_sum != order.total_sum:
+            context['currency_total_sum'] = currency_total_sum
         return context
 
     def post(self, request, *args, **kwargs):

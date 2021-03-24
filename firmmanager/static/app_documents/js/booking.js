@@ -9,11 +9,11 @@ $(document).ready(function() {
             $(this).find('input,select').each(function(i) {
                 // Remove any existing values
                 parts = $(this).attr('id').split('-', 3);
-                if ($(this).attr('id').split('-', 3)[2] !== 'specification') {
+                if (parts[2] !== 'order') {
                 $(this).val('');
                 }
+
                 // update the id attributes, incrementing the form number, e.g.: "id_form-1-field_name"
-                parts = $(this).attr('id').split('-', 3);
                 num = parseInt(parts[1]);
                 num += 1;
                 $(this).attr('id', parts[0] + '-' + num + '-' +parts[2]);
