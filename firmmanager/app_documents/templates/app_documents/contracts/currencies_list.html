@@ -15,26 +15,33 @@
     <a class="nav-link active" aria-current="page" href="{% url 'currencies_list' %}">Валюты</a>
   </li>
 </ul>
-
+<a href="{% url 'currencies_update' %}" class="btn btn-primary">Синхронизировать валюты</a>
 <h1>Валюты</h1>
 
 {% if currencies %}
-<div class="row">
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">Название</th>
+        <th scope="col">Код</th>
+        <th scope="col">Символьный код</th>
+        <th scope="col">Номинал</th>
+        <th scope="col">Цена</th>
+    </tr>
+    </thead>
+    <tbody>
     {% for currency in currencies %}
-    <div class="mb-5 col-3">
-        <div class="card" style="width: 18rem;">
-            <div class="card-body">
-                <h5 class="card-title">{{ currency.title }}</h5>
-            </div>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item">Стоимость валюты к 1 рублю: {{ currency.cost }}</li>
-            </ul>
-            <div class="card-body">
-                <a href="{% url 'currency_detail' currency.id %}" class="btn btn-primary">Открыть</a>
-            </div>
-        </div>
-    </div>
+    <tr>
+        <td>
+            <a href="{% url 'currency_detail' currency.id %}">{{ currency.title }}</a>
+        </td>
+        <td>{{ currency.code }}</td>
+        <td>{{ currency.char_code }}</td>
+        <td>{{ currency.nominal }}</td>
+        <td>{{ currency.cost }}</td>
+    </tr>
     {% endfor %}
-</div>
+    </tbody>
+</table>
 {% endif %}
 {% endblock %}

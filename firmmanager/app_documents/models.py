@@ -18,8 +18,11 @@ class ContractType(models.Model):
 
 
 class Currency(models.Model):
-    title = models.CharField('Название', max_length=30)
-    cost = models.DecimalField('Стоимость к 1 рублю', max_digits=10, decimal_places=4)
+    title = models.CharField('Название', max_length=100)
+    code = models.CharField('Код', max_length=20)
+    char_code = models.CharField('Символьное обозначение', max_length=10)
+    nominal = models.IntegerField('Номинал')
+    cost = models.DecimalField('Цена', max_digits=10, decimal_places=4)
 
     class Meta:
         verbose_name = 'Валюта'
@@ -82,6 +85,7 @@ class Order(models.Model):
     payment_conditions = models.ForeignKey(PaymentConditions, on_delete=models.CASCADE,
                                            verbose_name='Условия оплаты')
     shipment_mark = models.CharField('Отгрузочная метка', max_length=100)
+    total_sum = models.DecimalField('Сумма', max_digits=10, decimal_places=4, default=0)
     to_delete = models.BooleanField('К удалению', default=False)
 
     class Meta:

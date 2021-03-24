@@ -14,7 +14,7 @@ class OrderBookingForm(forms.ModelForm):
         data = self.cleaned_data
         product = data['product']
         product_sum = product.cost * int(data['quantity'])
-        spec_booking = ProductStoreBooking(specification=data['specification'], product=data['product'],
+        spec_booking = ProductStoreBooking(order=data['order'], product=data['product'],
                                            store=data['store'], quantity=data['quantity'], sum=product_sum)
         spec_booking.save()
 
@@ -23,7 +23,6 @@ class ContractForm(forms.ModelForm):
     class Meta:
         model = Contract
         fields = ['number', 'type', 'contractor', 'organization', 'delivery_address', 'currency']
-
 
 
 class OrderForm(forms.ModelForm):

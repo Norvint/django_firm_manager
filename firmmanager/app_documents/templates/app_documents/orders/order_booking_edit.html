@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<a href="{% url 'specifications_list' %}" class="btn btn-primary mt-2 col-3">К списку спецификаций</a>
+<a href="{% url 'orders_list' %}" class="btn btn-primary mt-2 col-3">К списку заказов</a>
 
 <p>
     {{ answer }}
@@ -18,9 +18,9 @@
     <div class="card p-3 mb-2 col-5">
         {% csrf_token %}
         <label>
-            {{ form.specification.label }}
+            {{ form.order.label }}
         </label>
-        {{ form.specification }}
+        {{ form.order }}
         <label>
             {{ form.product.label }}
         </label>
