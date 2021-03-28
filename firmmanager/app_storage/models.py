@@ -1,6 +1,6 @@
 from django.db import models
 
-from app_documents.models import Specification
+from app_documents.models import Order
 
 
 class ProductType(models.Model):
@@ -48,6 +48,7 @@ class Product(models.Model):
     packing_outside = models.ForeignKey(PackageOutsideType, on_delete=models.CASCADE, verbose_name='Внешнняя упаковка')
     country = models.CharField('Страна', max_length=50)
     cost = models.DecimalField('Цена за 1 ед. в рублях', decimal_places=2, max_digits=15)
+    description = models.TextField('Описание', max_length=800, blank=True)
 
     class Meta:
         verbose_name = 'Продукция'
@@ -91,7 +92,7 @@ class ProductStoreIncome(models.Model):
 
 
 class ProductStoreBooking(models.Model):
-    specification = models.ForeignKey(Specification, on_delete=models.CASCADE, verbose_name='Спецификация')
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, verbose_name='Заказ')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Продукция')
     store = models.ForeignKey(Store, on_delete=models.CASCADE, verbose_name='Склад')
     quantity = models.IntegerField('Количество')

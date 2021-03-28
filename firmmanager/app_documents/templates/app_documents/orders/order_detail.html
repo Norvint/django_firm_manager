@@ -3,9 +3,9 @@
 {% block title %}Спецификация{% endblock %}
 
 {% block content %}
-<h1>Спецификация</h1>
-<a href="{% url 'contractor_specifications_list' object.contract.contractor.id %}" class="btn btn-primary mb-3">К списку
-    спецификаций контрагента</a>
+<h1>Заказ</h1>
+<a href="{% url 'contractor_orders_list' object.contract.contractor.id %}" class="btn btn-primary mb-3">К списку
+    заказов контрагента</a>
 {% load static %}
 <div class="mb-5 col-9">
     <div class="card">
@@ -18,11 +18,11 @@
 
             <li class="list-group-item">
                 {% if object.to_delete %}
-                <a href="{% url 'specification_to_delete' object.id %}" class="btn btn-danger">
+                <a href="{% url 'order_to_delete' object.id %}" class="btn btn-danger">
                     Снять пометку на удаление
                 </a>
                 {% else %}
-                <a href="{% url 'specification_to_delete' object.id %}" class="btn btn-danger">
+                <a href="{% url 'order_to_delete' object.id %}" class="btn btn-danger">
                     Пометить на удаление
                 </a>
                 {% endif %}
@@ -30,7 +30,7 @@
         </ul>
 
         <div class="card-body d-flex justify-content-between">
-            <h5 class="card-title">Спецификация №{{ object.number }}</h5>
+            <h5 class="card-title">Заказ №{{ object.number }}</h5>
             {% if object.to_delete %}
             <p class="text-danger fw-bold">Помечена на удаление</p>
             {% endif %}
@@ -39,6 +39,7 @@
         <ul class="list-group list-group-flush">
             <li class="list-group-item">Договор: {{ object.contract }}</li>
             <li class="list-group-item">Условия поставки: {{ object.delivery_conditions }}</li>
+            <li class="list-group-item">Время поставки, дней: {{ object.delivery_time }}</li>
             <li class="list-group-item">Место загрузки: {{ object.loading_place }}</li>
             <li class="list-group-item">Условия оплаты: {{ object.payment_conditions }}</li>
             <li class="list-group-item">Дата создания: {{ object.created }}</li>
@@ -46,33 +47,33 @@
 
         <ul class="list-group list-group-horizontal">
             <li class="list-group-item">
-                <a href="{% url 'specification_booking' object.id %}" class="btn btn-primary">
+                <a href="{% url 'order_booking' object.id %}" class="btn btn-primary">
                     Выпустить продукцию
                 </a>
             </li>
 
-            <li class="list-group-item">
-                <a href="{% url 'invoice_create' object.id %}" class="btn btn-primary d-block">Создать инвойс</a>
-            </li>
-
-            <li class="list-group-item">
+              <li class="list-group-item">
                 <form name="specification-create-form" method="post" action="" class="">
                     {% csrf_token %}
-                    <input type="submit" value="Сгенерировать документ" class="btn btn-primary">
+                    <input type="submit" value="Перезаполнить документы" class="btn btn-primary">
                 </form>
             </li>
 
             {% if file %}
             <li class="list-group-item">
                 <a href="{% url 'download_specification' %}" download
-                   class="btn btn-success col-offset-2">Скачать</a>
+                   class="btn btn-success col-offset-2">Скачать спецификацию</a>
+            </li>
+
+            <li class="list-group-item">
+                <a href="{% url 'download_invoice' %}" class="btn btn-success d-block">Скачать инвойс</a>
             </li>
             {% endif %}
         </ul>
     </div>
 </div>
 
-{% if specification_booking %}
+{% if order_booking %}
 <h2>Выпускаемая продукция</h2>
 <table class="table">
     <thead>
@@ -87,7 +88,7 @@
     </tr>
     </thead>
     <tbody>
-    {% for document in specification_booking %}
+    {% for document in order_booking %}
     <tr>
         <td>
             <a href="{% url 'product_detail' document.product.id %}">{{ document.product }}</a>
@@ -97,12 +98,12 @@
         <td>{{ document.product.cost }}</td>
         <td>{{ document.sum }}</td>
         <td>
-            <a href="{% url 'specification_booking_edit' document.id %}">
+            <a href="{% url 'order_booking_edit' document.id %}">
                 <img src="{% static 'app_documents/images/edit.png' %}" alt="edit icon">
             </a>
         </td>
         <td>
-            <a href="{% url 'specification_booking_delete' document.id %}">
+            <a href="{% url 'order_booking_delete' document.id %}">
                 <img src="{% static 'app_documents/images/delete.png' %}" alt="delete icon">
             </a>
         </td>
@@ -112,27 +113,8 @@
 </table>
 {% endif %}
 
-{% if invoices %}
-<h2>Инвойсы</h2>
-<table class="table">
-    <thead>
-    <tr>
-        <th scope="col">Инвойс №</th>
-        <th scope="col">Клиент</th>
-        <th scope="col">Дата создания</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for invoice in invoices %}
-    <tr>
-        <td>
-            <a href="{% url 'invoice_detail' invoice.id %}">{{ invoice.number }}</a>
-        </td>
-        <td>{{ invoice.specification.contract.contractor }}</td>
-        <td>{{ invoice.created }}</td>
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
+<h3>RUB: {{ object.total_sum }}</h3>
+{% if currency_total_sum %}
+    <h3>{{ object.contract.currency.char_code }}: {{ currency_total_sum }}</h3>
 {% endif %}
 {% endblock %}

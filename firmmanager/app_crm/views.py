@@ -6,7 +6,7 @@ from django.views.generic.base import View
 
 from app_crm.forms import ContractorFilterForm, ContractorCommentForm, ContractorForm, ContractorContactForm
 from app_crm.models import Contractor, ContractorComment, ContractorContact
-from app_documents.models import Contract, Specification, Invoice
+from app_documents.models import Contract, Order
 
 
 class ContractorListView(LoginRequiredMixin, ListView):
@@ -134,21 +134,11 @@ class ContractorContractListView(LoginRequiredMixin, TemplateView):
         return context
 
 
-class ContractorSpecificationListView(LoginRequiredMixin, TemplateView):
-    template_name = 'app_crm/contractors/contractor_specifications_list.html'
+class ContractorOrderListView(LoginRequiredMixin, TemplateView):
+    template_name = 'app_crm/contractors/contractor_orders_list.html'
 
     def get_context_data(self, **kwargs):
-        context = super(ContractorSpecificationListView, self).get_context_data(**kwargs)
-        specifications = Specification.objects.filter(contract__contractor=kwargs.get('contractor_id')).distinct()
-        context['specifications'] = specifications
-        return context
-
-
-class ContractorInvoiceListView(LoginRequiredMixin, TemplateView):
-    template_name = 'app_crm/contractors/contractor_invoices_list.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(ContractorInvoiceListView, self).get_context_data(**kwargs)
-        invoices = Invoice.objects.filter(specification__contract__contractor=kwargs.get('contractor_id')).distinct()
-        context['invoices'] = invoices
+        context = super(ContractorOrderListView, self).get_context_data(**kwargs)
+        orders = Order.objects.filter(contract__contractor=kwargs.get('contractor_id')).distinct()
+        context['orders'] = orders
         return context

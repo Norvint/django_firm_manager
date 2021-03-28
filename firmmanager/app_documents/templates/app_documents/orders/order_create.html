@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<a href="{% url 'specifications_list' %}" class="btn btn-primary mt-2">К списку спецификаций</a>
+<a href="{% url 'orders_list' %}" class="btn btn-primary mt-2">К списку заказов</a>
 
 <p>
     {{ errors }}
@@ -13,7 +13,7 @@
     {% csrf_token %}
     <div class="card col-7">
         <div class="card-body">
-            <h5 class="card-title">Новая спецификация</h5>
+            <h5 class="card-title">Новый заказ</h5>
         </div>
         <ul class="list-group list-group-flush">
             <li class="list-group-item d-flex justify-content-between">
@@ -32,6 +32,10 @@
                     {{ form.delivery_conditions }}
                 </div>
                 <div>
+                    {{ form.delivery_time.label }}
+                    {{ form.delivery_time }}
+                </div>
+                <div>
                     {{ form.loading_place.label }}
                     {{ form.loading_place }}
                 </div>
@@ -40,6 +44,11 @@
             <li class="list-group-item d-flex justify-content-between">
                 {{ form.payment_conditions.label }}
                 {{ form.payment_conditions }}
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between">
+                {{ form.shipment_mark.label }}
+                {{ form.shipment_mark }}
             </li>
         </ul>
         <div class="card-body">

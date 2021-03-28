@@ -3,7 +3,7 @@ from datetime import datetime
 from django import forms
 from django.contrib.auth.models import User
 
-from app_organizations.models import Organization
+from app_organizations.models import Organization, OrganizationFile
 
 
 class WorkerForm(forms.Form):
@@ -21,3 +21,9 @@ class WorkerForm(forms.Form):
     date_of_birth = forms.DateField(widget=forms.SelectDateWidget(years=(range(datetime.now().year, 1930, -1))),
                                     required=False, label='Дата рождения')
     department_code = forms.CharField(max_length=20, required=False, label='Код подразделения')
+
+
+class OrganizationFileForm(forms.ModelForm):
+    class Meta:
+        model = OrganizationFile
+        fields = ['title', 'organization', 'file', 'description']

@@ -1,15 +1,29 @@
+import os
 from datetime import datetime
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils.deconstruct import deconstructible
+
+from firmmanager.settings import MEDIA_ROOT
 
 
 class Organization(models.Model):
     title = models.CharField('Наименование', max_length=30)
-    address = models.CharField('Адрес', max_length=100)
+    position = models.CharField('Должность', max_length=30, blank=True)
+    position_en = models.CharField('Должность(англ)', max_length=30, blank=True)
+    appeal = models.CharField('Обращение', max_length=30, default='г-н', blank=True)
+    appeal_en = models.CharField('Обращение(англ)', max_length=30, default='Mr.', blank=True)
+    name = models.CharField('Имя', max_length=30, blank=True)
+    second_name = models.CharField('Отчество', max_length=30, blank=True)
+    last_name = models.CharField('Фамилия', max_length=30, blank=True)
+    legal_address = models.CharField('Юр. адрес', max_length=200)
+    actual_address = models.CharField('Фактический адрес', max_length=200, blank=True)
     tin = models.CharField('ИНН(TIN)', max_length=12)
-    pprnie = models.CharField('ОГРИП(PPRNIE)', max_length=15)
-    registration = models.CharField('Уведомление о постановке на учет', max_length=100)
+    pprnie = models.CharField('ОГРН(ИП)', max_length=15)
+    registration = models.CharField('Действующий на основании', max_length=100, blank=True)
+    requisites = models.TextField('Банковские реквизиты', max_length=1000)
+    requisites_en = models.TextField('Банковские реквизиты(англ)', max_length=1000)
 
     class Meta:
         verbose_name = 'Организация'
@@ -17,22 +31,6 @@ class Organization(models.Model):
 
     def __str__(self):
         return f'{self.pk}. {self.title}'
-
-
-class Bank(models.Model):
-    title = models.CharField('Наименование', max_length=100)
-    short_code = models.CharField('Кодовое обозначение(SWIFT)', max_length=30)
-    address = models.CharField('Адрес', max_length=100)
-    payment_account = models.CharField('Расчетный счет', max_length=30)
-    correspondent_account = models.CharField('Корреспондентный счет', max_length=30, blank=True)
-    recipient = models.ForeignKey(Organization, on_delete=models.CASCADE, verbose_name='Получатель')
-
-    class Meta:
-        verbose_name = 'Банк'
-        verbose_name_plural = 'Банки'
-
-    def __str__(self):
-        return self.title
 
 
 class Worker(models.Model):
@@ -55,3 +53,30 @@ class Worker(models.Model):
 
     def __str__(self):
         return f'{self.pk}. {self.name} {self.second_name} {self.last_name}'
+
+
+@deconstructible
+class UploadToPathAndRename(object):
+
+    def __init__(self, path):
+        self.sub_path = path
+
+    def __call__(self, instance, filename):
+        filename = f'{datetime.now().strftime("%m%d%Y-%H-%M-%S")}_{filename}'
+        return os.path.join(self.sub_path, filename)
+
+
+class OrganizationFile(models.Model):
+    title = models.CharField('Название', max_length=100)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, verbose_name='Организация')
+    file = models.FileField('Файл', upload_to=UploadToPathAndRename(
+        os.path.join(MEDIA_ROOT, 'app_organizations', 'organization_files')), max_length=500)
+    description = models.TextField('Описание', blank=True)
+    created_at = models.DateTimeField('Создан', auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Файл'
+        verbose_name_plural = 'Файлы'
+
+    def __str__(self):
+        return self.title
