@@ -34,7 +34,6 @@ class Currency(models.Model):
 
 class DeliveryConditions(models.Model):
     title = models.CharField('Название', max_length=30)
-    delivery_time = models.IntegerField('Срок поставки', default=datetime(year=2021, month=1, day=1))
     description = models.CharField('Описание', max_length=200)
 
     class Meta:
@@ -42,7 +41,7 @@ class DeliveryConditions(models.Model):
         verbose_name_plural = 'Условия поставки'
 
     def __str__(self):
-        return f'{self.title}, срок поставки {self.delivery_time} дней'
+        return self.title
 
 
 class PaymentConditions(models.Model):
@@ -81,6 +80,7 @@ class Order(models.Model):
     created = models.DateField(auto_now_add=True)
     delivery_conditions = models.ForeignKey(DeliveryConditions, on_delete=models.CASCADE,
                                             verbose_name='Условия поставки')
+    delivery_time = models.IntegerField('Срок поставки, дней', default=1)
     loading_place = models.CharField('Место загрузки', max_length=100)
     payment_conditions = models.ForeignKey(PaymentConditions, on_delete=models.CASCADE,
                                            verbose_name='Условия оплаты')

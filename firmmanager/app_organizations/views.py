@@ -1,22 +1,21 @@
 import mimetypes
 import os
-from wsgiref.util import FileWrapper
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.shortcuts import redirect
-from django.utils.encoding import smart_str
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, TemplateView
 
 from app_organizations.forms import WorkerForm, OrganizationFileForm
-from app_organizations.models import Organization, Bank, Worker, OrganizationFile
+from app_organizations.models import Organization, Worker, OrganizationFile
 from firmmanager import settings
 
 
 class OrganizationCreateView(LoginRequiredMixin, CreateView):
     template_name = 'app_organizations/organization_create.html'
     model = Organization
-    fields = ('title', 'address', 'tin', 'pprnie', 'registration')
+    fields = ('title', 'tin', 'pprnie', 'registration', 'position', 'position_en', 'appeal', 'appeal_en',
+              'name', 'second_name', 'last_name', 'legal_address', 'actual_address', 'requisites', 'requisites_en')
     success_url = '/organizations'
 
 
@@ -78,24 +77,6 @@ def download_organization_file(request, **kwargs):
     response = HttpResponse(fl, content_type=mime_type)
     response['Content-Disposition'] = "attachment; filename=%s" % file.name
     return response
-
-
-class BankListView(LoginRequiredMixin, ListView):
-    template_name = 'app_organizations/banks_list.html'
-    queryset = Bank.objects.all()
-    context_object_name = 'banks'
-
-
-class BankCreateView(LoginRequiredMixin, CreateView):
-    template_name = 'app_organizations/bank_create.html'
-    model = Bank
-    fields = ('title', 'short_code', 'address', 'payment_account', 'correspondent_account', 'recipient')
-    success_url = '/organizations/banks'
-
-
-class BankDetailView(LoginRequiredMixin, DetailView):
-    template_name = 'app_organizations/bank_detail.html'
-    model = Bank
 
 
 class WorkerListView(LoginRequiredMixin, ListView):

@@ -5,7 +5,6 @@ from pathlib import Path
 from docxtpl import DocxTemplate
 
 from app_storage.models import ProductStoreBooking
-from app_organizations.models import Bank
 
 
 class ContractCreator:
@@ -37,15 +36,6 @@ class ContractCreator:
                 'banks': []
             }
         }
-        for bank in Bank.objects.all().filter(recipient=self.contract.organization):
-            context['organization']['banks'].append({
-                'title': bank.title,
-                'short_code': bank.short_code,
-                'payment_account': bank.payment_account,
-                'correspondent_account': bank.correspondent_account,
-                'address': bank.address,
-                'recipient': bank.recipient
-            })
         doc.render(context)
         doc.save(self.output_file_path)
 

@@ -28,7 +28,7 @@ class ContractForm(forms.ModelForm):
 class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
-        fields = ['number', 'contract', 'delivery_conditions', 'loading_place', 'payment_conditions', 'shipment_mark']
+        fields = ['number', 'contract', 'delivery_conditions', 'delivery_time', 'loading_place', 'payment_conditions', 'shipment_mark']
 
 
 class ContractFilterForm(forms.Form):

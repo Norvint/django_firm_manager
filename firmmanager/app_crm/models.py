@@ -44,7 +44,9 @@ class Contractor(models.Model):
     field_of_activity = models.ForeignKey(FieldOfActivity, on_delete=models.SET_NULL, null=True,
                                           verbose_name='Сфера деятельности')
     position = models.CharField('Должность', max_length=30)
+    position_en = models.CharField('Должность(англ)', max_length=30, blank=True)
     appeal = models.CharField('Обращение', max_length=30, default='г-н')
+    appeal_en = models.CharField('Обращение(англ)', max_length=30, default='Mr.')
     name = models.CharField('Имя', max_length=30)
     second_name = models.CharField('Отчество', max_length=30, blank=True)
     last_name = models.CharField('Фамилия', max_length=30)
