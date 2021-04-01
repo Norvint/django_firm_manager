@@ -89,16 +89,24 @@ class ContactType(models.Model):
         return self.title
 
 
-class ContractorContact(models.Model):
+class ContactPerson(models.Model):
+    name = models.CharField('Имя', max_length=30)
+    second_name = models.CharField('Отчество', max_length=30, blank=True)
+    last_name = models.CharField('Фамилия', max_length=30)
+    position = models.CharField('Должность', max_length=30)
     contractor = models.ForeignKey(Contractor, on_delete=models.CASCADE, blank=True, null=True,
                                    verbose_name='Контрагент')
+
+
+class Contact(models.Model):
+    contact_person = models.ForeignKey(ContactPerson, on_delete=models.CASCADE, blank=True, null=True,
+                                       verbose_name='Контактое лицо')
     type_of_contact = models.ForeignKey(ContactType, on_delete=models.CASCADE, verbose_name='Вид контакта')
     contact = models.CharField('Контактные данные', max_length=50)
-    contact_name = models.CharField('Имя контакта', max_length=90)
 
     class Meta:
         verbose_name = 'Контакт контрагента'
         verbose_name_plural = 'Контакты контрагентов'
 
     def __str__(self):
-        return f'{self.contact_name} ({self.contractor})'
+        return f'{self.type_of_contact.name} {self.contact}'

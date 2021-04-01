@@ -29,9 +29,9 @@
 <h1>Контрагенты</h1>
 <a href="{% url 'contractor_create' %}" class="btn btn-primary mb-3">Добавить контрагента</a>
 
-{% if clients_list %}
+{% if contractors %}
 <div class="row">
-    {% for contractor in clients_list %}
+    {% for contractor in contractors %}
     <div class="mb-5 col-4">
         {% if contractor.to_delete %}
         <div class="card text-white bg-secondary">

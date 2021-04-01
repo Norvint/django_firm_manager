@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Контактные лица{% endblock %}
+
+{% block content %}
+<a href="{% url 'contact_person_create' contractor_id %}" class="btn btn-primary">Добавить контактное лицо</a>
+<h1>Контактные лица</h1>
+
+{% if contact_persons %}
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">Имя</th>
+        <th scope="col">Отчество</th>
+        <th scope="col">Фамилия</th>
+        <th scope="col">Должность</th>
+        <th scope="col">Редактировать</th>
+        <th scope="col">Удалить</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for contact_person in contact_persons %}
+    <tr>
+        <td>
+            <a href="{% url 'contact_person_detail' contractor_id contact_person.id %}">{{ contact_person.name }}</a>
+        </td>
+        <td>{{ contact_person.second_name }}</td>
+        <td>{{ contact_person.last_name }}</td>
+        <td>{{ contact_person.position }}</td>
+        <td>"Кнопка"</td>
+        <td>"Кнопка"</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}

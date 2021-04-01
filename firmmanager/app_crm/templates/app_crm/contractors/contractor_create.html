@@ -107,51 +107,10 @@
     <p>
         {{ errors }}
     </p>
-    <table class="table" id="contact-form-wrapper">
-        {{ formset.management_form }}
-        <thead>
-        <tr>
-            <th scope="col">Тип контакта</th>
-            <th scope="col">Контактные данные</th>
-            <th scope="col">Имя контакта</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for contact_form in formset %}
-        <tr class="contact-form-container">
-            <td>{{ contact_form.type_of_contact }}</td>
-            <td>{{ contact_form.contact }}</td>
-            <td>{{ contact_form.contact_name }}</td>
-        </tr>
-        {% endfor %}
-
-        </tbody>
-        <tfoot>
-        <tr>
-            <td>
-                <a href="#" id="add_contact" class="btn btn-success col-1 mt-2 fw-bold">
-                    +
-                </a>
-            </td>
-
-            <td>
-
-            </td>
-
-            <td>
-
-            </td>
-        </tr>
-        </tfoot>
-    </table>
     <div>
         <input type="submit" value="Сохранить контрагента" class="btn btn-primary mt-2">
     </div>
 
 </form>
-
-{% block extrascripts %}
-<script type="text/JavaScript" src="{%  static 'app_crm/js/contact.js' %}"></script>
-{% endblock %}
 
 {% endblock %}

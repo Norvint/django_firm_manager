@@ -1,17 +1,17 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import formset_factory
 from django.shortcuts import redirect
-from django.views.generic import CreateView, ListView, DetailView, UpdateView, TemplateView
+from django.views.generic import ListView, DetailView, UpdateView, TemplateView
 from django.views.generic.base import View
 
-from app_crm.forms import ContractorFilterForm, ContractorCommentForm, ContractorForm, ContractorContactForm
-from app_crm.models import Contractor, ContractorComment, ContractorContact
+from app_crm.forms import ContractorFilterForm, ContractorCommentForm, ContractorForm, ContactForm, ContactPersonForm
+from app_crm.models import Contractor, ContractorComment, Contact, ContactPerson
 from app_documents.models import Contract, Order
 
 
 class ContractorListView(LoginRequiredMixin, ListView):
     template_name = 'app_crm/contractors/contractors_list.html'
-    context_object_name = 'clients_list'
+    context_object_name = 'contractors'
     queryset = Contractor.objects.all()
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -45,8 +45,6 @@ class ContractorDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(ContractorDetailView, self).get_context_data(**kwargs)
         comments = ContractorComment.objects.filter(contractor=self.get_object()).order_by('-created')
-        contacts = ContractorContact.objects.filter(contractor=self.get_object())
-        context['contacts'] = contacts
         context['comments'] = comments
         comment_form = ContractorCommentForm()
         context['comment_form'] = comment_form
@@ -73,31 +71,15 @@ class ContractorCreateView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(ContractorCreateView, self).get_context_data(**kwargs)
         form = ContractorForm()
-        formset = formset_factory(ContractorContactForm)
-        context['formset'] = formset
         context['form'] = form
         return context
 
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
         form = ContractorForm(request.POST)
-        contacts_formset = formset_factory(ContractorContactForm)
-        formset = contacts_formset(request.POST)
         if form.is_valid():
-            if formset.is_valid():
-                contractor = form.save()
-                for i, form in enumerate(formset):
-                    data = formset.cleaned_data[i]
-                    print(data)
-                    if form.is_valid() and data:
-                        print(data)
-                        contact = ContractorContact(contractor=contractor, type_of_contact=data['type_of_contact'],
-                                                    contact=data['contact'], contact_name=data['contact_name'])
-                        contact.save()
-                return redirect('contractor_detail', pk=contractor.pk)
-            else:
-                context['formset'] = formset
-                context['errors'] = formset.errors
+            contractor = form.save()
+            return redirect('contractor_detail', pk=contractor.pk)
         else:
             context['form'] = form
             return self.render_to_response(context)
@@ -141,4 +123,60 @@ class ContractorOrderListView(LoginRequiredMixin, TemplateView):
         context = super(ContractorOrderListView, self).get_context_data(**kwargs)
         orders = Order.objects.filter(contract__contractor=kwargs.get('contractor_id')).distinct()
         context['orders'] = orders
+        return context
+
+
+class ContactPersonCreateView(LoginRequiredMixin, TemplateView):
+    template_name = 'app_crm/contractors/contact_person_create.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ContactPersonCreateView, self).get_context_data(**kwargs)
+        contact_person_form = ContactPersonForm()
+        formset = formset_factory(ContactForm)
+        context['formset'] = formset
+        context['form'] = contact_person_form
+        return context
+
+    def post(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        contact_person_form = ContactPersonForm(request.POST)
+        contacts_formset = formset_factory(ContactForm)
+        formset = contacts_formset(request.POST)
+        if contact_person_form.is_valid():
+            if formset.is_valid():
+                contact_person = contact_person_form.save()
+                for i, form in enumerate(formset):
+                    data = formset.cleaned_data[i]
+                    if form.is_valid() and data:
+                        contact = Contact(contractor=contact_person, type_of_contact=data['type_of_contact'],
+                                          contact=data['contact'])
+                        contact.save()
+                return redirect('contact_person_detail', pk=contact_person.pk)
+            else:
+                context['formset'] = formset
+                context['errors'] = formset.errors
+        else:
+            context['form'] = contact_person_form
+            return self.render_to_response(context)
+
+
+class ContactPersonDetailView(LoginRequiredMixin, DetailView):
+    model = ContactPerson
+    template_name = 'app_crm/contractors/contact_person_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ContactPersonDetailView, self).get_context_data(**kwargs)
+        contacts = Contact.objects.filter(contact_person=self.get_object())
+        context['contacts'] = contacts
+        return context
+
+
+class ContactPersonListView(LoginRequiredMixin, ListView):
+    template_name = 'app_crm/contractors/contact_persons_list.html'
+    context_object_name = 'contact_persons'
+    queryset = ContactPerson.objects.all()
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        self.queryset = self.get_queryset().filter(contractor=kwargs.get('contractor_id'))
+        context = super(ContactPersonListView, self).get_context_data()
         return context

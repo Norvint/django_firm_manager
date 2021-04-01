@@ -1,8 +1,7 @@
 from django import forms
-from django.contrib.auth.models import User
 
-from app_crm.models import TypeOfContractor, FieldOfActivity, ContractorComment, ContractorContact, Contractor, \
-    ContactType
+from app_crm.models import TypeOfContractor, FieldOfActivity, ContractorComment, Contact, Contractor, \
+    ContactType, ContactPerson
 
 
 class ContractorFilterForm(forms.Form):
@@ -30,8 +29,11 @@ class ContractorForm(forms.ModelForm):
         }
 
 
-class ContractorContactForm(forms.Form):
-    contractor = forms.ModelChoiceField(Contractor.objects.all(), required=False)
+class ContactPersonForm(forms.ModelForm):
+    model = ContactPerson
+    fields = ['name', 'second_name', 'last_name', 'position', 'contractor']
+
+
+class ContactForm(forms.Form):
     type_of_contact = forms.ModelChoiceField(ContactType.objects.all(), label='Тип контакта')
     contact = forms.CharField(max_length=50, label='Контактные данные')
-    contact_name = forms.CharField(max_length=90, label='Имя контакта')

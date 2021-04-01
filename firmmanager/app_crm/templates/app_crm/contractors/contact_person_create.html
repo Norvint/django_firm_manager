@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Добавить новое контактное лицо{% endblock %}
+{% load static %}
+{% block content %}
+<h1>Новый клиент</h1>
+<form name="contact-person-create-form" method="post" action="{% url 'contact_person_create' %}" class="row">
+    {% csrf_token %}
+    <div class="card d-flex justify-content-around p-2">
+        <div>['name', 'second_name', 'last_name', 'position', 'contractor']
+            <label>{{ form.name.label }}</label>
+            {{ form.name }}
+        </div>
+
+        <div>
+            <label>{{ form.second_name.label }}</label>
+            {{ form.second_name }}
+        </div>
+
+        <div>
+            <label>{{ form.last_name.label }}</label>
+            {{ form.last_name }}
+        </div>
+
+        <div>
+            <label>{{ form.position.label }}</label>
+            {{ form.position }}
+        </div>
+
+        <div class="">
+            <label>{{ form.contractor.label }}</label>
+            {{ form.contractor }}
+        </div>
+    </div>
+    <p>
+        {{ errors }}
+    </p>
+    <table class="table" id="contact-form-wrapper">
+        {{ formset.management_form }}
+        <thead>
+        <tr>
+            <th scope="col">Тип контакта</th>
+            <th scope="col">Контактные данные</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for contact_form in formset %}
+        <tr class="contact-form-container">
+            <td>{{ contact_form.type_of_contact }}</td>
+            <td>{{ contact_form.contact }}</td>
+        </tr>
+        {% endfor %}
+
+        </tbody>
+        <tfoot>
+        <tr>
+            <td>
+                <a href="#" id="add_contact" class="btn btn-success col-1 mt-2 fw-bold">
+                    +
+                </a>
+            </td>
+
+            <td>
+
+            </td>
+
+            <td>
+
+            </td>
+        </tr>
+        </tfoot>
+    </table>
+    <div>
+        <input type="submit" value="Сохранить контактное лицо" class="btn btn-primary mt-2">
+    </div>
+
+</form>
+
+{% block extrascripts %}
+<script type="text/JavaScript" src="{%  static 'app_crm/js/contact.js' %}"></script>
+{% endblock %}
+
+{% endblock %}
