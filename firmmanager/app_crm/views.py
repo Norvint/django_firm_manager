@@ -131,7 +131,7 @@ class ContactPersonCreateView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(ContactPersonCreateView, self).get_context_data(**kwargs)
-        contact_person_form = ContactPersonForm()
+        contact_person_form = ContactPersonForm(initial={'contractor': kwargs.get('contractor_id')})
         formset = formset_factory(ContactForm)
         context['formset'] = formset
         context['form'] = contact_person_form
@@ -148,10 +148,10 @@ class ContactPersonCreateView(LoginRequiredMixin, TemplateView):
                 for i, form in enumerate(formset):
                     data = formset.cleaned_data[i]
                     if form.is_valid() and data:
-                        contact = Contact(contractor=contact_person, type_of_contact=data['type_of_contact'],
+                        contact = Contact(contact_person=contact_person, type_of_contact=data['type_of_contact'],
                                           contact=data['contact'])
                         contact.save()
-                return redirect('contact_person_detail', pk=contact_person.pk)
+                return redirect('contact_person_detail', pk=contact_person.pk, contractor_id=kwargs.get('contractor_id'))
             else:
                 context['formset'] = formset
                 context['errors'] = formset.errors
@@ -171,12 +171,24 @@ class ContactPersonDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
-class ContactPersonListView(LoginRequiredMixin, ListView):
+class ContactPersonListView(LoginRequiredMixin, TemplateView):
     template_name = 'app_crm/contractors/contact_persons_list.html'
-    context_object_name = 'contact_persons'
-    queryset = ContactPerson.objects.all()
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        self.queryset = self.get_queryset().filter(contractor=kwargs.get('contractor_id'))
-        context = super(ContactPersonListView, self).get_context_data()
+        context = super(ContactPersonListView, self).get_context_data(**kwargs)
+        contact_persons = ContactPerson.objects.filter(contractor=kwargs.get('contractor_id'))
+        context['contact_persons'] = contact_persons
         return context
+
+
+class ContactPersonToDeleteView(LoginRequiredMixin, View):
+
+    def get(self, request, *args, **kwargs):
+        obj = ContactPerson.objects.get(pk=kwargs.get('pk'))
+        if obj:
+            if obj.to_delete:
+                obj.to_delete = False
+            else:
+                obj.to_delete = True
+            obj.save()
+            return redirect('contact_persons_list', contractor_id=kwargs.get('contractor_id'))

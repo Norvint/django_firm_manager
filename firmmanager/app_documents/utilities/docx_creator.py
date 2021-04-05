@@ -30,7 +30,7 @@ class ContractCreator:
             'organization': {
                 'title': self.contract.organization.title,
                 'registration': self.contract.organization.registration,
-                'address': self.contract.organization.address,
+                'address': self.contract.organization.legal_address,
                 'tin': self.contract.organization.tin,
                 'pprnie': self.contract.organization.pprnie,
                 'banks': []
@@ -58,7 +58,7 @@ class SpecificationCreator:
             'delivery_conditions':
                 {
                     'title': self.order.delivery_conditions.title,
-                    'time_of_delivery': self.order.delivery_conditions.delivery_time
+                    'time_of_delivery': self.order.delivery_time
                 },
             'contract': {
                 'number': self.order.contract.number,
@@ -72,7 +72,7 @@ class SpecificationCreator:
                 'organization': {
                     'title': self.order.contract.organization.title,
                     'registration': self.order.contract.organization.registration,
-                    'address': self.order.contract.organization.address,
+                    'address': self.order.contract.organization.legal_address,
                     'tin': self.order.contract.organization.tin,
                     'pprnie': self.order.contract.organization.pprnie,
                 },
@@ -119,7 +119,7 @@ class InvoiceCreator:
             'delivery_conditions':
                 {
                     'title': self.order.delivery_conditions.title,
-                    'time_of_delivery': self.order.delivery_conditions.delivery_time,
+                    'time_of_delivery': self.order.delivery_time,
                     'description': self.order.delivery_conditions.description
                 },
             'contract': {
@@ -135,7 +135,7 @@ class InvoiceCreator:
                 'organization': {
                     'title': self.order.contract.organization.title,
                     'registration': self.order.contract.organization.registration,
-                    'address': self.order.contract.organization.address,
+                    'address': self.order.contract.organization.legal_address,
                     'tin': self.order.contract.organization.tin,
                     'pprnie': self.order.contract.organization.pprnie,
                 },

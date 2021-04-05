@@ -30,8 +30,9 @@ class ContractorForm(forms.ModelForm):
 
 
 class ContactPersonForm(forms.ModelForm):
-    model = ContactPerson
-    fields = ['name', 'second_name', 'last_name', 'position', 'contractor']
+    class Meta:
+        model = ContactPerson
+        fields = ['name', 'second_name', 'last_name', 'position', 'contractor']
 
 
 class ContactForm(forms.Form):

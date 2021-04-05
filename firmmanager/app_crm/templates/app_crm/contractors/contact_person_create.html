@@ -4,10 +4,10 @@
 {% load static %}
 {% block content %}
 <h1>Новый клиент</h1>
-<form name="contact-person-create-form" method="post" action="{% url 'contact_person_create' %}" class="row">
+<form name="contact-person-create-form" method="post" action="{% url 'contact_person_create' contractor_id %}" class="row">
     {% csrf_token %}
     <div class="card d-flex justify-content-around p-2">
-        <div>['name', 'second_name', 'last_name', 'position', 'contractor']
+        <div>
             <label>{{ form.name.label }}</label>
             {{ form.name }}
         </div>

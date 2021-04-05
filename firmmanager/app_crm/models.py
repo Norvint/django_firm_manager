@@ -96,6 +96,11 @@ class ContactPerson(models.Model):
     position = models.CharField('Должность', max_length=30)
     contractor = models.ForeignKey(Contractor, on_delete=models.CASCADE, blank=True, null=True,
                                    verbose_name='Контрагент')
+    to_delete = models.BooleanField('К удалению', default=False)
+
+    class Meta:
+        verbose_name = 'Контактное лицо'
+        verbose_name_plural = 'Контактные лица'
 
 
 class Contact(models.Model):
@@ -105,8 +110,8 @@ class Contact(models.Model):
     contact = models.CharField('Контактные данные', max_length=50)
 
     class Meta:
-        verbose_name = 'Контакт контрагента'
-        verbose_name_plural = 'Контакты контрагентов'
+        verbose_name = 'Контакт контактного лица'
+        verbose_name_plural = 'Контакты контактных лиц'
 
     def __str__(self):
-        return f'{self.type_of_contact.name} {self.contact}'
+        return f'{self.type_of_contact} {self.contact}'

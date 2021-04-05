@@ -3,17 +3,28 @@
 {% block title %}Договоры{% endblock %}
 
 {% block content %}
+<div class="dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+       data-bs-toggle="dropdown" aria-expanded="false">
+        Навигация по контрагенту
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+        <li>
+            <a href="{% url 'contractor_detail' contractor_id %}"
+               class="dropdown-item">Контрагент</a>
+        </li>
 
-<ul class="nav nav-pills pt-2 pb-2">
-    <li class="col-2">
-        <a href="{% url 'contractor_detail' contractor_id %}" class="btn btn-primary col-11">Контрагент</a>
-    </li>
+        <li>
+            <a href="{% url 'contractor_orders_list' contractor_id %}"
+               class="dropdown-item">Заказы</a>
+        </li>
 
-    <li class="col-2">
-        <a href="{% url 'contractor_orders_list' contractor_id %}"
-           class="btn btn-primary col-11">Заказы</a>
-    </li>
-</ul>
+        <li>
+            <a href="{% url 'contact_persons_list' contractor_id %}" class="dropdown-item">Контактные
+                лица контрагента</a>
+        </li>
+    </ul>
+</div>
 
 <h1>Договоры</h1>
 
