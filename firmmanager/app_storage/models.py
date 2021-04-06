@@ -90,6 +90,13 @@ class ProductStoreIncome(models.Model):
     quantity = models.IntegerField('Количество')
     date = models.DateField(auto_now_add=True, verbose_name='Дата выпуска')
 
+    class Meta:
+        verbose_name = 'Приход продукции на склад'
+        verbose_name_plural = 'Приходы продукции на склад'
+
+    def __str__(self):
+        return f'{self.product} - {self.store} - {self.quantity}'
+
 
 class ProductStoreBooking(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, verbose_name='Заказ')

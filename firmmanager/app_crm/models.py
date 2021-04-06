@@ -103,6 +103,9 @@ class ContactPerson(models.Model):
         verbose_name = 'Контактное лицо'
         verbose_name_plural = 'Контактные лица'
 
+    def __str__(self):
+        return f'{self.name} {self.second_name} {self.last_name} - {self.contractor}'
+
 
 class Contact(models.Model):
     contact_person = models.ForeignKey(ContactPerson, on_delete=models.CASCADE, blank=True, null=True,

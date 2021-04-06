@@ -78,7 +78,9 @@ class ContractorCreateView(LoginRequiredMixin, TemplateView):
         context = self.get_context_data(**kwargs)
         form = ContractorForm(request.POST)
         if form.is_valid():
-            contractor = form.save()
+            contractor = form.save(commit=False)
+            contractor.responsible = request.user
+            contractor.save()
             return redirect('contractor_detail', pk=contractor.pk)
         else:
             context['form'] = form

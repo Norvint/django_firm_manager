@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from django.contrib.auth.models import User
 from django.db import models
 
 from app_crm.models import Contractor
@@ -65,6 +66,7 @@ class Contract(models.Model):
     delivery_address = models.CharField('Место поставки', max_length=50)
     currency = models.ForeignKey(Currency, on_delete=models.CASCADE, verbose_name='Валюта')
     to_delete = models.BooleanField('К удалению', default=False)
+    responsible = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
     class Meta:
         verbose_name = 'Договор'
@@ -87,6 +89,7 @@ class Order(models.Model):
     shipment_mark = models.CharField('Отгрузочная метка', max_length=100)
     total_sum = models.DecimalField('Сумма', max_digits=10, decimal_places=4, default=0)
     to_delete = models.BooleanField('К удалению', default=False)
+    responsible = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
     class Meta:
         verbose_name = 'Заказ'

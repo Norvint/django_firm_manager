@@ -69,7 +69,9 @@ class ContractCreateView(LoginRequiredMixin, TemplateView):
         context = self.get_context_data(**kwargs)
         contract_form = ContractForm(request.POST)
         if contract_form.is_valid():
-            contract_form.save()
+            contract = contract_form.save(commit=False)
+            contract.responsible = request.user
+            contract.save()
             return redirect('contracts_list')
         else:
             context['form'] = contract_form
@@ -214,7 +216,9 @@ class OrderCreateView(LoginRequiredMixin, TemplateView):
         context = self.get_context_data(**kwargs)
         order_form = OrderForm(request.POST)
         if order_form.is_valid():
-            order_form.save()
+            order = order_form.save(commit=False)
+            order.responsible = request.user
+            order.save()
             return redirect('orders_list')
         else:
             context['form'] = order_form
