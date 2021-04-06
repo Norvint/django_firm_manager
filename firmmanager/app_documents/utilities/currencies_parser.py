@@ -1,5 +1,9 @@
+import logging
 import re
-from decimal import Decimal, getcontext
+import time
+from decimal import Decimal
+from django.db import connections
+
 
 from bs4 import BeautifulSoup
 import requests
@@ -10,7 +14,7 @@ from app_documents.models import Currency
 class CurrenciesUpdater:
 
     def __init__(self):
-        self.url = 'http://www.cbr.ru/scripts/XML_daily.asp'
+        self.url = 'https://www.cbr.ru/scripts/XML_daily.asp'
         self.pattern = re.compile(r'\.val\("([^@]+@[^@]+\.[^@]+)"\);', re.MULTILINE | re.DOTALL)
         self.currencies = []
 
@@ -34,11 +38,12 @@ class CurrenciesUpdater:
             try:
                 currency_object = Currency.objects.get(code=currency['code'])
             except Exception:
-                currency_object = Currency(title=currency['title'],
-                                           code=currency['code'],
-                                           char_code=currency['char_code'],
-                                           nominal=currency['nominal'],
-                                           cost=currency['cost'])
-                currency_object.save()
+                Currency.objects.create(title=currency['title'],
+                                        code=currency['code'],
+                                        char_code=currency['char_code'],
+                                        nominal=currency['nominal'],
+                                        cost=currency['cost'])
+                for conn in connections.all():
+                    conn.close()
 
 

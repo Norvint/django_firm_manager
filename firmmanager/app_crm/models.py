@@ -55,6 +55,7 @@ class Contractor(models.Model):
     actual_address = models.CharField('Фактический адрес', max_length=200, blank=True)
     requisites = models.TextField('Реквизиты', max_length=500)
     to_delete = models.BooleanField('К удалению', default=False)
+    responsible = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
     class Meta:
         verbose_name = 'Контрагент'
