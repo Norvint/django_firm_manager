@@ -22,13 +22,13 @@ class OrderBookingForm(forms.ModelForm):
 class ContractForm(forms.ModelForm):
     class Meta:
         model = Contract
-        fields = ['number', 'type', 'contractor', 'organization', 'delivery_address', 'currency']
+        fields = ['number', 'type', 'contractor', 'organization', 'currency', 'created']
 
 
 class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
-        fields = ['number', 'contract', 'delivery_conditions', 'delivery_time', 'loading_place', 'payment_conditions', 'shipment_mark']
+        fields = ['number', 'contract', 'delivery_conditions', 'delivery_time', 'delivery_address', 'payment_conditions', 'shipment_mark']
 
 
 class ContractFilterForm(forms.Form):

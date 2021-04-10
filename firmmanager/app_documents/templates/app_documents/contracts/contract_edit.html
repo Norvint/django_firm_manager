@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 
-{% block title %}Добавить договор{% endblock %}
+{% block title %}Редактировать договор{% endblock %}
 
 {% block content %}
-<h1>Новый договор</h1>
+<h1>Редактировать договор</h1>
 <a href="{% url 'contracts_list' %}" class="btn btn-primary mb-3">Назад</a>
 <p>
     {{ answer }}
@@ -11,7 +11,7 @@
 <p>
     {{ errors }}
 </p>
-<form name="contract-create-form" method="post" action="{% url 'contract_create' %}" class="card p-2 col-6 row">
+<form name="contract-create-form" method="post" action="{% url 'contract_edit' object.id %}" class="card p-2 col-6 row">
     {% csrf_token %}
      <label>
         {{ form.number.label }}
@@ -33,10 +33,10 @@
         {{ form.currency.label }}
     </label>
     {{ form.currency }}
-     <label>
+    <label>
         {{ form.created.label }}
     </label>
     {{ form.created }}
-    <input type="submit" value="Добавить" class="btn btn-primary mt-2">
+    <input type="submit" value="Сохранить" class="btn btn-primary mt-2">
 </form>
 {% endblock %}

@@ -7,7 +7,7 @@ from django.forms import formset_factory
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.views import View
-from django.views.generic import DetailView, ListView, TemplateView, DeleteView
+from django.views.generic import DetailView, ListView, TemplateView, DeleteView, UpdateView
 
 from app_documents.forms import OrderBookingForm, OrderForm, ContractFilterForm, \
     ContractForm, OrderFilterForm
@@ -98,6 +98,17 @@ class ContractDetailView(LoginRequiredMixin, DetailView):
         contract_creator.create_contract()
         context['file'] = True
         return self.render_to_response(context)
+
+
+class ContractEditView(LoginRequiredMixin, UpdateView):
+    template_name = 'app_documents/contracts/contract_edit.html'
+    model = Contract
+    fields = ['number', 'type', 'contractor', 'organization', 'currency']
+    success_url = f'/documents/contracts/'
+
+    def get_success_url(self):
+        url = super(ContractEditView, self).get_success_url() + str(self.object.id)
+        return url
 
 
 class ContractToDeleteView(LoginRequiredMixin, View):

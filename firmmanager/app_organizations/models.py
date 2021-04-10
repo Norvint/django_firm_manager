@@ -9,7 +9,8 @@ from firmmanager.settings import MEDIA_ROOT
 
 
 class Organization(models.Model):
-    title = models.CharField('Наименование', max_length=30)
+    title = models.CharField('Наименование', max_length=100)
+    title_en = models.CharField('Наименование(англ)', max_length=100, blank=True)
     position = models.CharField('Должность', max_length=30, blank=True)
     position_en = models.CharField('Должность(англ)', max_length=30, blank=True)
     appeal = models.CharField('Обращение', max_length=30, default='г-н', blank=True)
@@ -18,12 +19,14 @@ class Organization(models.Model):
     second_name = models.CharField('Отчество', max_length=30, blank=True)
     last_name = models.CharField('Фамилия', max_length=30, blank=True)
     legal_address = models.CharField('Юр. адрес', max_length=200)
+    legal_address_en = models.CharField('Юр. адрес(англ)', max_length=200, blank=True)
     actual_address = models.CharField('Фактический адрес', max_length=200, blank=True)
     tin = models.CharField('ИНН(TIN)', max_length=12)
     pprnie = models.CharField('ОГРН(ИП)', max_length=15)
     registration = models.CharField('Действующий на основании', max_length=100, blank=True)
+    registration_en = models.CharField('Действующий на основании(англ)', max_length=100, blank=True)
     requisites = models.TextField('Банковские реквизиты', max_length=1000)
-    requisites_en = models.TextField('Банковские реквизиты(англ)', max_length=1000)
+    requisites_en = models.TextField('Банковские реквизиты(англ)', max_length=1000, blank=True)
 
     class Meta:
         verbose_name = 'Организация'

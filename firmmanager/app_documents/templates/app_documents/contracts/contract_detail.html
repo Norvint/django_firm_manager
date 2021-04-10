@@ -11,7 +11,7 @@
     <div class="card">
         <ul class="list-group list-group-horizontal">
             <li class="list-group-item">
-                <a href="" class="btn btn-primary">Редактировать</a>
+                <a href="{% url 'contract_edit' object.id %}" class="btn btn-primary">Редактировать</a>
             </li>
             {% if object.to_delete %}
             <li class="list-group-item">

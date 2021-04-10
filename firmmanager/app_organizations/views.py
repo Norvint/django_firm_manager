@@ -14,8 +14,11 @@ from firmmanager import settings
 class OrganizationCreateView(LoginRequiredMixin, CreateView):
     template_name = 'app_organizations/organization_create.html'
     model = Organization
-    fields = ('title', 'tin', 'pprnie', 'registration', 'position', 'position_en', 'appeal', 'appeal_en',
-              'name', 'second_name', 'last_name', 'legal_address', 'actual_address', 'requisites', 'requisites_en')
+    fields = (
+    'title', 'title_en', 'tin', 'pprnie', 'registration', 'registration_en', 'position', 'position_en', 'appeal',
+    'appeal_en',
+    'name', 'second_name', 'last_name', 'legal_address', 'legal_address_en', 'actual_address', 'requisites',
+    'requisites_en')
     success_url = '/organizations'
 
 
@@ -33,7 +36,7 @@ class OrganizationDetailView(LoginRequiredMixin, DetailView):
 class OrganizationFileList(LoginRequiredMixin, TemplateView):
     template_name = 'app_organizations/organization_files.html'
 
-    def get_context_data(self,  **kwargs):
+    def get_context_data(self, **kwargs):
         context = super(OrganizationFileList, self).get_context_data(**kwargs)
         organization = Organization.objects.get(pk=kwargs.get('pk'))
         files = OrganizationFile.objects.all().filter(organization=organization)
@@ -124,8 +127,9 @@ class WorkerCreateView(LoginRequiredMixin, TemplateView):
 class WorkerEditView(LoginRequiredMixin, UpdateView):
     template_name = 'app_organizations/worker_edit.html'
     model = Worker
-    fields = ('user', 'name', 'second_name', 'last_name', 'position', 'organization', 'serial_number', 'number', 'issued_by',
-              'date', 'date_of_birth', 'department_code')
+    fields = (
+    'user', 'name', 'second_name', 'last_name', 'position', 'organization', 'serial_number', 'number', 'issued_by',
+    'date', 'date_of_birth', 'department_code')
     success_url = '/organizations/workers'
 
 

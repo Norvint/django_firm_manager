@@ -4,13 +4,14 @@ from app_documents.views import DeliveryConditionsDetailView, DeliveryConditions
     ContractDetailView, ContractListView, ContractTypeDetailView, ContractTypeListView, CurrencyDetailView, \
     CurrencyListView, download_contract, OrderCreateView, OrderBookingCreateView, OrderDetailView, OrderListView, \
     PaymentConditionsListView, download_specification, download_invoice, OrderBookingDeleteView, OrderBookingEditView, \
-    ContractToDeleteView, OrderToDeleteView, CurrencyUpdate
+    ContractToDeleteView, OrderToDeleteView, CurrencyUpdate, ContractEditView
 
 # contracts
 urlpatterns = [
     path('contracts/', ContractListView.as_view(), name='contracts_list'),
     path('contracts/create-contract/', ContractCreateView.as_view(), name='contract_create'),
     path('contracts/<int:pk>', ContractDetailView.as_view(), name='contract_detail'),
+    path('contracts/<int:pk>/edit', ContractEditView.as_view(), name='contract_edit'),
     path('contracts/download-contract/', download_contract, name='download_contract'),
     path('contracts/contract-types/', ContractTypeListView.as_view(), name='contract_types_list'),
     path('contracts/contract-types/<int:pk>', ContractTypeDetailView.as_view(), name='contract_type_detail'),
