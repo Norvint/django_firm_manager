@@ -1,5 +1,10 @@
+import os
+
 from django.contrib.auth.models import User
 from django.db import models
+
+from app_organizations.models import UploadToPathAndRename
+from firmmanager.settings import MEDIA_ROOT
 
 
 class TypeOfContractor(models.Model):
@@ -119,3 +124,32 @@ class Contact(models.Model):
 
     def __str__(self):
         return f'{self.type_of_contact} {self.contact}'
+
+
+class ContractorFileCategory(models.Model):
+    title = models.CharField('Название', max_length=100)
+    slug = models.CharField('Наимнование для образования ссылки(англ)', max_length=100)
+
+    class Meta:
+        verbose_name = 'Категория файлов контрагента'
+        verbose_name_plural = 'Категории файлов контрагентов'
+
+    def __str__(self):
+        return self.title
+
+
+class ContractorFile(models.Model):
+    title = models.CharField('Название', max_length=100)
+    contractor = models.ForeignKey(Contractor, on_delete=models.CASCADE, verbose_name='Организация')
+    file = models.FileField('Файл', upload_to=UploadToPathAndRename(
+        os.path.join(MEDIA_ROOT, 'app_organizations', 'organization_files')), max_length=500)
+    description = models.TextField('Описание', blank=True)
+    category = models.ForeignKey(ContractorFileCategory, on_delete=models.CASCADE, verbose_name='Категория')
+    created_at = models.DateTimeField('Создан', auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'Файл контрагента'
+        verbose_name_plural = 'Файлы контрагентов'
+
+    def __str__(self):
+        return self.title

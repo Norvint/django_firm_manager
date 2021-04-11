@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Прикрепленные файлы{% endblock %}
+
+{% block content %}
+<div class="dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+       data-bs-toggle="dropdown" aria-expanded="false">
+        Навигация по контрагенту
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+        <li>
+            <a href="{% url 'contractor_detail' contractor_id %}"
+               class="dropdown-item">Контрагент</a>
+        </li>
+
+        <li>
+            <a href="{% url 'contractor_contracts_list' contractor_id %}" class="dropdown-item">Договоры</a>
+        </li>
+
+        <li>
+            <a href="{% url 'contractor_orders_list' contractor_id %}"
+               class="dropdown-item">Заказы</a>
+        </li>
+
+        <li>
+            <a href="{% url 'contact_persons_list' contractor_id %}" class="dropdown-item">Контактные
+                лица контрагента</a>
+        </li>
+    </ul>
+</div>
+
+<div class="dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+       data-bs-toggle="dropdown" aria-expanded="false">
+        Прикрепленные файлы
+    </a>
+   <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+        {% for file_category in files_categories %}
+        <li>
+            <a href="{% url 'contractor_files_list' contractor_id file_category.slug %}" class="dropdown-item">{{ file_category.title }}</a>
+        </li>
+        {% endfor %}
+       <li>
+            <a href="{% url 'contractor_files_list' contractor_id 'all' %}" class="dropdown-item">Все файлы</a>
+       </li>
+    </ul>
+</div>
+<h1>{{ category_slug }}</h1>
+
+{% if files %}
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <td>Название файла</td>
+            <td>Описание</td>
+            <td>Открыть</td>
+            <td>Категория</td>
+            <td>Дата загрузки</td>
+        </tr>
+    </thead>
+    <tbody>
+    {% for file in files %}
+        <tr>
+            <td>{{ file.title }}</td>
+            <td>{{ file.description }}</td>
+            <td>
+                <a href="" target="_blank">Значок</a>
+            </td>
+            <td>{{ file.category.title }}</td>
+            <td>{{ file.created_at }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+<a href="{% url 'contractor_file_create' contractor_id %}" class="btn btn-primary mb-3">Прикрепить файл</a>
+{% endblock %}

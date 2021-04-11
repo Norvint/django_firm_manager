@@ -25,6 +25,25 @@
     </ul>
 </div>
 
+
+<div class="dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+       data-bs-toggle="dropdown" aria-expanded="false">
+        Прикрепленные файлы
+    </a>
+   <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+        {% for file_category in files_categories %}
+        <li>
+            <a href="{% url 'contractor_files_list' object.id file_category.slug %}" class="dropdown-item">{{ file_category.title }}</a>
+        </li>
+        {% endfor %}
+       <li>
+            <a href="{% url 'contractor_files_list' object.id 'all' %}" class="dropdown-item">Все файлы</a>
+       </li>
+    </ul>
+</div>
+
+
 <h1>Информация о контрагенте</h1>
 <div class="card col-9">
      <ul class="list-group list-group-horizontal">

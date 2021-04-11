@@ -18,6 +18,9 @@ class Organization(models.Model):
     name = models.CharField('Имя', max_length=30, blank=True)
     second_name = models.CharField('Отчество', max_length=30, blank=True)
     last_name = models.CharField('Фамилия', max_length=30, blank=True)
+    name_en = models.CharField('Имя(Англ)', max_length=30, blank=True)
+    second_name_en = models.CharField('Отчество(Англ)', max_length=30, blank=True)
+    last_name_en = models.CharField('Фамилия(Англ)', max_length=30, blank=True)
     legal_address = models.CharField('Юр. адрес', max_length=200)
     legal_address_en = models.CharField('Юр. адрес(англ)', max_length=200, blank=True)
     actual_address = models.CharField('Фактический адрес', max_length=200, blank=True)
@@ -33,7 +36,7 @@ class Organization(models.Model):
         verbose_name_plural = 'Организации'
 
     def __str__(self):
-        return f'{self.pk}. {self.title}'
+        return self.title
 
 
 class Worker(models.Model):
@@ -55,7 +58,7 @@ class Worker(models.Model):
         verbose_name_plural = 'Сотрудники'
 
     def __str__(self):
-        return f'{self.pk}. {self.name} {self.second_name} {self.last_name}'
+        return f'{self.name} {self.second_name} {self.last_name}'
 
 
 @deconstructible

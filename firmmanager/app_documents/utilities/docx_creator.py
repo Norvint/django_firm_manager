@@ -1,9 +1,8 @@
 import os
-from datetime import datetime
 from decimal import Decimal
 from pathlib import Path
 
-from django.db.models.functions import ExtractYear
+import pymorphy2
 from docxtpl import DocxTemplate
 
 from app_storage.models import ProductStoreBooking
@@ -20,7 +19,7 @@ class ContractCreator:
     def create_contract(self):
         doc = DocxTemplate(self.template)
         context = {
-            'number': self.contract.pk,
+            'number': self.contract.number,
             'created': self.contract.created,
             'created_year': self.get_created_year(),
             'client': {
@@ -40,11 +39,11 @@ class ContractCreator:
                 'appeal': self.contract.organization.appeal,
                 'appeal_en': self.contract.organization.appeal_en,
                 'name': self.contract.organization.name,
-                'name_en': 'Имя транслитом тут нужно!',
+                'name_en': self.contract.organization.name_en,
                 'second_name': self.contract.organization.second_name,
-                'second_name_en': 'Второе имя транслитом тут нужно!',
+                'second_name_en': self.contract.organization.second_name_en,
                 'last_name': self.contract.organization.last_name,
-                'last_name_en': 'Фамилия транслитом тут нужна!',
+                'last_name_en': self.contract.organization.last_name_en,
                 'word_ending': self.get_word_ending(),
                 'registration': self.contract.organization.registration,
                 'registration_en': self.contract.organization.registration_en,
@@ -54,8 +53,10 @@ class ContractCreator:
                 'pprnie': self.contract.organization.pprnie,
                 'requisites': self.contract.organization.requisites,
                 'requisites_en': self.contract.organization.requisites_en,
+                'position': self.get_position(),
+                'position_en': self.contract.organization.position_en,
             },
-            'currency' : {
+            'currency': {
                 'title': self.contract.currency.title,
                 'char_code': self.contract.currency.char_code,
             }
@@ -75,6 +76,13 @@ class ContractCreator:
     def get_created_year(self):
         created_year = self.contract.created.strftime('%Y')
         return created_year
+
+    def get_position(self):
+        morph = pymorphy2.MorphAnalyzer()
+        position_raw = morph.parse(self.contract.organization.position)[0]
+        position = position_raw.inflect({'gent'})
+        print(position.word)
+        return position.word
 
 
 class SpecificationCreator:

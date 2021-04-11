@@ -2,12 +2,13 @@ from django.urls import path
 
 from app_organizations.views import OrganizationCreateView, \
     OrganizationDetailView, OrganizationListView, WorkerCreateView, WorkerDetailView, WorkerListView, WorkerEditView, \
-    OrganizationFileList, download_organization_file, OrganizationFileCreate
+    OrganizationFileList, download_organization_file, OrganizationFileCreate, OrganizationEditView
 
 urlpatterns = [
     path('', OrganizationListView.as_view(), name='organizations_list'),
     path('create-organization/', OrganizationCreateView.as_view(), name='organization_create'),
     path('<int:pk>', OrganizationDetailView.as_view(), name='organization_detail'),
+    path('<int:pk>/edit', OrganizationEditView.as_view(), name='organization_edit'),
     path('<int:pk>/files', OrganizationFileList.as_view(), name='organization_files_list'),
     path('<int:pk>/files/create', OrganizationFileCreate.as_view(), name='organization_file_create'),
     path('files/<int:pk>/download', download_organization_file, name='organization_file_download'),

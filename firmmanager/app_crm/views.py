@@ -4,8 +4,9 @@ from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, UpdateView, TemplateView
 from django.views.generic.base import View
 
-from app_crm.forms import ContractorFilterForm, ContractorCommentForm, ContractorForm, ContactForm, ContactPersonForm
-from app_crm.models import Contractor, ContractorComment, Contact, ContactPerson
+from app_crm.forms import ContractorFilterForm, ContractorCommentForm, ContractorForm, ContactForm, ContactPersonForm, \
+    ContractorFileForm
+from app_crm.models import Contractor, ContractorComment, Contact, ContactPerson, ContractorFile, ContractorFileCategory
 from app_documents.models import Contract, Order
 
 
@@ -45,8 +46,10 @@ class ContractorDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(ContractorDetailView, self).get_context_data(**kwargs)
         comments = ContractorComment.objects.filter(contractor=self.get_object()).order_by('-created')
+        files_categories = ContractorFileCategory.objects.all()
         context['comments'] = comments
         comment_form = ContractorCommentForm()
+        context['files_categories'] = files_categories
         context['comment_form'] = comment_form
         return context
 
@@ -106,6 +109,49 @@ class ContractorToDeleteView(LoginRequiredMixin, View):
                 obj.to_delete = True
             obj.save()
             return redirect('contractor_detail', pk=kwargs.get('pk'))
+
+
+class ContractorFileList(LoginRequiredMixin, TemplateView):
+    template_name = 'app_crm/contractors/contractor_files_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ContractorFileList, self).get_context_data(**kwargs)
+        contractor = Contractor.objects.get(pk=kwargs.get('contractor_id'))
+        category_slug = kwargs.get('category_slug')
+        if category_slug != "all":
+            files = ContractorFile.objects.all().filter(contractor=contractor, category__slug=category_slug)
+        else:
+            files = ContractorFile.objects.all().filter(contractor=contractor)
+        files_categories = ContractorFileCategory.objects.all()
+        context['files_categories'] = files_categories
+        context['files'] = files
+        context['contractor'] = contractor
+        return context
+
+    def post(self, request, *args, **kwargs):
+        pass
+
+
+class ContractorFileCreate(LoginRequiredMixin, TemplateView):
+    template_name = 'app_crm/contractors/contractor_file_create.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ContractorFileCreate, self).get_context_data(**kwargs)
+        contractor = Contractor.objects.get(pk=kwargs.get('contractor_id'))
+        form = ContractorFileForm(initial={'contractor': contractor})
+        context['form'] = form
+        return context
+
+    def post(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        form = ContractorFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('contractor_files_list', kwargs.get('contractor_id'), form.cleaned_data['category'].slug)
+        else:
+            context['form'] = form
+            context['errors'] = form.errors
+        return self.render_to_response(context)
 
 
 class ContractorContractListView(LoginRequiredMixin, TemplateView):

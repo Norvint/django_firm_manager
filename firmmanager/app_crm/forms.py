@@ -1,7 +1,7 @@
 from django import forms
 
 from app_crm.models import TypeOfContractor, FieldOfActivity, ContractorComment, Contact, Contractor, \
-    ContactType, ContactPerson
+    ContactType, ContactPerson, ContractorFile
 
 
 class ContractorFilterForm(forms.Form):
@@ -38,3 +38,9 @@ class ContactPersonForm(forms.ModelForm):
 class ContactForm(forms.Form):
     type_of_contact = forms.ModelChoiceField(ContactType.objects.all(), label='Тип контакта')
     contact = forms.CharField(max_length=50, label='Контактные данные')
+
+
+class ContractorFileForm(forms.ModelForm):
+    class Meta:
+        model = ContractorFile
+        fields = ['title', 'contractor', 'file', 'description', 'category']
