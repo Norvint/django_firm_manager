@@ -5,55 +5,73 @@
 {% block content %}
 <form action="" method="post">
     {% csrf_token %}
-    <div class="d-flex flex-row col-6 justify-content-between mb-2">
-        <div class="d-flex flex-column col-3">
-            {{ filter.country.errors }}
-            {{ filter.country.label }}
-            {{ filter.country }}
-        </div>
+    <table>
+        <thead>
+            <tr>
+                <th>
+                    {{ filter.country.label }}
+                </th>
 
-        <div class="d-flex flex-column col-3">
-            {{ filter.type_of_contractor.errors }}
-            {{ filter.type_of_contractor.label }}
-            {{ filter.type_of_contractor }}
-        </div>
+                <th>
+                    {{ filter.type_of_contractor.label }}
+                </th>
 
-        <div class="d-flex flex-column col-3">
-            {{ filter.field_of_activity.errors }}
-            {{ filter.field_of_activity.label }}
-            {{ filter.field_of_activity }}
-        </div>
-        <button class="btn btn-secondary mt-3 mb-3" type="submit">Отсортировать</button>
-    </div>
+                <th>
+                    {{ filter.field_of_activity.label }}
+                </th>
+
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    {{ filter.country }}
+                </td>
+
+                <td class="w-auto">
+                    {{ filter.type_of_contractor }}
+                </td>
+
+                <td>
+                    {{ filter.field_of_activity }}
+                </td>
+
+                <td>
+                    <button class="btn btn-secondary mt-3 mb-3" type="submit">Отсортировать</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </form>
 <h1>Контрагенты</h1>
 <a href="{% url 'contractor_create' %}" class="btn btn-primary mb-3">Добавить контрагента</a>
 
 {% if contractors %}
-<div class="row">
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th scope="col">Название</th>
+        <th scope="col">Страна</th>
+        <th scope="col">Ответсвенный</th>
+    </tr>
+    </thead>
+    <tbody>
     {% for contractor in contractors %}
-    <div class="mb-5 col-4">
-        {% if contractor.to_delete %}
-        <div class="card text-white bg-secondary">
-            <div class="card-body">
-                <h5 class="card-title"><a class="text-white" href="{% url 'contractor_detail' contractor.id %}">{{ contractor.title }}</a></h5>
-            </div>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item bg-secondary">Страна: {{ contractor.country }}</li>
-            </ul>
-        </div>
-        {% else %}
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title"><a class="text-reset" href="{% url 'contractor_detail' contractor.id %}">{{ contractor.title }}</a></h5>
-            </div>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item">Страна: {{ contractor.country }}</li>
-            </ul>
-        </div>
-        {% endif %}
-    </div>
+    <tr class="{% if contractor.to_delete %} text-white bg-secondary {% endif %}">
+        <td>
+            <a class="{% if contractor.to_delete %} text-white {% else %} text-reset {% endif %}"
+               href="{% url 'contractor_detail' contractor.id %}">{{ contractor.title }}</a>
+        </td>
+        <td>
+            {{ contractor.country }}
+        </td>
+        <td>
+            {{ contractor.responsible }}
+        </td>
+    </tr>
     {% endfor %}
-</div>
+    </tbody>
+</table>
 {% endif %}
 {% endblock %}

@@ -37,6 +37,8 @@ class CurrenciesUpdater:
         for currency in self.currencies:
             try:
                 currency_object = Currency.objects.get(code=currency['code'])
+                currency_object.cost = currency['cost']
+                currency_object.save()
             except Exception:
                 Currency.objects.create(title=currency['title'],
                                         code=currency['code'],

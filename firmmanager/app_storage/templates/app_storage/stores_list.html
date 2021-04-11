@@ -16,22 +16,26 @@
 <h1>Склады</h1>
 <a href="{% url 'product_store_income' %}" class="btn btn-primary mb-2 mt-2">Оформить приход продукции на склад</a>
 {% if stores_list %}
-    <div class="row">
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th scope="col">Название</th>
+        <th scope="col">Адрес</th>
+    </tr>
+    </thead>
+    <tbody>
     {% for store in stores_list %}
-        <div class="mb-5 col-4">
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">{{ store.title }}</h5>
-              </div>
-              <ul class="list-group list-group-flush">
-                <li class="list-group-item">Адрес: {{ store.address }}</li>
-              </ul>
-              <div class="card-body">
-                <a href="{% url 'store_detail' store.id %}" class="btn btn-primary">Открыть</a>
-              </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
+    <tr>
+        <td>
+            <a class="text-reset" href="{% url 'store_detail' store.id %}">{{ store.title }}</a>
+        </td>
+
+        <td>
+            {{ store.address }}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
 {% endif %}
 {% endblock %}

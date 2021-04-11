@@ -33,7 +33,7 @@
     {% for currency in currencies %}
     <tr>
         <td>
-            <a href="{% url 'currency_detail' currency.id %}">{{ currency.title }}</a>
+            <a class="text-reset" href="{% url 'currency_detail' currency.id %}">{{ currency.title }}</a>
         </td>
         <td>{{ currency.code }}</td>
         <td>{{ currency.char_code }}</td>

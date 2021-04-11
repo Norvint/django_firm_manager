@@ -60,7 +60,7 @@ class ContractCreateView(LoginRequiredMixin, TemplateView):
             number = f'{current_year}-0{contract_id}'
         else:
             number = f'{current_year}-{contract_id}'
-        contract_form = ContractForm(initial={'number': number})
+        contract_form = ContractForm(initial={'number': number, 'contractor': kwargs.get('contractor_id')})
         context['form'] = contract_form
         context['answer'] = kwargs
         return context

@@ -4,14 +4,11 @@
 
 {% block content %}
 <h1>Новый договор</h1>
-<a href="{% url 'contracts_list' %}" class="btn btn-primary mb-3">Назад</a>
-<p>
-    {{ answer }}
-</p>
+<a href="{% url 'contracts_list' %}" class="btn btn-primary mb-3">К списку договоров</a>
 <p>
     {{ errors }}
 </p>
-<form name="contract-create-form" method="post" action="{% url 'contract_create' %}" class="card p-2 col-6 row">
+<form name="contract-create-form" method="post" class="card p-2 col-6 row">
     {% csrf_token %}
      <label>
         {{ form.number.label }}

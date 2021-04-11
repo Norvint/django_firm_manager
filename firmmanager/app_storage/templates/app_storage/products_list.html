@@ -46,25 +46,43 @@
 <a href="{% url 'product_create' 1 %}" class="btn btn-primary mb-3">Добавить продукцию</a>
 
 {% if products_list %}
-    <div class="row">
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th scope="col">Тип продукта</th>
+        <th scope="col">Артикул</th>
+        <th scope="col">Модель</th>
+        <th scope="col">Версия</th>
+        <th scope="col">Страна</th>
+    </tr>
+    </thead>
+    <tbody>
     {% for product in products_list %}
-        <div class="mb-5 col-4">
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">{{ product.type_of_product }}</h5>
-              </div>
-              <ul class="list-group list-group-flush">
-                <li class="list-group-item">Артикул: {{ product.number }}</li>
-                <li class="list-group-item">Модель: {{ product.model }}</li>
-                <li class="list-group-item">Версия: {{ product.version }}</li>
-                <li class="list-group-item">Страна: {{ product.country }}</li>
-              </ul>
-              <div class="card-body">
-                <a href="{% url 'product_detail' product.id %}" class="btn btn-primary">Открыть</a>
-              </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
+    <tr>
+        <td>
+            {{ product.type_of_product }}
+        </td>
+
+        <td>
+            <a class="text-reset" href="{% url 'product_detail' product.id %}">{{ product.number }}</a>
+        </td>
+
+        <td>
+            {{ product.model }}
+        </td>
+
+        <td>
+            {{ product.version }}
+        </td>
+
+        <td>
+            {{ product.country }}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
 {% endif %}
+
+
 {% endblock %}

@@ -5,12 +5,6 @@
 {% block content %}
 <h1>Редактировать договор</h1>
 <a href="{% url 'contracts_list' %}" class="btn btn-primary mb-3">Назад</a>
-<p>
-    {{ answer }}
-</p>
-<p>
-    {{ errors }}
-</p>
 <form name="contract-create-form" method="post" action="{% url 'contract_edit' object.id %}" class="card p-2 col-6 row">
     {% csrf_token %}
      <label>

@@ -7,23 +7,31 @@
 <a href="{% url 'organization_create' %}" class="btn btn-primary mb-3">Добавить организацию</a>
 
 {% if organizations %}
-<div class="row">
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th scope="col">Название</th>
+        <th scope="col">Юр. адрес</th>
+        <th scope="col">ИНН</th>
+    </tr>
+    </thead>
+    <tbody>
     {% for organization in organizations %}
-    <div class="mb-5 col-3">
-        <div class="card" style="width: 18rem;">
-            <div class="card-body">
-                <h5 class="card-title">{{ organization.title }}</h5>
-            </div>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item">Адрес: {{ organization.address }}</li>
-                <li class="list-group-item">ИНН(TIN): {{ organization.tin }}</li>
-            </ul>
-            <div class="card-body">
-                <a href="{% url 'organization_detail' organization.id %}" class="btn btn-primary">Открыть</a>
-            </div>
-        </div>
-    </div>
+    <tr>
+        <td>
+            <a class="text-reset" href="{% url 'organization_detail' organization.id %}">{{ organization.title }}</a>
+        </td>
+
+        <td>
+            {{ organization.legal_address }}
+        </td>
+
+        <td>
+            {{ organization.tin }}
+        </td>
+    </tr>
     {% endfor %}
-</div>
+    </tbody>
+</table>
 {% endif %}
 {% endblock %}

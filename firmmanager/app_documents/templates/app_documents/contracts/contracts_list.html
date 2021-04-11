@@ -5,15 +5,15 @@
 {% block content %}
 
 <ul class="nav nav-pills pt-2 pb-2">
-  <li class="nav-item">
-    <a class="nav-link active" aria-current="page" href="{% url 'contracts_list' %}">Договоры</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="{% url 'contract_types_list' %}">Типы договоров</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="{% url 'currencies_list' %}">Валюты</a>
-  </li>
+    <li class="nav-item">
+        <a class="nav-link active" aria-current="page" href="{% url 'contracts_list' %}">Договоры</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'contract_types_list' %}">Типы договоров</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'currencies_list' %}">Валюты</a>
+    </li>
 </ul>
 
 <form action="" method="post" class="mb-2">
@@ -42,43 +42,29 @@
         </div>
     </div>
 </form>
-<a href="{% url 'contract_create' %}" class="btn btn-primary mb-3">Добавить договор</a>
+<a href="{% url 'contract_create' 0 %}" class="btn btn-primary mb-3">Добавить договор</a>
 <h1>Договоры</h1>
 {% if contracts %}
-<div class="row">
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th scope="col">Контрагент</th>
+        <th scope="col">Номер</th>
+        <th scope="col">Дата создания</th>
+    </tr>
+    </thead>
+    <tbody>
     {% for contract in contracts %}
-    {% if contract.to_delete %}
-    <div class="mb-5 col-4">
-        <div class="card text-white bg-secondary">
-            <div class="card-body">
-                <h5 class="card-title">{{ contract.contractor }}</h5>
-            </div>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item bg-secondary">Номер: {{ contract.number }}</li>
-                <li class="list-group-item bg-secondary">Дата создания: {{ contract.created }}</li>
-            </ul>
-            <div class="card-body">
-                <a href="{% url 'contract_detail' contract.id %}" class="btn btn-primary">Открыть</a>
-            </div>
-        </div>
-    </div>
-    {% else %}
-    <div class="mb-5 col-4">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">{{ contract.contractor }}</h5>
-            </div>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item">Номер: {{ contract.number }}</li>
-                <li class="list-group-item">Дата создания: {{ contract.created }}</li>
-            </ul>
-            <div class="card-body">
-                <a href="{% url 'contract_detail' contract.id %}" class="btn btn-primary">Открыть</a>
-            </div>
-        </div>
-    </div>
-    {% endif %}
+    <tr class="{% if contract.to_delete %} text-white bg-secondary {% endif %}">
+        <td>
+            <a class="{% if contract.to_delete %} text-white {% else %} text-reset {% endif %}"
+               href="{% url 'contract_detail' contract.id %}">{{ contract.contractor }}</a>
+        </td>
+        <td>{{ contract.number }}</td>
+        <td>{{ contract.created }}</td>
+    </tr>
     {% endfor %}
-</div>
+    </tbody>
+</table>
 {% endif %}
 {% endblock %}

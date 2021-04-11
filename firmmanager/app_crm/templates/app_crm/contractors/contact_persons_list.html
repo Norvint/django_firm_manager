@@ -26,7 +26,7 @@
 </div>
 
 <h1>Контактные лица</h1>
-
+<a href="{% url 'contact_person_create' contractor_id %}" class="btn btn-primary">Добавить контактное лицо</a>
 {% if contact_persons %}
 <table class="table">
     <thead>
@@ -41,21 +41,31 @@
     </thead>
     <tbody>
     {% for contact_person in contact_persons %}
-    <tr>
+    <tr class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}">
 
-        <td class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}">
+        <td>
             <a class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}"
-               href="{% url 'contact_person_detail' contractor_id contact_person.id %}">{{ contact_person.name }}</a>
+               href="{% url 'contact_person_detail' contractor_id contact_person.id %}">
+                {{ contact_person.name }}
+            </a>
         </td>
-        <td class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}">{{ contact_person.second_name }}
+
+        <td>
+            {{ contact_person.second_name }}
         </td>
-        <td class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}">{{ contact_person.last_name }}
+
+        <td>
+            {{ contact_person.last_name }}
         </td>
-        <td class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}">{{ contact_person.position }}
+
+        <td>
+            {{ contact_person.position }}
         </td>
+
         <td class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}">
             "Кнопка"
         </td>
+
         <td class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}">
             <a class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}"
                href="{% url 'contact_person_to_delete' contractor_id contact_person.id %}">
@@ -67,5 +77,4 @@
     </tbody>
 </table>
 {% endif %}
-<a href="{% url 'contact_person_create' contractor_id %}" class="btn btn-primary">Добавить контактное лицо</a>
 {% endblock %}

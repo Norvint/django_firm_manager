@@ -12,7 +12,7 @@
             <h5 class="card-title">{{ object.title }}</h5>
         </div>
         <ul class="list-group list-group-flush">
-            <li class="list-group-item">Адрес: {{ object.address }}</li>
+            <li class="list-group-item">Адрес: {{ object.legal_address }}</li>
             <li class="list-group-item">ИНН(TIN): {{ object.tin }}</li>
             <li class="list-group-item">ОГРИП(PPRNIE): {{ object.pprnie }}</li>
             <li class="list-group-item">Уведомление о постановке на учет: {{ object.registration }}</li>
@@ -22,21 +22,5 @@
         </div>
     </div>
 </div>
-
-<h2>Банки</h2>
-{% for bank in object.banks.all %}
-    <div class="card col-8">
-        <div class="card-body">
-            <h5 class="card-title">{{ bank.title }}</h5>
-        </div>
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item">Адрес: {{ bank.address }}</li>
-            <li class="list-group-item">Кодовое обозначение(SWIFT): {{ bank.short_code }}</li>
-            <li class="list-group-item">Расчетный счет: {{ bank.payment_account }}</li>
-            <li class="list-group-item">Корреспондентный счет: {{ bank.correspondent_account }}</li>
-            <li class="list-group-item">Получатель: {{ bank.recipient }}</li>
-        </ul>
-    </div>
-{% endfor %}
 
 {% endblock %}

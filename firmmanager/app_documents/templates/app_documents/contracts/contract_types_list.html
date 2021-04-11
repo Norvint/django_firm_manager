@@ -19,16 +19,21 @@
 <h1>Типы договоров</h1>
 
 {% if contract_types %}
-<div class="row">
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th scope="col">Название</th>
+    </tr>
+    </thead>
+    <tbody>
     {% for contract_type in contract_types %}
-    <div class="mb-5 col-3">
-        <div class="card" style="width: 18rem;">
-            <div class="card-body">
-                <h5 class="card-title">{{ contract_type.title }}</h5>
-            </div>
-        </div>
-    </div>
+    <tr class="{% if contract.to_delete %} text-white bg-secondary {% endif %}">
+        <td>
+            {{ contract_type.title }}
+        </td>
+    </tr>
     {% endfor %}
-</div>
+    </tbody>
+</table>
 {% endif %}
 {% endblock %}

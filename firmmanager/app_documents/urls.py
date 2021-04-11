@@ -9,7 +9,7 @@ from app_documents.views import DeliveryConditionsDetailView, DeliveryConditions
 # contracts
 urlpatterns = [
     path('contracts/', ContractListView.as_view(), name='contracts_list'),
-    path('contracts/create-contract/', ContractCreateView.as_view(), name='contract_create'),
+    path('contracts/create-contract/<int:contractor_id>/', ContractCreateView.as_view(), name='contract_create'),
     path('contracts/<int:pk>', ContractDetailView.as_view(), name='contract_detail'),
     path('contracts/<int:pk>/edit', ContractEditView.as_view(), name='contract_edit'),
     path('contracts/download-contract/', download_contract, name='download_contract'),
