@@ -2,13 +2,17 @@ asgiref==3.3.1
 beautifulsoup4==4.9.3
 certifi==2020.12.5
 chardet==4.0.0
+DAWG-Python==0.7.2
 Django==3.1.6
+docopt==0.6.2
 docxtpl==0.11.3
 idna==2.10
 Jinja2==2.11.3
 lxml==4.6.2
 MarkupSafe==1.1.1
 psycopg2==2.8.6
+pymorphy2==0.9.1
+pymorphy2-dicts-ru==2.4.417127.4579844
 python-docx==0.8.10
 pytz==2021.1
 requests==2.25.1
