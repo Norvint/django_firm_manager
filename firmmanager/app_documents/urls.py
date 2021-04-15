@@ -25,7 +25,7 @@ urlpatterns = [
 # orders
 urlpatterns += [
     path('orders/', OrderListView.as_view(), name='orders_list'),
-    path('orders/create-order/<int:contract_id>', OrderCreateView.as_view(),
+    path('orders/create-order/<int:contract_id>/contractor/<int:contractor_id>', OrderCreateView.as_view(),
          name='order_create'),
     path('orders/<int:pk>', OrderDetailView.as_view(), name='order_detail'),
     path('orders/download-specification/', download_specification, name='download_specification'),

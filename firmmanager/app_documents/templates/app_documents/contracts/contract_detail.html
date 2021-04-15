@@ -45,7 +45,7 @@
         <div>
             <ul class="list-group list-group-horizontal">
                 <li class="list-group-item">
-                    <a href="{% url 'order_create' object.id %}" class="btn btn-primary">
+                    <a href="{% url 'order_create' object.id object.contractor.id %}" class="btn btn-primary">
                         Создать заказ
                     </a>
                 </li>

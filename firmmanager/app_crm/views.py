@@ -1,5 +1,9 @@
+import mimetypes
+import os
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import formset_factory
+from django.http import HttpResponse, FileResponse
 from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, UpdateView, TemplateView
 from django.views.generic.base import View
@@ -8,6 +12,7 @@ from app_crm.forms import ContractorFilterForm, ContractorCommentForm, Contracto
     ContractorFileForm
 from app_crm.models import Contractor, ContractorComment, Contact, ContactPerson, ContractorFile, ContractorFileCategory
 from app_documents.models import Contract, Order
+from firmmanager.settings import BASE_DIR
 
 
 class ContractorListView(LoginRequiredMixin, ListView):
@@ -131,6 +136,11 @@ class ContractorFileList(LoginRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         pass
 
+    def download(request, **kwargs):
+        obj = ContractorFile.objects.get(id=kwargs.get('file_id'))
+        filename = obj.file.path
+        response = FileResponse(open(filename, 'rb'))
+        return response
 
 class ContractorFileCreate(LoginRequiredMixin, TemplateView):
     template_name = 'app_crm/contractors/contractor_file_create.html'

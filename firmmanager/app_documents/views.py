@@ -218,8 +218,16 @@ class OrderCreateView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(OrderCreateView, self).get_context_data(**kwargs)
-        number = len(Order.objects.filter(contract=kwargs.get('contract_id'))) + 1
-        order_form = OrderForm(initial={'number': number, 'contract': kwargs.get('contract_id')})
+        contract = kwargs.get('contract_id')
+        number = 'Генерируется автоматически'
+        contractor = kwargs.get('contractor_id')
+        if contract:
+            order_form = OrderForm(initial={'number': number, 'contract': contract})
+        elif contractor and not contract:
+            order_form = OrderForm(initial={'number': number})
+            order_form.fields['contract'].queryset = Contract.objects.all().filter(contractor=contractor)
+        else:
+            order_form = OrderForm(initial={'number': number})
         context['form'] = order_form
         return context
 

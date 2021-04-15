@@ -72,7 +72,7 @@ class Contract(models.Model):
         verbose_name_plural = 'Договоры'
 
     def __str__(self):
-        return f'{self.pk} - {self.contractor}'
+        return f'{self.number} - {self.contractor}'
 
 
 class Order(models.Model):

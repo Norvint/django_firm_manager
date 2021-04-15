@@ -26,9 +26,25 @@ class ContractForm(forms.ModelForm):
 
 
 class OrderForm(forms.ModelForm):
+
+    def save(self, commit=True):
+        data = self.cleaned_data
+        number = len(Order.objects.all().filter(contract=data['contract'])) + 1
+        order = Order(number=number, contract=data['contract'],
+                                           delivery_conditions=data['delivery_conditions'],
+                                           delivery_time=data['delivery_time'],
+                                           delivery_address=data['delivery_address'],
+                                           payment_conditions=data['payment_conditions'],
+                                           shipment_mark=data['shipment_mark'], )
+        if commit:
+            order.save()
+        else:
+            return order
+
     class Meta:
         model = Order
-        fields = ['number', 'contract', 'delivery_conditions', 'delivery_time', 'delivery_address', 'payment_conditions', 'shipment_mark']
+        fields = ['number', 'contract', 'delivery_conditions', 'delivery_time', 'delivery_address',
+                  'payment_conditions', 'shipment_mark']
 
 
 class ContractFilterForm(forms.Form):

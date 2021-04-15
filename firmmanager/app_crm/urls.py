@@ -12,6 +12,8 @@ urlpatterns = [
     path('contractors/<int:pk>/edit/', ContractorEditView.as_view(), name='contractor_edit'),
     path('contractors/<int:contractor_id>/files/<str:category_slug>', ContractorFileList.as_view(),
          name='contractor_files_list'),
+    path('contractors/<int:contractor_id>/files/all/<int:file_id>', ContractorFileList.download,
+         name='contractor_file_download'),
     path('contractors/<int:contractor_id>/files/all/create', ContractorFileCreate.as_view(), name='contractor_file_create'),
     path('contractors/<int:contractor_id>/contracts', ContractorContractListView.as_view(),
          name='contractor_contracts_list'),

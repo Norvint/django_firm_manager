@@ -26,7 +26,7 @@
 </div>
 
 <h1>Заказы</h1>
-
+<a href="{% url 'order_create' 0 contractor_id %}" class="btn btn-primary mb-3">Добавить заказ</a>
 {% if orders %}
 <table class="table table-striped">
     <thead>

@@ -65,7 +65,7 @@
             <td>{{ file.title }}</td>
             <td>{{ file.description }}</td>
             <td>
-                <a href="" target="_blank">Значок</a>
+                <a href="{% url 'contractor_file_download' contractor_id file.id %}" target="_blank">Значок</a>
             </td>
             <td>{{ file.category.title }}</td>
             <td>{{ file.created_at }}</td>
