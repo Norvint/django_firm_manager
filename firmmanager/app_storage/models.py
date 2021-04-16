@@ -48,7 +48,8 @@ class Product(models.Model):
     packing_outside = models.ForeignKey(PackageOutsideType, on_delete=models.CASCADE, verbose_name='Внешнняя упаковка')
     country = models.CharField('Страна', max_length=50)
     cost = models.DecimalField('Цена за 1 ед. в рублях', decimal_places=2, max_digits=15)
-    description = models.TextField('Описание', max_length=800, blank=True)
+    description = models.TextField('Описание', max_length=1000, blank=True)
+    description_en = models.TextField('Описание(англ)', max_length=1000, blank=True)
 
     class Meta:
         verbose_name = 'Продукция'
@@ -77,11 +78,11 @@ class ProductStore(models.Model):
     booked = models.IntegerField('Забронировано')
 
     class Meta:
-        verbose_name = 'Продукция на складе'
-        verbose_name_plural = 'Продукция на складе'
+        verbose_name = 'Колисчество продукции на складе'
+        verbose_name_plural = 'Колисчество продукции на складах'
 
     def __str__(self):
-        return f'{self.store} - {self.product} - {self.quantity} шт.'
+        return f'{self.store} / {self.product} / {self.quantity} / {self.booked}'
 
 
 class ProductStoreIncome(models.Model):
@@ -98,7 +99,21 @@ class ProductStoreIncome(models.Model):
         return f'{self.product} - {self.store} - {self.quantity}'
 
 
-class ProductStoreBooking(models.Model):
+class ProductStoreOutcome(models.Model):
+    store = models.ForeignKey(Store, on_delete=models.CASCADE, verbose_name='Склад')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Продукция')
+    quantity = models.IntegerField('Количество')
+    date = models.DateField(auto_now_add=True, verbose_name='Дата выпуска')
+
+    class Meta:
+        verbose_name = 'Списание продукции со склада'
+        verbose_name_plural = 'Списания продукции со складов'
+
+    def __str__(self):
+        return f'{self.product} - {self.store} - {self.quantity}'
+
+
+class ProductStoreSpecificationBooking(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, verbose_name='Заказ')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Продукция')
     store = models.ForeignKey(Store, on_delete=models.CASCADE, verbose_name='Склад')

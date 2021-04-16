@@ -4,8 +4,33 @@
 
 {% block content %}
 <h1>Заказ</h1>
-<a href="{% url 'contractor_orders_list' object.contract.contractor.id %}" class="btn btn-primary mb-3">К списку
-    заказов контрагента</a>
+<div class="dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+       data-bs-toggle="dropdown" aria-expanded="false">
+        Навигация по контрагенту
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+        <li>
+            <a href="{% url 'contractor_detail' object.contract.contractor.id %}"
+               class="dropdown-item">Контрагент</a>
+        </li>
+
+        <li>
+            <a href="{% url 'contractor_contracts_list' object.contract.contractor.id %}"
+               class="dropdown-item">Договоры</a>
+        </li>
+
+        <li>
+            <a href="{% url 'contractor_orders_list' object.contract.contractor.id %}"
+               class="dropdown-item">Заказы</a>
+        </li>
+
+        <li>
+            <a href="{% url 'contact_persons_list' object.contract.contractor.id %}" class="dropdown-item">Контактные
+                лица контрагента</a>
+        </li>
+    </ul>
+</div>
 {% load static %}
 <div class="mb-5 col-9">
     <div class="card">
@@ -53,23 +78,14 @@
                 </a>
             </li>
 
-              <li class="list-group-item">
-                <form name="specification-create-form" method="post" action="" class="">
-                    {% csrf_token %}
-                    <input type="submit" value="Перезаполнить документы" class="btn btn-primary">
-                </form>
-            </li>
-
-            {% if file %}
             <li class="list-group-item">
-                <a href="{% url 'download_specification' %}" download
+                <a href="{% url 'download_specification' object.id %}" download
                    class="btn btn-success col-offset-2">Скачать спецификацию</a>
             </li>
 
             <li class="list-group-item">
-                <a href="{% url 'download_invoice' %}" class="btn btn-success d-block">Скачать инвойс</a>
+                <a href="{% url 'download_invoice' object.id %}" class="btn btn-success d-block">Скачать инвойс</a>
             </li>
-            {% endif %}
         </ul>
     </div>
 </div>

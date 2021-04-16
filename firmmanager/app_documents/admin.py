@@ -3,7 +3,7 @@ from django.forms import TextInput, Textarea
 from django.db import models
 
 from app_documents.models import Contract, ContractType, Currency, DeliveryConditions, PaymentConditions, Order
-from app_storage.models import ProductStoreBooking
+from app_storage.models import ProductStoreSpecificationBooking
 
 
 @admin.register(Contract)
@@ -18,7 +18,7 @@ class SpecificationAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(ProductStoreBooking)
+@admin.register(ProductStoreSpecificationBooking)
 class SpecificationBookingAdmin(admin.ModelAdmin):
     pass
 

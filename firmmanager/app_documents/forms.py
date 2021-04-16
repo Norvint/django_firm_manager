@@ -1,21 +1,23 @@
+from datetime import datetime
+
 from django import forms
 
 from app_crm.models import Contractor
 from app_documents.models import Order, Contract
-from app_storage.models import ProductStoreBooking
+from app_storage.models import ProductStoreSpecificationBooking
 
 
 class OrderBookingForm(forms.ModelForm):
     class Meta:
-        model = ProductStoreBooking
+        model = ProductStoreSpecificationBooking
         fields = ['order', 'product', 'store', 'quantity', 'sum']
 
     def save(self, commit=True):
         data = self.cleaned_data
         product = data['product']
         product_sum = product.cost * int(data['quantity'])
-        spec_booking = ProductStoreBooking(order=data['order'], product=data['product'],
-                                           store=data['store'], quantity=data['quantity'], sum=product_sum)
+        spec_booking = ProductStoreSpecificationBooking(order=data['order'], product=data['product'],
+                                                        store=data['store'], quantity=data['quantity'], sum=product_sum)
         spec_booking.save()
 
 
@@ -29,7 +31,14 @@ class OrderForm(forms.ModelForm):
 
     def save(self, commit=True):
         data = self.cleaned_data
-        number = len(Order.objects.all().filter(contract=data['contract'])) + 1
+        current_year = datetime.now().year
+        order_id = len(Order.objects.all().filter(contract=data['contract'])) + 1
+        if order_id < 10:
+            number = f'{current_year}-00{order_id}'
+        elif 10 <= order_id < 100:
+            number = f'{current_year}-0{order_id}'
+        else:
+            number = f'{current_year}-{order_id}'
         order = Order(number=number, contract=data['contract'],
                                            delivery_conditions=data['delivery_conditions'],
                                            delivery_time=data['delivery_time'],

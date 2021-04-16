@@ -86,7 +86,8 @@ class Order(models.Model):
     payment_conditions = models.ForeignKey(PaymentConditions, on_delete=models.CASCADE,
                                            verbose_name='Условия оплаты')
     shipment_mark = models.CharField('Отгрузочная метка', max_length=100)
-    total_sum = models.DecimalField('Сумма', max_digits=10, decimal_places=4, default=0)
+    counted_sum = models.DecimalField('Расчетная сумма', max_digits=20, decimal_places=4, default=0)
+    total_sum = models.DecimalField('Итоговая сумма', max_digits=20, decimal_places=4, default=0)
     to_delete = models.BooleanField('К удалению', default=False)
     responsible = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 

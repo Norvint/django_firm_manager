@@ -14,7 +14,7 @@ from app_documents.forms import OrderBookingForm, OrderForm, ContractFilterForm,
 from app_documents.models import Contract, ContractType, Currency, DeliveryConditions, PaymentConditions, Order
 from app_documents.utilities.currencies_parser import CurrenciesUpdater
 from app_documents.utilities.docx_creator import ContractCreator, SpecificationCreator, InvoiceCreator
-from app_storage.models import ProductStore, ProductStoreBooking
+from app_storage.models import ProductStore, ProductStoreSpecificationBooking
 from firmmanager.settings import BASE_DIR
 
 
@@ -90,15 +90,18 @@ class ContractDetailView(LoginRequiredMixin, DetailView):
         context['orders'] = orders
         return context
 
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        context = self.get_context_data()
+    def download_contract(request, **kwargs):
         contract = Contract.objects.get(pk=kwargs.get('pk'))
-        contract_creator = ContractCreator(contract)
-        contract_creator.create_contract()
-        context['file'] = True
-        return self.render_to_response(context)
-
+        if contract:
+            contract_creator = ContractCreator(contract)
+            contract_creator.create_contract()
+            fl_path = os.path.join(BASE_DIR, 'static', 'app_documents', 'layouts', 'contract.docx')
+            filename = 'contract.docx'
+            fl = open(fl_path, 'rb')
+            mime_type, _ = mimetypes.guess_type(fl_path)
+            response = HttpResponse(fl, content_type=mime_type)
+            response['Content-Disposition'] = "attachment; filename=%s" % filename
+            return response
 
 class ContractEditView(LoginRequiredMixin, UpdateView):
     template_name = 'app_documents/contracts/contract_edit.html'
@@ -122,16 +125,6 @@ class ContractToDeleteView(LoginRequiredMixin, View):
                 obj.to_delete = True
             obj.save()
             return redirect('contract_detail', pk=kwargs.get('pk'))
-
-
-def download_contract(request):
-    fl_path = os.path.join(BASE_DIR, 'static', 'app_documents', 'layouts', 'contract.docx')
-    filename = 'contract.docx'
-    fl = open(fl_path, 'rb')
-    mime_type, _ = mimetypes.guess_type(fl_path)
-    response = HttpResponse(fl, content_type=mime_type)
-    response['Content-Disposition'] = "attachment; filename=%s" % filename
-    return response
 
 
 class ContractTypeListView(LoginRequiredMixin, ListView):
@@ -252,22 +245,38 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(OrderDetailView, self).get_context_data(**kwargs)
         order = self.get_object()
-        order_booking = ProductStoreBooking.objects.filter(order=order)
+        order_booking = ProductStoreSpecificationBooking.objects.filter(order=order)
         context['order_booking'] = order_booking
-        currency_total_sum = round(order.total_sum * (order.contract.currency.nominal / order.contract.currency.cost))
-        if currency_total_sum != order.total_sum:
+        currency_total_sum = round(order.counted_sum * (order.contract.currency.nominal / order.contract.currency.cost))
+        if currency_total_sum != order.counted_sum:
             context['currency_total_sum'] = currency_total_sum
         return context
 
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        context = self.get_context_data()
-        specification_creator = SpecificationCreator(self.object)
-        specification_creator.create_specification()
-        invoice_creator = InvoiceCreator(self.object)
-        invoice_creator.create_invoice()
-        context['file'] = True
-        return self.render_to_response(context)
+    def download_specification(request, **kwargs):
+        order = Order.objects.get(pk=kwargs.get('pk'))
+        if order:
+            specification_creator = SpecificationCreator(order)
+            specification_creator.create_specification()
+            fl_path = os.path.join(BASE_DIR, 'static', 'app_documents', 'layouts', 'specification.docx')
+            filename = 'specification.docx'
+            fl = open(fl_path, 'rb')
+            mime_type, _ = mimetypes.guess_type(fl_path)
+            response = HttpResponse(fl, content_type=mime_type)
+            response['Content-Disposition'] = "attachment; filename=%s" % filename
+            return response
+
+    def download_invoice(request, **kwargs):
+        order = Order.objects.get(pk=kwargs.get('pk'))
+        if order:
+            invoice_creator = InvoiceCreator(order)
+            invoice_creator.create_invoice()
+            fl_path = os.path.join(BASE_DIR, 'static', 'app_documents', 'layouts', 'invoice.docx')
+            filename = 'invoice.docx'
+            fl = open(fl_path, 'rb')
+            mime_type, _ = mimetypes.guess_type(fl_path)
+            response = HttpResponse(fl, content_type=mime_type)
+            response['Content-Disposition'] = "attachment; filename=%s" % filename
+            return response
 
 
 class OrderToDeleteView(LoginRequiredMixin, View):
@@ -281,16 +290,6 @@ class OrderToDeleteView(LoginRequiredMixin, View):
                 obj.to_delete = True
             obj.save()
             return redirect('order_detail', pk=kwargs.get('pk'))
-
-
-def download_specification(request):
-    fl_path = os.path.join(BASE_DIR, 'static', 'app_documents', 'layouts', 'specification.docx')
-    filename = 'specification.docx'
-    fl = open(fl_path, 'rb')
-    mime_type, _ = mimetypes.guess_type(fl_path)
-    response = HttpResponse(fl, content_type=mime_type)
-    response['Content-Disposition'] = "attachment; filename=%s" % filename
-    return response
 
 
 class OrderBookingCreateView(LoginRequiredMixin, TemplateView):
@@ -320,7 +319,7 @@ class OrderBookingCreateView(LoginRequiredMixin, TemplateView):
                     for product_on_store in products_on_store:
                         product_on_store.quantity -= data['quantity']
                         product_on_store.booked += data['quantity']
-                        order.total_sum += int(data['quantity']) * product.cost
+                        order.counted_sum += int(data['quantity']) * product.cost
                         order.save()
                         product_on_store.save()
                     form.save()
@@ -334,14 +333,14 @@ class OrderBookingCreateView(LoginRequiredMixin, TemplateView):
 class OrderBookingDeleteView(LoginRequiredMixin, DeleteView):
 
     def get(self, request, *args, **kwargs):
-        obj = ProductStoreBooking.objects.get(pk=kwargs.get('order_booking_id'))
+        obj = ProductStoreSpecificationBooking.objects.get(pk=kwargs.get('order_booking_id'))
         order = obj.order
         if obj:
             product_on_store = ProductStore.objects.get(product=obj.product, store=obj.store)
             product_on_store.booked -= obj.quantity
             product_on_store.quantity += obj.quantity
             product_on_store.save()
-            order.total_sum -= int(obj.quantity) * obj.product.cost
+            order.counted_sum -= int(obj.quantity) * obj.product.cost
             order.save()
             obj.delete()
             return redirect('order_detail', pk=obj.order.pk)
@@ -352,7 +351,7 @@ class OrderBookingEditView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(OrderBookingEditView, self).get_context_data(**kwargs)
-        object = ProductStoreBooking.objects.get(pk=kwargs.get('order_booking_id'))
+        object = ProductStoreSpecificationBooking.objects.get(pk=kwargs.get('order_booking_id'))
         form = OrderBookingForm(initial={'order': object.order,
                                          'product': object.product,
                                          'store': object.store,
@@ -365,18 +364,18 @@ class OrderBookingEditView(LoginRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
         form = OrderBookingForm(request.POST)
-        product_booking = ProductStoreBooking.objects.get(pk=kwargs.get('order_booking_id'))
+        product_booking = ProductStoreSpecificationBooking.objects.get(pk=kwargs.get('order_booking_id'))
         order = product_booking.order
         if form.is_valid():
             data = form.cleaned_data
             product_on_store = ProductStore.objects.get(product=product_booking.product, store=product_booking.store)
             product_on_store.booked -= product_booking.quantity
             product_on_store.quantity += product_booking.quantity
-            order.total_sum -= int(product_booking.quantity) * product_booking.product.cost
+            order.counted_sum -= int(product_booking.quantity) * product_booking.product.cost
             order.save()
             product_on_store.quantity -= data['quantity']
             product_on_store.booked += data['quantity']
-            order.total_sum += int(data['quantity']) * product_booking.product.cost
+            order.counted_sum += int(data['quantity']) * product_booking.product.cost
             order.save()
             product_on_store.save()
             product_booking.product = data['product']
@@ -389,13 +388,3 @@ class OrderBookingEditView(LoginRequiredMixin, TemplateView):
         else:
             context['errors'] = form.errors
         return self.render_to_response(context)
-
-
-def download_invoice(request):
-    fl_path = os.path.join(BASE_DIR, 'static', 'app_documents', 'layouts', 'invoice.docx')
-    filename = 'invoice.docx'
-    fl = open(fl_path, 'rb')
-    mime_type, _ = mimetypes.guess_type(fl_path)
-    response = HttpResponse(fl, content_type=mime_type)
-    response['Content-Disposition'] = "attachment; filename=%s" % filename
-    return response

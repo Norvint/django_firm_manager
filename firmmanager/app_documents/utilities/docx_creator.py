@@ -5,7 +5,7 @@ from pathlib import Path
 import pymorphy2
 from docxtpl import DocxTemplate
 
-from app_storage.models import ProductStoreBooking
+from app_storage.models import ProductStoreSpecificationBooking
 
 
 class ContractCreator:
@@ -128,7 +128,7 @@ class SpecificationCreator:
             'booked_products': []
         }
         total_sum = Decimal(0)
-        for booked_product in ProductStoreBooking.objects.all().filter(order=self.order):
+        for booked_product in ProductStoreSpecificationBooking.objects.all().filter(order=self.order):
             context['booked_products'].append({
                 'product': {
                     'title': booked_product.product.type_of_product,
@@ -194,7 +194,7 @@ class InvoiceCreator:
             'booked_products': []
         }
         total_sum = Decimal(0)
-        for i, booked_product in enumerate(ProductStoreBooking.objects.all().filter(order=self.order)):
+        for i, booked_product in enumerate(ProductStoreSpecificationBooking.objects.all().filter(order=self.order)):
             context['booked_products'].append({
                 'number': i + 1,
                 'product': {

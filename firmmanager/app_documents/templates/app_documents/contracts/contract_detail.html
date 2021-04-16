@@ -3,8 +3,33 @@
 {% block title %}Детали договора{% endblock %}
 
 {% block content %}
-<a href="{% url 'contractor_contracts_list' object.contractor.id %}" class="btn btn-primary mb-2 mt-2">К списку
-    договоров контрагента</a>
+<div class="dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+       data-bs-toggle="dropdown" aria-expanded="false">
+        Навигация по контрагенту
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+        <li>
+            <a href="{% url 'contractor_detail' object.contractor.id %}"
+               class="dropdown-item">Контрагент</a>
+        </li>
+
+        <li>
+            <a href="{% url 'contractor_contracts_list' object.contractor.id %}"
+               class="dropdown-item">Договоры</a>
+        </li>
+
+        <li>
+            <a href="{% url 'contractor_orders_list' object.contractor.id %}"
+               class="dropdown-item">Заказы</a>
+        </li>
+
+        <li>
+            <a href="{% url 'contact_persons_list' object.contractor.id %}" class="dropdown-item">Контактные
+                лица контрагента</a>
+        </li>
+    </ul>
+</div>
 <h1>Договор</h1>
 
 <div class="mb-5 col-9">
@@ -51,19 +76,10 @@
                 </li>
 
                 <li class="list-group-item">
-                    <form name="contract-create-form" method="post" action="" class="">
-                        {% csrf_token %}
-                        <input type="submit" value="Сгенерировать документ" class="btn btn-primary">
-                    </form>
-                </li>
-
-                {% if file %}
-                <li class="list-group-item">
-                    <a href="{% url 'download_contract' %}" download class="btn btn-success">
-                        Скачать
+                    <a href="{% url 'download_contract' object.id %}" download class="btn btn-success">
+                        Скачать договор
                     </a>
                 </li>
-                {% endif %}
             </ul>
         </div>
     </div>
