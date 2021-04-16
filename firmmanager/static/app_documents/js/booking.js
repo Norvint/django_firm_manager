@@ -5,7 +5,7 @@ $(document).ready(function() {
         e.preventDefault();
 
         // create a clone of the existing form elements, but with blank fields.
-        $('div.booking-form-container:last').clone().each(function(i) {
+        $('tr.booking-form-container:last').clone().each(function(i) {
             $(this).find('input,select').each(function(i) {
                 // Remove any existing values
                 parts = $(this).attr('id').split('-', 3);
@@ -13,7 +13,7 @@ $(document).ready(function() {
                 $(this).val('');
                 }
 
-                // update the id attributes, incrementing the form number, e.g.: "id_form-1-field_name"
+                parts = $(this).attr('id').split('-', 3);
                 num = parseInt(parts[1]);
                 num += 1;
                 $(this).attr('id', parts[0] + '-' + num + '-' +parts[2]);
@@ -26,7 +26,7 @@ $(document).ready(function() {
 
             });
 
-        }).appendTo('div#booking-form-wrapper');
+        }).appendTo('table#booking-form-wrapper');
         //         Increment the TOTAL_FORMS
         $('#id_form-TOTAL_FORMS').val(parseInt($('#id_form-TOTAL_FORMS').val()) + 1);
         throw "";

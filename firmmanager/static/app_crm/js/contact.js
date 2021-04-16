@@ -7,11 +7,8 @@ $(document).ready(function() {
         // create a clone of the existing form elements, but with blank fields.
         $('tr.contact-form-container:last').clone().each(function(i) {
             $(this).find('input,select').each(function(i) {
-                // Remove any existing values
-//                parts = $(this).attr('id').split('-', 3);
-//                if ($(this).attr('id').split('-', 3)[2] !== 'specification') {
                 $(this).val('');
-//                }
+
                 // update the id attributes, incrementing the form number, e.g.: "id_form-1-field_name"
                 parts = $(this).attr('id').split('-', 3);
                 num = parseInt(parts[1]);

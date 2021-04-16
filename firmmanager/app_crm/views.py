@@ -142,6 +142,7 @@ class ContractorFileList(LoginRequiredMixin, TemplateView):
         response = FileResponse(open(filename, 'rb'))
         return response
 
+
 class ContractorFileCreate(LoginRequiredMixin, TemplateView):
     template_name = 'app_crm/contractors/contractor_file_create.html'
 

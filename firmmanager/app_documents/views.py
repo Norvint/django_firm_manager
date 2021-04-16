@@ -9,12 +9,12 @@ from django.shortcuts import redirect
 from django.views import View
 from django.views.generic import DetailView, ListView, TemplateView, DeleteView, UpdateView
 
-from app_documents.forms import OrderBookingForm, OrderForm, ContractFilterForm, \
-    ContractForm, OrderFilterForm
+from app_documents.forms import BookingForm, OrderForm, ContractFilterForm, \
+    ContractForm, OrderFilterForm, OrderBookingForm
 from app_documents.models import Contract, ContractType, Currency, DeliveryConditions, PaymentConditions, Order
 from app_documents.utilities.currencies_parser import CurrenciesUpdater
 from app_documents.utilities.docx_creator import ContractCreator, SpecificationCreator, InvoiceCreator
-from app_storage.models import ProductStore, ProductStoreSpecificationBooking
+from app_storage.models import ProductStore, ProductStoreOrderBooking
 from firmmanager.settings import BASE_DIR
 
 
@@ -102,6 +102,7 @@ class ContractDetailView(LoginRequiredMixin, DetailView):
             response = HttpResponse(fl, content_type=mime_type)
             response['Content-Disposition'] = "attachment; filename=%s" % filename
             return response
+
 
 class ContractEditView(LoginRequiredMixin, UpdateView):
     template_name = 'app_documents/contracts/contract_edit.html'
@@ -221,20 +222,51 @@ class OrderCreateView(LoginRequiredMixin, TemplateView):
             order_form.fields['contract'].queryset = Contract.objects.all().filter(contractor=contractor)
         else:
             order_form = OrderForm(initial={'number': number})
+        product_store_book_form_set = formset_factory(OrderBookingForm)
+        formset = product_store_book_form_set()
+        context['formset'] = formset
         context['form'] = order_form
         return context
 
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
         order_form = OrderForm(request.POST)
+        product_store_book_form_set = formset_factory(OrderBookingForm)
+        formset = product_store_book_form_set(request.POST)
         if order_form.is_valid():
             order = order_form.save(commit=False)
             order.responsible = request.user
-            order.save()
-            return redirect('orders_list')
+            if formset.is_valid():
+                order.save()
+                for i, form in enumerate(formset):
+                    data = formset.cleaned_data[i]
+                    if form.is_valid() and data:
+                        product = data['product']
+                        products_on_store = ProductStore.objects.filter(product=data['product'], store=data['store'])
+                        for product_on_store in products_on_store:
+                            product_on_store.quantity -= data['quantity']
+                            product_on_store.booked += data['quantity']
+                            order.counted_sum += int(data['quantity']) * product.cost
+                            product_on_store.save()
+                        booking_sum = int(data['quantity']) * product.cost
+                        product_booking = ProductStoreOrderBooking(order=order,
+                                                                   product=data['product'],
+                                                                   store=data['store'],
+                                                                   quantity=data['quantity'],
+                                                                   sum=booking_sum)
+                        product_booking.save()
+                order.save()
+                return redirect('order_detail', order.id)
+            else:
+                context['formset'] = formset
+                context['formset_errors'] = formset.errors
+                context['form'] = order_form
+                context['form_errors'] = order_form.errors
         else:
+            context['formset'] = formset
+            context['formset_errors'] = formset.errors
             context['form'] = order_form
-            context['errors'] = order_form.errors
+            context['form_errors'] = order_form.errors
         return self.render_to_response(context)
 
 
@@ -245,11 +277,11 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(OrderDetailView, self).get_context_data(**kwargs)
         order = self.get_object()
-        order_booking = ProductStoreSpecificationBooking.objects.filter(order=order)
+        order_booking = ProductStoreOrderBooking.objects.filter(order=order)
         context['order_booking'] = order_booking
         currency_total_sum = round(order.counted_sum * (order.contract.currency.nominal / order.contract.currency.cost))
         if currency_total_sum != order.counted_sum:
-            context['currency_total_sum'] = currency_total_sum
+            context['currency_counted_sum'] = currency_total_sum
         return context
 
     def download_specification(request, **kwargs):
@@ -293,11 +325,11 @@ class OrderToDeleteView(LoginRequiredMixin, View):
 
 
 class OrderBookingCreateView(LoginRequiredMixin, TemplateView):
-    template_name = 'app_documents/orders/order_booking.html'
+    template_name = 'app_documents/orders/order_booking_create.html'
 
     def get_context_data(self, **kwargs):
         context = super(OrderBookingCreateView, self).get_context_data(**kwargs)
-        product_store_book_form_set = formset_factory(OrderBookingForm, extra=0)
+        product_store_book_form_set = formset_factory(BookingForm, extra=0)
         formset = product_store_book_form_set(initial=[{
             'order': kwargs.get('order_id')
         }])
@@ -307,7 +339,7 @@ class OrderBookingCreateView(LoginRequiredMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
-        product_store_book_form_set = formset_factory(OrderBookingForm)
+        product_store_book_form_set = formset_factory(BookingForm)
         formset = product_store_book_form_set(request.POST)
         if formset.is_valid():
             for i, form in enumerate(formset):
@@ -333,7 +365,7 @@ class OrderBookingCreateView(LoginRequiredMixin, TemplateView):
 class OrderBookingDeleteView(LoginRequiredMixin, DeleteView):
 
     def get(self, request, *args, **kwargs):
-        obj = ProductStoreSpecificationBooking.objects.get(pk=kwargs.get('order_booking_id'))
+        obj = ProductStoreOrderBooking.objects.get(pk=kwargs.get('order_booking_id'))
         order = obj.order
         if obj:
             product_on_store = ProductStore.objects.get(product=obj.product, store=obj.store)
@@ -351,20 +383,20 @@ class OrderBookingEditView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(OrderBookingEditView, self).get_context_data(**kwargs)
-        object = ProductStoreSpecificationBooking.objects.get(pk=kwargs.get('order_booking_id'))
-        form = OrderBookingForm(initial={'order': object.order,
+        object = ProductStoreOrderBooking.objects.get(pk=kwargs.get('order_booking_id'))
+        form = BookingForm(initial={'order': object.order,
                                          'product': object.product,
                                          'store': object.store,
                                          'quantity': object.quantity,
                                          'sum': object.sum}
-                                )
+                           )
         context['form'] = form
         return context
 
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
-        form = OrderBookingForm(request.POST)
-        product_booking = ProductStoreSpecificationBooking.objects.get(pk=kwargs.get('order_booking_id'))
+        form = BookingForm(request.POST)
+        product_booking = ProductStoreOrderBooking.objects.get(pk=kwargs.get('order_booking_id'))
         order = product_booking.order
         if form.is_valid():
             data = form.cleaned_data

@@ -113,7 +113,7 @@ class ProductStoreOutcome(models.Model):
         return f'{self.product} - {self.store} - {self.quantity}'
 
 
-class ProductStoreSpecificationBooking(models.Model):
+class ProductStoreOrderBooking(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, verbose_name='Заказ')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Продукция')
     store = models.ForeignKey(Store, on_delete=models.CASCADE, verbose_name='Склад')

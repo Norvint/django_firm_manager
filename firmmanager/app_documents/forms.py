@@ -4,21 +4,27 @@ from django import forms
 
 from app_crm.models import Contractor
 from app_documents.models import Order, Contract
-from app_storage.models import ProductStoreSpecificationBooking
+from app_storage.models import ProductStoreOrderBooking
 
 
-class OrderBookingForm(forms.ModelForm):
+class BookingForm(forms.ModelForm):
     class Meta:
-        model = ProductStoreSpecificationBooking
+        model = ProductStoreOrderBooking
         fields = ['order', 'product', 'store', 'quantity', 'sum']
 
     def save(self, commit=True):
         data = self.cleaned_data
         product = data['product']
         product_sum = product.cost * int(data['quantity'])
-        spec_booking = ProductStoreSpecificationBooking(order=data['order'], product=data['product'],
-                                                        store=data['store'], quantity=data['quantity'], sum=product_sum)
+        spec_booking = ProductStoreOrderBooking(order=data['order'], product=data['product'],
+                                                store=data['store'], quantity=data['quantity'], sum=product_sum)
         spec_booking.save()
+
+
+class OrderBookingForm(forms.ModelForm):
+    class Meta:
+        model = ProductStoreOrderBooking
+        fields = ['product', 'store', 'quantity', 'sum']
 
 
 class ContractForm(forms.ModelForm):
@@ -40,11 +46,11 @@ class OrderForm(forms.ModelForm):
         else:
             number = f'{current_year}-{order_id}'
         order = Order(number=number, contract=data['contract'],
-                                           delivery_conditions=data['delivery_conditions'],
-                                           delivery_time=data['delivery_time'],
-                                           delivery_address=data['delivery_address'],
-                                           payment_conditions=data['payment_conditions'],
-                                           shipment_mark=data['shipment_mark'], )
+                      delivery_conditions=data['delivery_conditions'],
+                      delivery_time=data['delivery_time'],
+                      delivery_address=data['delivery_address'],
+                      payment_conditions=data['payment_conditions'],
+                      shipment_mark=data['shipment_mark'], )
         if commit:
             order.save()
         else:

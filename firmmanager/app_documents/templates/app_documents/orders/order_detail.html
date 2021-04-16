@@ -130,8 +130,15 @@
 </table>
 {% endif %}
 
-<h3>RUB: {{ object.total_sum }}</h3>
-{% if currency_total_sum %}
-    <h3>{{ object.contract.currency.char_code }}: {{ currency_total_sum }}</h3>
-{% endif %}
+<h3>Расчетная сумма</h3>
+<div class="d-flex justify-content-between">
+    <div>
+        <h4>RUB: {{ object.counted_sum }}</h4>
+    </div>
+
+    <div>
+        <h4>{{ object.contract.currency.char_code }}: {{ currency_counted_sum }}</h4>
+    </div>
+</div>
+
 {% endblock %}
