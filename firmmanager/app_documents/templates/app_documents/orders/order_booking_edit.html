@@ -13,7 +13,7 @@
     {{ errors }}
 </p>
 
-<h1>Редактирование брони продукции по спецификации</h1>
+<h1>Редактирование брони продукции по заказу</h1>
 <form name="specification-create-form" method="post" class="d-flex justify-content-evenly col-12 row">
     <div class="card p-3 mb-2 col-5">
         {% csrf_token %}
@@ -33,6 +33,16 @@
             {{ form.quantity.label }}
         </label>
         {{ form.quantity }}
+        <label>
+            {{ form.total_price.label }}
+        </label>
+        {{ form.total_price }}
+        <span class="mt-1">
+            Стандартная цена
+        </span>
+        <P class="border border-dark p-1">
+            {{ order_booking.product.cost }}
+        </P>
     </div>
     <input type="submit" value="Сохранить" class="btn btn-primary col-8 mb-3">
 </form>

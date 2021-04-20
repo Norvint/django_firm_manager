@@ -121,7 +121,8 @@ class ProductStoreOrderBooking(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Продукция')
     store = models.ForeignKey(Store, on_delete=models.CASCADE, verbose_name='Склад')
     quantity = models.IntegerField('Количество')
-    total_price = models.DecimalField('Цена за ед.', decimal_places=2, max_digits=18, null=True, blank=True)
+    total_price = models.DecimalField('Итоговая цена', decimal_places=2, max_digits=18, null=True, blank=True)
+    standard_price = models.DecimalField('Стандартная цена', decimal_places=2, max_digits=18, null=True, blank=True)
     counted_sum = models.DecimalField('Расчетная сумма', decimal_places=2, max_digits=18, null=True, blank=True)
     total_sum = models.DecimalField('Итоговая сумма', decimal_places=2, max_digits=18, null=True, blank=True)
 

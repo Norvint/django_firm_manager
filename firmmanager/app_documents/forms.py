@@ -7,7 +7,7 @@ from app_documents.models import Order, Contract
 from app_storage.models import ProductStoreOrderBooking
 
 
-class BookingForm(forms.ModelForm):
+class BookingCreateForm(forms.ModelForm):
     class Meta:
         model = ProductStoreOrderBooking
         fields = ['order', 'product', 'store', 'quantity', 'counted_sum']
@@ -21,6 +21,11 @@ class BookingForm(forms.ModelForm):
                                                 total_sum=counted_sum)
         spec_booking.save()
 
+
+class BookingEditForm(forms.ModelForm):
+    class Meta:
+        model = ProductStoreOrderBooking
+        fields = ['order', 'product', 'store', 'quantity', 'total_price']
 
 class OrderBookingForm(forms.ModelForm):
     class Meta:
@@ -61,12 +66,6 @@ class OrderForm(forms.ModelForm):
         model = Order
         fields = ['number', 'contract', 'delivery_conditions', 'delivery_time', 'delivery_address',
                   'payment_conditions', 'shipment_mark']
-
-
-class OrderTotalSumForm(forms.ModelForm):
-    class Meta:
-        model = Order
-        fields = ['total_sum',]
 
 
 class ContractFilterForm(forms.Form):

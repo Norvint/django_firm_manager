@@ -98,8 +98,10 @@
         <th scope="col">Продукция</th>
         <th scope="col">Склад</th>
         <th scope="col">Количество</th>
-        <th scope="col">Стоимость 1 ед.</th>
-        <th scope="col">Сумма</th>
+        <th scope="col">Стандартная цена</th>
+        <th scope="col">Итоговая цена</th>
+        <th scope="col">Расчетная сумма</th>
+        <th scope="col">Итоговая сумма</th>
         <th scope="col">Редактировать</th>
         <th scope="col">Удалить</th>
     </tr>
@@ -112,7 +114,9 @@
         </td>
         <td>{{ document.store }}</td>
         <td>{{ document.quantity }}</td>
+        <td>{{ document.product.cost }}</td>
         <td>{{ document.total_price }}</td>
+        <td>{{ document.counted_sum }}</td>
         <td>{{ document.total_sum }}</td>
         <td>
             <a href="{% url 'order_booking_edit' document.id %}">
@@ -143,14 +147,18 @@
     </div>
 </div>
 
-<p>
-    {{ errors }}
-</p>
+<div>
+    <h3>Итоговая сумма</h3>
+    <div class="d-flex justify-content-between">
+        <div>
+            <h4>RUB: {{ object.total_sum }}</h4>
+        </div>
 
-<form name="order-total-sum-form" method="post">
-    {% csrf_token %}
-    {{ total_sum_form.total_sum.label }}
-    {{ total_sum_form.total_sum }}
-    <input type="submit" value="Пересчитать" class="btn btn-primary col-4">
-</form>
+        <div>
+            <h4>{{ object.contract.currency.char_code }}: {{ currency_total_sum }}</h4>
+        </div>
+    </div>
+</div>
+
+
 {% endblock %}

@@ -98,52 +98,97 @@ class SpecificationCreator:
         context = {
             'number': self.order.number,
             'payment_conditions': {
-                'description': self.order.payment_conditions.description
+                'description': self.order.payment_conditions.description,
+                'description_en': self.order.payment_conditions.description_en
             },
+            'current_date': self.order.created,
             'delivery_conditions':
                 {
                     'title': self.order.delivery_conditions.title,
-                    'time_of_delivery': self.order.delivery_time
                 },
+            'delivery_time': self.order.delivery_time,
             'contract': {
                 'number': self.order.contract.number,
+                'created': self.order.contract.created,
+                'created_year': self.get_created_year(),
                 'client': {
                     'title': self.order.contract.contractor.title,
+                    'appeal_en': self.order.contract.contractor.appeal_en,
                     'position': self.order.contract.contractor.position,
+                    'position_en': self.order.contract.contractor.position_en,
                     'name': self.order.contract.contractor.name,
+                    'second_name': self.order.contract.contractor.second_name,
                     'last_name': self.order.contract.contractor.last_name,
-                    'address': self.order.contract.contractor.country,
+                    'legal_address': self.order.contract.contractor.legal_address,
+                    'requisites': self.order.contract.contractor.requisites,
+                    'initials': self.get_contractor_initials(),
                 },
                 'organization': {
                     'title': self.order.contract.organization.title,
+                    'title_en': self.order.contract.organization.title_en,
+                    'appeal': self.order.contract.organization.appeal,
+                    'appeal_en': self.order.contract.organization.appeal_en,
+                    'name': self.order.contract.organization.name,
+                    'name_en': self.order.contract.organization.name_en,
+                    'second_name': self.order.contract.organization.second_name,
+                    'second_name_en': self.order.contract.organization.second_name_en,
+                    'last_name': self.order.contract.organization.last_name,
+                    'last_name_en': self.order.contract.organization.last_name_en,
                     'registration': self.order.contract.organization.registration,
-                    'address': self.order.contract.organization.legal_address,
+                    'registration_en': self.order.contract.organization.registration_en,
+                    'legal_address': self.order.contract.organization.legal_address,
+                    'legal_address_en': self.order.contract.organization.legal_address_en,
                     'tin': self.order.contract.organization.tin,
                     'pprnie': self.order.contract.organization.pprnie,
+                    'requisites': self.order.contract.organization.requisites,
+                    'requisites_en': self.order.contract.organization.requisites_en,
+                    'position': self.get_position(),
+                    'position_en': self.order.contract.organization.position_en,
+                    'initials': self.get_organization_initials(),
+                    'initials_en': self.get_organization_english_initials(),
                 },
                 'currency': {
                     'title': self.order.contract.currency.title,
+                    'char_code': self.order.contract.currency.char_code,
                 }
             },
+            'currency_total_sum': round(self.order.total_sum * (
+                    self.order.contract.currency.nominal / self.order.contract.currency.cost)),
             'booked_products': []
         }
-        total_sum = Decimal(0)
         for booked_product in ProductStoreOrderBooking.objects.all().filter(order=self.order):
             context['booked_products'].append({
                 'product': {
-                    'title': booked_product.product.type_of_product,
-                    'color': booked_product.product.color,
-                    'model': booked_product.product.model,
-                    'cost': booked_product.product.cost,
+                    'article': booked_product.product.number,
                     'description': booked_product.product.description,
+                    'description_en': booked_product.product.description_en,
                 },
                 'total_sum': booked_product.total_sum,
+                'total_price': booked_product.total_price,
                 'quantity': booked_product.quantity,
             })
-            total_sum += Decimal(booked_product.total_sum)
-        context['total_sum'] = total_sum
         doc.render(context)
         doc.save(self.output_file_path)
+
+    def get_contractor_initials(self):
+        return f'{self.order.contract.contractor.name[:1]}. {self.order.contract.contractor.second_name[:1]}.'
+
+    def get_organization_initials(self):
+        return f'{self.order.contract.organization.name[:1]}. {self.order.contract.organization.second_name[:1]}.'
+
+    def get_organization_english_initials(self):
+        return f'{self.order.contract.organization.name_en[:1]}. {self.order.contract.organization.second_name_en[:1]}.'
+
+    def get_created_year(self):
+        created_year = self.order.contract.created.strftime('%Y')
+        return created_year
+
+    def get_position(self):
+        morph = pymorphy2.MorphAnalyzer()
+        position_raw = morph.parse(self.order.contract.organization.position)[0]
+        position = position_raw.inflect({'gent'})
+        print(position.word)
+        return position.word
 
 
 class InvoiceCreator:

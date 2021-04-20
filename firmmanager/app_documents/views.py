@@ -9,8 +9,8 @@ from django.shortcuts import redirect
 from django.views import View
 from django.views.generic import DetailView, ListView, TemplateView, DeleteView, UpdateView
 
-from app_documents.forms import BookingForm, OrderForm, ContractFilterForm, \
-    ContractForm, OrderFilterForm, OrderBookingForm, OrderTotalSumForm
+from app_documents.forms import BookingCreateForm, OrderForm, ContractFilterForm, \
+    ContractForm, OrderFilterForm, OrderBookingForm, BookingEditForm
 from app_documents.models import Contract, ContractType, Currency, DeliveryConditions, PaymentConditions, Order
 from app_documents.utilities.currencies_parser import CurrenciesUpdater
 from app_documents.utilities.docx_creator import ContractCreator, SpecificationCreator, InvoiceCreator
@@ -255,6 +255,7 @@ class OrderCreateView(LoginRequiredMixin, TemplateView):
                                                                    quantity=data['quantity'],
                                                                    counted_sum=booking_sum,
                                                                    total_sum=booking_sum,
+                                                                   standard_price=product.cost,
                                                                    total_price=product.cost)
                         product_booking.save()
                 order.total_sum = order.counted_sum
@@ -280,34 +281,14 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(OrderDetailView, self).get_context_data(**kwargs)
         order = self.get_object()
-        order_booking = ProductStoreOrderBooking.objects.filter(order=order)
-        total_sum_form = OrderTotalSumForm(initial={'total_sum': order.total_sum})
-        context['order_booking'] = order_booking
-        context['total_sum_form'] = total_sum_form
+        order_bookings = ProductStoreOrderBooking.objects.filter(order=order)
+        context['order_booking'] = order_bookings
         currency_total_sum = round(order.total_sum * (order.contract.currency.nominal / order.contract.currency.cost))
+        currency_counted_sum = round(order.counted_sum * (order.contract.currency.nominal / order.contract.currency.cost))
+        context['currency_total_sum'] = currency_total_sum
         if currency_total_sum != order.counted_sum:
-            context['currency_counted_sum'] = currency_total_sum
+            context['currency_counted_sum'] = currency_counted_sum
         return context
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        context = self.get_context_data(**kwargs)
-        total_sum_form = OrderTotalSumForm(request.POST)
-        if total_sum_form.is_valid():
-            order = self.get_object()
-            order.total_sum = total_sum_form.cleaned_data['total_sum']
-            order.save()
-            order_bookings = ProductStoreOrderBooking.objects.filter(order=order)
-            for booking in order_bookings:
-                percent = booking.counted_sum / (order.counted_sum / 100)
-                booking.total_sum = (order.total_sum / 100) * percent
-                booking.total_price = booking.total_sum / booking.quantity
-                booking.save()
-            return redirect('order_detail', order.id)
-        else:
-            context['total_sum_form'] = total_sum_form
-            context['errors'] = total_sum_form.errors
-            return self.render_to_response(context)
 
     def download_specification(request, **kwargs):
         order = Order.objects.get(pk=kwargs.get('pk'))
@@ -352,7 +333,7 @@ class OrderBookingCreateView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(OrderBookingCreateView, self).get_context_data(**kwargs)
-        product_store_book_form_set = formset_factory(BookingForm, extra=0)
+        product_store_book_form_set = formset_factory(BookingCreateForm, extra=0)
         formset = product_store_book_form_set(initial=[{
             'order': kwargs.get('order_id')
         }])
@@ -362,7 +343,7 @@ class OrderBookingCreateView(LoginRequiredMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
-        product_store_book_form_set = formset_factory(BookingForm)
+        product_store_book_form_set = formset_factory(BookingCreateForm)
         formset = product_store_book_form_set(request.POST)
         if formset.is_valid():
             for i, form in enumerate(formset):
@@ -375,9 +356,19 @@ class OrderBookingCreateView(LoginRequiredMixin, TemplateView):
                         product_on_store.quantity -= data['quantity']
                         product_on_store.booked += data['quantity']
                         order.counted_sum += int(data['quantity']) * product.cost
+                        order.total_sum = order.counted_sum
                         order.save()
                         product_on_store.save()
-                    form.save()
+                    booking_sum = int(data['quantity']) * product.cost
+                    product_booking = ProductStoreOrderBooking(order=order,
+                                                               product=data['product'],
+                                                               store=data['store'],
+                                                               quantity=data['quantity'],
+                                                               counted_sum=booking_sum,
+                                                               total_sum=booking_sum,
+                                                               standard_price=product.cost,
+                                                               total_price=product.cost)
+                    product_booking.save()
             return redirect('order_detail', pk=kwargs.get('order_id'))
         else:
             context['formset'] = formset
@@ -396,6 +387,7 @@ class OrderBookingDeleteView(LoginRequiredMixin, DeleteView):
             product_on_store.quantity += obj.quantity
             product_on_store.save()
             order.counted_sum -= int(obj.quantity) * obj.product.cost
+            order.total_sum -= int(obj.quantity) * obj.total_price
             order.save()
             obj.delete()
             return redirect('order_detail', pk=obj.order.pk)
@@ -407,18 +399,19 @@ class OrderBookingEditView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(OrderBookingEditView, self).get_context_data(**kwargs)
         object = ProductStoreOrderBooking.objects.get(pk=kwargs.get('order_booking_id'))
-        form = BookingForm(initial={'order': object.order,
+        form = BookingEditForm(initial={'order': object.order,
                                     'product': object.product,
                                     'store': object.store,
                                     'quantity': object.quantity,
-                                    'counted_sum': object.counted_sum}
-                           )
+                                    'total_price': object.total_price}
+                                 )
+        context['order_booking'] = object
         context['form'] = form
         return context
 
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
-        form = BookingForm(request.POST)
+        form = BookingEditForm(request.POST)
         product_booking = ProductStoreOrderBooking.objects.get(pk=kwargs.get('order_booking_id'))
         order = product_booking.order
         if form.is_valid():
@@ -426,19 +419,24 @@ class OrderBookingEditView(LoginRequiredMixin, TemplateView):
             product_on_store = ProductStore.objects.get(product=product_booking.product, store=product_booking.store)
             product_on_store.booked -= product_booking.quantity
             product_on_store.quantity += product_booking.quantity
-            order.counted_sum -= int(product_booking.quantity) * product_booking.product.cost
-            order.save()
             product_on_store.quantity -= data['quantity']
             product_on_store.booked += data['quantity']
-            order.counted_sum += int(data['quantity']) * product_booking.product.cost
-            order.save()
             product_on_store.save()
             product_booking.product = data['product']
             product_booking.order = data['order']
             product_booking.store = data['store']
             product_booking.quantity = data['quantity']
             product_booking.counted_sum = product_booking.product.cost * product_booking.quantity
+            product_booking.total_price = data['total_price']
+            product_booking.total_sum = product_booking.total_price * product_booking.quantity
             product_booking.save()
+            order_bookings = ProductStoreOrderBooking.objects.filter(order=order)
+            order.total_sum = 0
+            order.counted_sum = 0
+            for order_booking in order_bookings:
+                order.total_sum += order_booking.total_sum
+                order.counted_sum += order_booking.counted_sum
+            order.save()
             return redirect('order_detail', pk=product_booking.order.pk)
         else:
             context['errors'] = form.errors

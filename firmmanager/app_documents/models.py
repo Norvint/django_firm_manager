@@ -47,7 +47,8 @@ class DeliveryConditions(models.Model):
 
 class PaymentConditions(models.Model):
     title = models.CharField('Название', max_length=30)
-    description = models.CharField('Описание', max_length=200)
+    description = models.CharField('Описание', max_length=1000)
+    description_en = models.CharField('Описание(англ)', max_length=1000, blank=True)
 
     class Meta:
         verbose_name = 'Условие оплаты'
