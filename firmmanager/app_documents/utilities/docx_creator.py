@@ -137,10 +137,10 @@ class SpecificationCreator:
                     'cost': booked_product.product.cost,
                     'description': booked_product.product.description,
                 },
-                'total_sum': booked_product.sum,
+                'total_sum': booked_product.total_sum,
                 'quantity': booked_product.quantity,
             })
-            total_sum += Decimal(booked_product.sum)
+            total_sum += Decimal(booked_product.total_sum)
         context['total_sum'] = total_sum
         doc.render(context)
         doc.save(self.output_file_path)
@@ -204,10 +204,10 @@ class InvoiceCreator:
                     'cost': booked_product.product.cost,
                     'description': booked_product.product.description,
                 },
-                'total_sum': booked_product.sum,
+                'total_sum': booked_product.total_sum,
                 'quantity': booked_product.quantity,
             })
-            total_sum += Decimal(booked_product.sum)
+            total_sum += Decimal(booked_product.total_sum)
         context['total_sum'] = total_sum
         doc.render(context)
         doc.save(self.output_file_path)

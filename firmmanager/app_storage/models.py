@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 from app_documents.models import Order
@@ -89,7 +90,8 @@ class ProductStoreIncome(models.Model):
     store = models.ForeignKey(Store, on_delete=models.CASCADE, verbose_name='Склад')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Продукция')
     quantity = models.IntegerField('Количество')
-    date = models.DateField(auto_now_add=True, verbose_name='Дата выпуска')
+    date = models.DateField(auto_now_add=True, verbose_name='Дата прихода')
+    responsible = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
     class Meta:
         verbose_name = 'Приход продукции на склад'
@@ -104,6 +106,7 @@ class ProductStoreOutcome(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Продукция')
     quantity = models.IntegerField('Количество')
     date = models.DateField(auto_now_add=True, verbose_name='Дата выпуска')
+    responsible = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
     class Meta:
         verbose_name = 'Списание продукции со склада'
@@ -118,7 +121,9 @@ class ProductStoreOrderBooking(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Продукция')
     store = models.ForeignKey(Store, on_delete=models.CASCADE, verbose_name='Склад')
     quantity = models.IntegerField('Количество')
-    sum = models.DecimalField('Сумма', decimal_places=2, max_digits=18, null=True, blank=True)
+    total_price = models.DecimalField('Цена за ед.', decimal_places=2, max_digits=18, null=True, blank=True)
+    counted_sum = models.DecimalField('Расчетная сумма', decimal_places=2, max_digits=18, null=True, blank=True)
+    total_sum = models.DecimalField('Итоговая сумма', decimal_places=2, max_digits=18, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Бронь продукции по спецификации'

@@ -5,7 +5,7 @@ from django.forms import formset_factory
 from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView, TemplateView
 
-from app_storage.forms import ProductStoreForm, ProductForm, ProductFilterForm
+from app_storage.forms import ProductStoreForm, ProductForm, ProductFilterForm, ProductStoreIncomeForm
 from app_storage.models import Product, ProductStore, Store
 
 
@@ -98,24 +98,37 @@ class ProductEditView(LoginRequiredMixin, UpdateView):
     success_url = '/storage/products'
 
 
-class ProductStoreIncomeView(LoginRequiredMixin, FormView):
-    template_name = 'app_storage/product_store_income.html'
-    form_class = ProductStoreForm
-    success_url = f'/storage/stores'
+class ProductStoreIncomeCreateView(LoginRequiredMixin, TemplateView):
+    template_name = 'app_storage/product_store_income_create.html'
 
-    def form_valid(self, form):
-        form_data = form.cleaned_data
-        print(self.form_class.changed_data)
-        products = ProductStore.objects.all().filter(store=form_data['store'], product=form_data['product'])
-        if products:
-            for product in products:
-                product.quantity += form_data['quantity']
-                product.save()
+    def get_context_data(self, **kwargs):
+        context = super(ProductStoreIncomeCreateView, self).get_context_data(**kwargs)
+        store_income_form = ProductStoreIncomeForm(initial={'store': kwargs.get('store_id')})
+        context['store_income_form'] = store_income_form
+        return context
+
+    def post(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        store_income_form = ProductStoreIncomeForm(request.POST)
+        if store_income_form.is_valid():
+            form_data = store_income_form.cleaned_data
+            product_store_income = store_income_form.save(commit=False)
+            product_store_income.responsible = request.user
+            product_store_income.save()
+            products = ProductStore.objects.all().filter(store=form_data['store'], product=form_data['product'])
+            if products:
+                for product in products:
+                    product.quantity += form_data['quantity']
+                    product.save()
+            else:
+                product_income = ProductStore(store=form_data['store'], product=form_data['product'],
+                                              quantity=form_data['quantity'], booked=0)
+                product_income.save()
+            return redirect('store_detail', pk=form_data['store'].id)
         else:
-            product_income = ProductStore(store=form_data['store'], product=form_data['product'],
-                                          quantity=form_data['quantity'], booked=0)
-            product_income.save()
-        return super().form_valid(form)
+            context['store_income_form'] = store_income_form
+            context['errors'] = store_income_form.errors
+        return self.render_to_response(context)
 
 
 class StoreListView(LoginRequiredMixin, ListView):

@@ -10,21 +10,22 @@ from app_storage.models import ProductStoreOrderBooking
 class BookingForm(forms.ModelForm):
     class Meta:
         model = ProductStoreOrderBooking
-        fields = ['order', 'product', 'store', 'quantity', 'sum']
+        fields = ['order', 'product', 'store', 'quantity', 'counted_sum']
 
     def save(self, commit=True):
         data = self.cleaned_data
         product = data['product']
-        product_sum = product.cost * int(data['quantity'])
-        spec_booking = ProductStoreOrderBooking(order=data['order'], product=data['product'],
-                                                store=data['store'], quantity=data['quantity'], sum=product_sum)
+        counted_sum = product.cost * int(data['quantity'])
+        spec_booking = ProductStoreOrderBooking(order=data['order'], product=data['product'], price=product.cost,
+                                                store=data['store'], quantity=data['quantity'], counted_sum=counted_sum,
+                                                total_sum=counted_sum)
         spec_booking.save()
 
 
 class OrderBookingForm(forms.ModelForm):
     class Meta:
         model = ProductStoreOrderBooking
-        fields = ['product', 'store', 'quantity', 'sum']
+        fields = ['product', 'store', 'quantity']
 
 
 class ContractForm(forms.ModelForm):
@@ -60,6 +61,12 @@ class OrderForm(forms.ModelForm):
         model = Order
         fields = ['number', 'contract', 'delivery_conditions', 'delivery_time', 'delivery_address',
                   'payment_conditions', 'shipment_mark']
+
+
+class OrderTotalSumForm(forms.ModelForm):
+    class Meta:
+        model = Order
+        fields = ['total_sum',]
 
 
 class ContractFilterForm(forms.Form):

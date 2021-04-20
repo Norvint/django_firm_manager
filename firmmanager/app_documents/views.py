@@ -10,7 +10,7 @@ from django.views import View
 from django.views.generic import DetailView, ListView, TemplateView, DeleteView, UpdateView
 
 from app_documents.forms import BookingForm, OrderForm, ContractFilterForm, \
-    ContractForm, OrderFilterForm, OrderBookingForm
+    ContractForm, OrderFilterForm, OrderBookingForm, OrderTotalSumForm
 from app_documents.models import Contract, ContractType, Currency, DeliveryConditions, PaymentConditions, Order
 from app_documents.utilities.currencies_parser import CurrenciesUpdater
 from app_documents.utilities.docx_creator import ContractCreator, SpecificationCreator, InvoiceCreator
@@ -253,8 +253,11 @@ class OrderCreateView(LoginRequiredMixin, TemplateView):
                                                                    product=data['product'],
                                                                    store=data['store'],
                                                                    quantity=data['quantity'],
-                                                                   sum=booking_sum)
+                                                                   counted_sum=booking_sum,
+                                                                   total_sum=booking_sum,
+                                                                   total_price=product.cost)
                         product_booking.save()
+                order.total_sum = order.counted_sum
                 order.save()
                 return redirect('order_detail', order.id)
             else:
@@ -278,37 +281,57 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
         context = super(OrderDetailView, self).get_context_data(**kwargs)
         order = self.get_object()
         order_booking = ProductStoreOrderBooking.objects.filter(order=order)
+        total_sum_form = OrderTotalSumForm(initial={'total_sum': order.total_sum})
         context['order_booking'] = order_booking
-        currency_total_sum = round(order.counted_sum * (order.contract.currency.nominal / order.contract.currency.cost))
+        context['total_sum_form'] = total_sum_form
+        currency_total_sum = round(order.total_sum * (order.contract.currency.nominal / order.contract.currency.cost))
         if currency_total_sum != order.counted_sum:
             context['currency_counted_sum'] = currency_total_sum
         return context
 
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        context = self.get_context_data(**kwargs)
+        total_sum_form = OrderTotalSumForm(request.POST)
+        if total_sum_form.is_valid():
+            order = self.get_object()
+            order.total_sum = total_sum_form.cleaned_data['total_sum']
+            order.save()
+            order_bookings = ProductStoreOrderBooking.objects.filter(order=order)
+            for booking in order_bookings:
+                percent = booking.counted_sum / (order.counted_sum / 100)
+                booking.total_sum = (order.total_sum / 100) * percent
+                booking.total_price = booking.total_sum / booking.quantity
+                booking.save()
+            return redirect('order_detail', order.id)
+        else:
+            context['total_sum_form'] = total_sum_form
+            context['errors'] = total_sum_form.errors
+            return self.render_to_response(context)
+
     def download_specification(request, **kwargs):
         order = Order.objects.get(pk=kwargs.get('pk'))
-        if order:
-            specification_creator = SpecificationCreator(order)
-            specification_creator.create_specification()
-            fl_path = os.path.join(BASE_DIR, 'static', 'app_documents', 'layouts', 'specification.docx')
-            filename = 'specification.docx'
-            fl = open(fl_path, 'rb')
-            mime_type, _ = mimetypes.guess_type(fl_path)
-            response = HttpResponse(fl, content_type=mime_type)
-            response['Content-Disposition'] = "attachment; filename=%s" % filename
-            return response
+        specification_creator = SpecificationCreator(order)
+        specification_creator.create_specification()
+        fl_path = os.path.join(BASE_DIR, 'static', 'app_documents', 'layouts', 'specification.docx')
+        filename = 'specification.docx'
+        fl = open(fl_path, 'rb')
+        mime_type, _ = mimetypes.guess_type(fl_path)
+        response = HttpResponse(fl, content_type=mime_type)
+        response['Content-Disposition'] = "attachment; filename=%s" % filename
+        return response
 
     def download_invoice(request, **kwargs):
         order = Order.objects.get(pk=kwargs.get('pk'))
-        if order:
-            invoice_creator = InvoiceCreator(order)
-            invoice_creator.create_invoice()
-            fl_path = os.path.join(BASE_DIR, 'static', 'app_documents', 'layouts', 'invoice.docx')
-            filename = 'invoice.docx'
-            fl = open(fl_path, 'rb')
-            mime_type, _ = mimetypes.guess_type(fl_path)
-            response = HttpResponse(fl, content_type=mime_type)
-            response['Content-Disposition'] = "attachment; filename=%s" % filename
-            return response
+        invoice_creator = InvoiceCreator(order)
+        invoice_creator.create_invoice()
+        fl_path = os.path.join(BASE_DIR, 'static', 'app_documents', 'layouts', 'invoice.docx')
+        filename = 'invoice.docx'
+        fl = open(fl_path, 'rb')
+        mime_type, _ = mimetypes.guess_type(fl_path)
+        response = HttpResponse(fl, content_type=mime_type)
+        response['Content-Disposition'] = "attachment; filename=%s" % filename
+        return response
 
 
 class OrderToDeleteView(LoginRequiredMixin, View):
@@ -385,10 +408,10 @@ class OrderBookingEditView(LoginRequiredMixin, TemplateView):
         context = super(OrderBookingEditView, self).get_context_data(**kwargs)
         object = ProductStoreOrderBooking.objects.get(pk=kwargs.get('order_booking_id'))
         form = BookingForm(initial={'order': object.order,
-                                         'product': object.product,
-                                         'store': object.store,
-                                         'quantity': object.quantity,
-                                         'sum': object.sum}
+                                    'product': object.product,
+                                    'store': object.store,
+                                    'quantity': object.quantity,
+                                    'counted_sum': object.counted_sum}
                            )
         context['form'] = form
         return context
@@ -414,7 +437,7 @@ class OrderBookingEditView(LoginRequiredMixin, TemplateView):
             product_booking.order = data['order']
             product_booking.store = data['store']
             product_booking.quantity = data['quantity']
-            product_booking.sum = product_booking.product.cost * product_booking.quantity
+            product_booking.counted_sum = product_booking.product.cost * product_booking.quantity
             product_booking.save()
             return redirect('order_detail', pk=product_booking.order.pk)
         else:

@@ -1,11 +1,17 @@
 from django import forms
 
-from app_storage.models import ProductStore, Product, ProductType
+from app_storage.models import ProductStore, Product, ProductType, ProductStoreIncome
 
 
 class ProductStoreForm(forms.ModelForm):
     class Meta:
         model = ProductStore
+        fields = ['store', 'product', 'quantity']
+
+
+class ProductStoreIncomeForm(forms.ModelForm):
+    class Meta:
+        model = ProductStoreIncome
         fields = ['store', 'product', 'quantity']
 
 

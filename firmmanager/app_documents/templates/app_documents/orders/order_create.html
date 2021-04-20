@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Добавить новую заказ{% endblock %}
+{% block title %}Добавить новый заказ{% endblock %}
 
 {% block content %}
 
@@ -9,7 +9,7 @@
 <p>
     {{ errors }}
 </p>
-<form name="specification-create-form" method="post">
+<form name="order-create-form" method="post">
     {% csrf_token %}
     <div class="card">
         <div class="card-body">

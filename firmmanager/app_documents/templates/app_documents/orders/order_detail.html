@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Спецификация{% endblock %}
+{% block title %}Заказ{% endblock %}
 
 {% block content %}
 <h1>Заказ</h1>
@@ -112,8 +112,8 @@
         </td>
         <td>{{ document.store }}</td>
         <td>{{ document.quantity }}</td>
-        <td>{{ document.product.cost }}</td>
-        <td>{{ document.sum }}</td>
+        <td>{{ document.total_price }}</td>
+        <td>{{ document.total_sum }}</td>
         <td>
             <a href="{% url 'order_booking_edit' document.id %}">
                 <img src="{% static 'app_documents/images/edit.png' %}" alt="edit icon">
@@ -130,15 +130,27 @@
 </table>
 {% endif %}
 
-<h3>Расчетная сумма</h3>
-<div class="d-flex justify-content-between">
-    <div>
-        <h4>RUB: {{ object.counted_sum }}</h4>
-    </div>
+<div>
+    <h3>Расчетная сумма</h3>
+    <div class="d-flex justify-content-between">
+        <div>
+            <h4>RUB: {{ object.counted_sum }}</h4>
+        </div>
 
-    <div>
-        <h4>{{ object.contract.currency.char_code }}: {{ currency_counted_sum }}</h4>
+        <div>
+            <h4>{{ object.contract.currency.char_code }}: {{ currency_counted_sum }}</h4>
+        </div>
     </div>
 </div>
 
+<p>
+    {{ errors }}
+</p>
+
+<form name="order-total-sum-form" method="post">
+    {% csrf_token %}
+    {{ total_sum_form.total_sum.label }}
+    {{ total_sum_form.total_sum }}
+    <input type="submit" value="Пересчитать" class="btn btn-primary col-4">
+</form>
 {% endblock %}
