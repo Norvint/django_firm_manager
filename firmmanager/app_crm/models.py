@@ -56,6 +56,7 @@ class Contractor(models.Model):
     second_name = models.CharField('Отчество', max_length=30, blank=True)
     last_name = models.CharField('Фамилия', max_length=30)
     country = models.CharField('Страна', max_length=30)
+    tel = models.CharField('Основной номер телефона', max_length=20)
     legal_address = models.CharField('Юр. адрес', max_length=200)
     actual_address = models.CharField('Фактический адрес', max_length=200, blank=True)
     requisites = models.TextField('Реквизиты', max_length=1000)

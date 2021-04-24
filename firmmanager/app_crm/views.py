@@ -98,8 +98,9 @@ class ContractorCreateView(LoginRequiredMixin, TemplateView):
 class ContractorEditView(LoginRequiredMixin, UpdateView):
     template_name = 'app_crm/contractors/contractor_edit.html'
     model = Contractor
-    fields = ['title', 'status', 'type_of_contractor', 'field_of_activity', 'position', 'appeal', 'name', 'second_name',
-              'last_name', 'country', 'requisites']
+    fields = ['title', 'status', 'type_of_contractor', 'field_of_activity', 'position', 'position_en', 'appeal',
+              'appeal_en', 'name', 'second_name', 'last_name', 'country', 'tel', 'legal_address', 'actual_address',
+              'requisites']
     success_url = '/crm/contractors'
 
 

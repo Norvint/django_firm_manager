@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from app_crm.models import Contractor, TypeOfContractor, FieldOfActivity, ContractorStatus, ContractorComment, \
-    ContactType, Contact, ContactPerson, ContractorFileCategory
+    ContactType, Contact, ContactPerson, ContractorFileCategory, ContractorFile
 
 
 @admin.register(Contractor)
@@ -48,3 +48,10 @@ class ContactPersonAdmin(admin.ModelAdmin):
 @admin.register(ContractorFileCategory)
 class ContractorFileCategoryAdmin(admin.ModelAdmin):
     pass
+
+
+@admin.register(ContractorFile)
+class ContractorFileAdmin(admin.ModelAdmin):
+    list_display = ('id', 'title', 'contractor', 'description', 'category')
+    list_filter = ['category',]
+    search_fields = ('contractor__title', 'title')
