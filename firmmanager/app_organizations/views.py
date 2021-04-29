@@ -2,7 +2,7 @@ import mimetypes
 import os
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse
+from django.http import HttpResponse, FileResponse
 from django.shortcuts import redirect
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, TemplateView
 
@@ -55,6 +55,12 @@ class OrganizationFileList(LoginRequiredMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         pass
+
+    def download(request, *args, **kwargs):
+        obj = OrganizationFile.objects.get(id=kwargs.get('file_id'))
+        filename = obj.file.path
+        response = FileResponse(open(filename, 'rb'))
+        return response
 
 
 class OrganizationFileCreate(LoginRequiredMixin, TemplateView):

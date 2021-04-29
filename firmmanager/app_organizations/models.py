@@ -45,7 +45,7 @@ class Worker(models.Model):
     second_name = models.CharField('Отчество', max_length=30)
     last_name = models.CharField('Фамилия', max_length=30)
     position = models.CharField('Должность', max_length=30)
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, verbose_name='Организация')
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, blank=True, verbose_name='Организация')
     serial_number = models.CharField('Серия', max_length=4, blank=True)
     number = models.CharField('Номер', max_length=6, blank=True)
     issued_by = models.CharField('Кем выдан', max_length=100, blank=True)

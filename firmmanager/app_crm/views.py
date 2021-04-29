@@ -69,8 +69,31 @@ class ContractorDetailView(LoginRequiredMixin, DetailView):
             comment_form.save()
         else:
             context['comment_form'] = comment_form
-
         return self.render_to_response(context)
+
+
+class ContractorCommentEditView(LoginRequiredMixin, TemplateView):
+    template_name = 'app_crm/comment_edit.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ContractorCommentEditView, self).get_context_data(**kwargs)
+        comment = ContractorComment.objects.get(kwargs.get('comment_id'))
+        comment_form = ContractorCommentForm(initial=comment)
+        context['comment_form'] = comment_form
+        return context
+
+    def post(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        request_data = {'text': request.POST['text']}
+        comment_form = ContractorCommentForm(data=request_data)
+        if comment_form.is_valid():
+            comment = ContractorComment.objects.get(kwargs.get('comment_id'))
+            comment.text = comment_form.cleaned_data['text']
+            comment.save()
+            return redirect('contractor_detail', kwargs.get('contractor_id'))
+        else:
+            context['comment_form'] = comment_form
+            return self.render_to_response(context)
 
 
 class ContractorCreateView(LoginRequiredMixin, TemplateView):

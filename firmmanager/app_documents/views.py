@@ -13,7 +13,8 @@ from app_documents.forms import BookingCreateForm, OrderForm, ContractFilterForm
     ContractForm, OrderFilterForm, OrderBookingForm, BookingEditForm
 from app_documents.models import Contract, ContractType, Currency, DeliveryConditions, PaymentConditions, Order
 from app_documents.utilities.currencies_parser import CurrenciesUpdater
-from app_documents.utilities.docx_creator import ContractCreator, SpecificationCreator, InvoiceCreator
+from app_documents.utilities.docx_creator import ContractCreator, SpecificationCreator, InvoiceCreator, \
+    GoodsAcceptanceCreator
 from app_storage.models import ProductStore, ProductStoreOrderBooking
 from firmmanager.settings import BASE_DIR
 
@@ -308,6 +309,18 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
         invoice_creator.create_invoice()
         fl_path = os.path.join(BASE_DIR, 'static', 'app_documents', 'layouts', 'invoice.docx')
         filename = 'invoice.docx'
+        fl = open(fl_path, 'rb')
+        mime_type, _ = mimetypes.guess_type(fl_path)
+        response = HttpResponse(fl, content_type=mime_type)
+        response['Content-Disposition'] = "attachment; filename=%s" % filename
+        return response
+
+    def download_goods_acceptance(request, **kwargs):
+        order = Order.objects.get(pk=kwargs.get('pk'))
+        goods_acceptance_creator = GoodsAcceptanceCreator(order)
+        goods_acceptance_creator.create_goods_acceptance()
+        fl_path = os.path.join(BASE_DIR, 'static', 'app_documents', 'layouts', 'goods_acceptance.docx')
+        filename = 'goods_acceptance.docx'
         fl = open(fl_path, 'rb')
         mime_type, _ = mimetypes.guess_type(fl_path)
         response = HttpResponse(fl, content_type=mime_type)

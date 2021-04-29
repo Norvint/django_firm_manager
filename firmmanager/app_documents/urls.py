@@ -28,7 +28,8 @@ urlpatterns += [
     path('orders/create-order/<int:contract_id>/contractor/<int:contractor_id>', OrderCreateView.as_view(),
          name='order_create'),
     path('orders/<int:pk>', OrderDetailView.as_view(), name='order_detail'),
-    path('orders/<int:pk>/download-specification/', OrderDetailView.download_specification, name='download_specification'),
+    path('orders/<int:pk>/download-specification/', OrderDetailView.download_specification,
+         name='download_specification'),
     path('orders/delivery-conditions', DeliveryConditionsListView.as_view(), name='delivery_conditions_list'),
     path('orders/delivery-conditions/<int:pk>', DeliveryConditionsDetailView.as_view(),
          name='delivery_condition_detail'),
@@ -41,4 +42,6 @@ urlpatterns += [
          name='order_booking_edit'),
     path('orders/<int:pk>/to-delete/', OrderToDeleteView.as_view(), name='order_to_delete'),
     path('orders/<int:pk>/download-invoice/', OrderDetailView.download_invoice, name='download_invoice'),
+    path('orders/<int:pk>/download-goods-acceptance/', OrderDetailView.download_goods_acceptance,
+         name='download_goods_acceptance'),
 ]

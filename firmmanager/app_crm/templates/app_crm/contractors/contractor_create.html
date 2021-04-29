@@ -36,6 +36,20 @@
                     </label>
                     {{ form.field_of_activity }}
                 </div>
+
+                <div class="d-flex justify-content-between mb-1">
+                    <label class="fw-bold">
+                        {{ form.legal_address.label }}
+                    </label>
+                    {{ form.legal_address }}
+                </div>
+
+                <div class="d-flex justify-content-between mb-1">
+                    <label class="fw-bold">
+                        {{ form.actual_address.label }}
+                    </label>
+                    {{ form.actual_address }}
+                </div>
             </div>
 
             <div class="col-4">
@@ -47,10 +61,24 @@
                 </div>
 
                 <div class="d-flex justify-content-between mb-1">
-                    <label class="fw-bold">
-                        {{ form.legal_address.label }}
+                    <label>
+                        {{ form.position_en.label }}
                     </label>
-                    {{ form.legal_address }}
+                    {{ form.position_en }}
+                </div>
+
+                <div class="d-flex justify-content-between mb-1">
+                    <label class="fw-bold">
+                        {{ form.appeal.label }}
+                    </label>
+                    {{ form.appeal }}
+                </div>
+
+                <div class="d-flex justify-content-between mb-1">
+                    <label>
+                        {{ form.appeal_en.label }}
+                    </label>
+                    {{ form.appeal_en }}
                 </div>
 
                 <div class="d-flex justify-content-between mb-1">
@@ -58,13 +86,6 @@
                         {{ form.tel.label }}
                     </label>
                     {{ form.tel }}
-                </div>
-
-                <div class="d-flex justify-content-between mb-1">
-                    <label class="fw-bold">
-                        {{ form.actual_address.label }}
-                    </label>
-                    {{ form.actual_address }}
                 </div>
 
 
@@ -77,12 +98,6 @@
             </div>
 
             <div class="col-3">
-                <div class="d-flex justify-content-between mb-1">
-                    <label class="fw-bold">
-                        {{ form.appeal.label }}
-                    </label>
-                    {{ form.appeal }}
-                </div>
 
                 <div class="d-flex justify-content-between mb-1">
                     <label class="fw-bold">

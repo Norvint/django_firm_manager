@@ -58,6 +58,18 @@ class PaymentConditions(models.Model):
         return self.title
 
 
+class ShipmentMark(models.Model):
+    description = models.CharField('Описание', max_length=1000)
+    description_en = models.CharField('Описание(англ)', max_length=1000)
+
+    class Meta:
+        verbose_name = 'Отгрузочная метка'
+        verbose_name_plural = 'Отгрузочные метки'
+
+    def __str__(self):
+        return self.description
+
+
 class Contract(models.Model):
     number = models.CharField('Номер договора', max_length=30)
     type = models.ForeignKey(ContractType, on_delete=models.CASCADE, verbose_name='Тип договора')
@@ -86,7 +98,8 @@ class Order(models.Model):
     delivery_address = models.CharField('Место поставки', max_length=100)
     payment_conditions = models.ForeignKey(PaymentConditions, on_delete=models.CASCADE,
                                            verbose_name='Условия оплаты')
-    shipment_mark = models.CharField('Отгрузочная метка', max_length=100)
+    shipment_mark = models.ForeignKey(ShipmentMark, on_delete=models.CASCADE, verbose_name='Отгрузочная метка',
+                                      blank=True)
     counted_sum = models.DecimalField('Расчетная сумма', max_digits=20, decimal_places=4, default=0)
     total_sum = models.DecimalField('Итоговая сумма', max_digits=20, decimal_places=4, default=0)
     to_delete = models.BooleanField('К удалению', default=False)

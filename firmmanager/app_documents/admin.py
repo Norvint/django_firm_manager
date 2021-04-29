@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.forms import TextInput, Textarea
 from django.db import models
 
-from app_documents.models import Contract, ContractType, Currency, DeliveryConditions, PaymentConditions, Order
+from app_documents.models import Contract, ContractType, Currency, DeliveryConditions, PaymentConditions, Order, \
+    ShipmentMark
 from app_storage.models import ProductStoreOrderBooking
 
 
@@ -46,3 +47,8 @@ class PaymentConditionsAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.CharField: {'widget': TextInput(attrs={'size': '150em'})},
     }
+
+
+@admin.register(ShipmentMark)
+class ShipmentMarkAdmin(admin.ModelAdmin):
+    pass

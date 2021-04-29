@@ -1,0 +1,5 @@
+<form method="post" name="comment-edit-form" action="{% url 'contractor_comment_edit' contractor_id comment_id %}">
+    {% csrf_token %}
+    {{ comment_form.as_table }}
+    <input class="btn btn-primary col-3" type="submit" value="Добавить">
+</form>

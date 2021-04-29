@@ -1,6 +1,5 @@
 import os
 from datetime import datetime
-from decimal import Decimal
 from pathlib import Path
 
 import pymorphy2
@@ -21,7 +20,7 @@ class ContractCreator:
         doc = DocxTemplate(self.template)
         context = {
             'number': self.contract.number,
-            'created': self.contract.created,
+            'created': self.contract.created.strftime('%d-%m-%Y'),
             'created_year': self.get_created_year(),
             'client': {
                 'title': self.contract.contractor.title,
@@ -102,7 +101,8 @@ class SpecificationCreator:
                 'description': self.order.payment_conditions.description,
                 'description_en': self.order.payment_conditions.description_en
             },
-            'current_date': self.order.created,
+            'current_date': datetime.now().strftime('%d-%m-%Y'),
+            'delivery_address': self.order.delivery_address,
             'delivery_conditions':
                 {
                     'title': self.order.delivery_conditions.title,
@@ -110,12 +110,12 @@ class SpecificationCreator:
             'delivery_time': self.order.delivery_time,
             'contract': {
                 'number': self.order.contract.number,
-                'created': self.order.contract.created,
+                'created': self.order.contract.created.strftime('%d-%m-%Y'),
                 'created_year': self.get_created_year(),
                 'client': {
                     'title': self.order.contract.contractor.title,
                     'appeal_en': self.order.contract.contractor.appeal_en,
-                    'position': self.order.contract.contractor.position,
+                    'position': self.get_contractor_position(),
                     'position_en': self.order.contract.contractor.position_en,
                     'name': self.order.contract.contractor.name,
                     'second_name': self.order.contract.contractor.second_name,
@@ -143,7 +143,7 @@ class SpecificationCreator:
                     'pprnie': self.order.contract.organization.pprnie,
                     'requisites': self.order.contract.organization.requisites,
                     'requisites_en': self.order.contract.organization.requisites_en,
-                    'position': self.get_position(),
+                    'position': self.get_organization_position(),
                     'position_en': self.order.contract.organization.position_en,
                     'initials': self.get_organization_initials(),
                     'initials_en': self.get_organization_english_initials(),
@@ -165,9 +165,9 @@ class SpecificationCreator:
                     'description_en': booked_product.product.description_en,
                 },
                 'total_sum': round(booked_product.total_sum * (
-                    self.order.contract.currency.nominal / self.order.contract.currency.cost), 1),
+                        self.order.contract.currency.nominal / self.order.contract.currency.cost), 1),
                 'total_price': round(booked_product.total_price * (
-                    self.order.contract.currency.nominal / self.order.contract.currency.cost), 1),
+                        self.order.contract.currency.nominal / self.order.contract.currency.cost), 1),
                 'quantity': booked_product.quantity,
             })
         doc.render(context)
@@ -186,12 +186,21 @@ class SpecificationCreator:
         created_year = self.order.contract.created.strftime('%Y')
         return created_year
 
-    def get_position(self):
+    def get_organization_position(self):
         morph = pymorphy2.MorphAnalyzer()
-        position_raw = morph.parse(self.order.contract.organization.position)[0]
-        position = position_raw.inflect({'gent'})
-        print(position.word)
-        return position.word
+        position = ''
+        for raw_word in self.order.contract.organization.position.split(' '):
+            new_word = morph.parse(raw_word)[0]
+            position += new_word.inflect({'gent'}).word + ' '
+        return position
+
+    def get_contractor_position(self):
+        morph = pymorphy2.MorphAnalyzer()
+        position = ''
+        for raw_word in self.order.contract.contractor.position.split(' '):
+            new_word = morph.parse(raw_word)[0]
+            position += new_word.inflect({'gent'}).word + ' '
+        return position
 
 
 class InvoiceCreator:
@@ -210,7 +219,12 @@ class InvoiceCreator:
                 'description': self.order.payment_conditions.description,
                 'description_en': self.order.payment_conditions.description_en
             },
-            'current_date': datetime.now().date(),
+            'current_date': datetime.now().strftime('%d-%m-%Y'),
+            'shipment_mark': {
+                'description': self.order.shipment_mark.description,
+                'description_en': self.order.shipment_mark.description_en,
+            },
+            'delivery_address': self.order.delivery_address,
             'delivery_conditions':
                 {
                     'title': self.order.delivery_conditions.title,
@@ -218,12 +232,12 @@ class InvoiceCreator:
             'delivery_time': self.order.delivery_time,
             'contract': {
                 'number': self.order.contract.number,
-                'created': self.order.contract.created,
+                'created': self.order.contract.created.strftime('%d-%m-%Y'),
                 'created_year': self.get_created_year(),
                 'client': {
                     'title': self.order.contract.contractor.title,
                     'appeal_en': self.order.contract.contractor.appeal_en,
-                    'position': self.order.contract.contractor.position,
+                    'position': self.get_contractor_position(),
                     'position_en': self.order.contract.contractor.position_en,
                     'name': self.order.contract.contractor.name,
                     'second_name': self.order.contract.contractor.second_name,
@@ -252,7 +266,7 @@ class InvoiceCreator:
                     'pprnie': self.order.contract.organization.pprnie,
                     'requisites': self.order.contract.organization.requisites,
                     'requisites_en': self.order.contract.organization.requisites_en,
-                    'position': self.get_position(),
+                    'position': self.get_organization_position(),
                     'position_en': self.order.contract.organization.position_en,
                     'initials': self.get_organization_initials(),
                     'initials_en': self.get_organization_english_initials(),
@@ -268,7 +282,7 @@ class InvoiceCreator:
         }
         for i, booked_product in enumerate(ProductStoreOrderBooking.objects.all().filter(order=self.order)):
             context['booked_products'].append({
-                'tr_number': i,
+                'tr_number': str(i + 1),
                 'product': {
                     'article': booked_product.product.number,
                     'description': booked_product.product.description,
@@ -296,10 +310,105 @@ class InvoiceCreator:
         created_year = self.order.contract.created.strftime('%Y')
         return created_year
 
-    def get_position(self):
+    def get_organization_position(self):
         morph = pymorphy2.MorphAnalyzer()
-        position_raw = morph.parse(self.order.contract.organization.position)[0]
-        position = position_raw.inflect({'gent'})
-        print(position.word)
-        return position.word
+        position = ''
+        for raw_word in self.order.contract.organization.position.split(' '):
+            new_word = morph.parse(raw_word)[0]
+            position += new_word.inflect({'gent'}).word + ' '
+        return position
 
+    def get_contractor_position(self):
+        morph = pymorphy2.MorphAnalyzer()
+        position = ''
+        for raw_word in self.order.contract.contractor.position.split(' '):
+            new_word = morph.parse(raw_word)[0]
+            position += new_word.inflect({'gent'}).word + ' '
+        return position
+
+
+class GoodsAcceptanceCreator:
+    BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+    def __init__(self, context):
+        self.template = os.path.join(self.BASE_DIR, 'static', 'app_documents', 'layouts',
+                                     'goods_acceptance_template.docx')
+        self.output_file_path = os.path.join(self.BASE_DIR, 'static', 'app_documents', 'layouts',
+                                             'goods_acceptance.docx')
+        self.order = context
+
+    def create_goods_acceptance(self):
+        doc = DocxTemplate(self.template)
+        context = {
+            'number': self.order.number,
+            'current_date': datetime.now().strftime('%d-%m-%Y'),
+            'contract': {
+                'number': self.order.contract.number,
+                'created': self.order.contract.created.strftime('%d-%m-%Y'),
+                'client': {
+                    'title': self.order.contract.contractor.title,
+                    'appeal_en': self.order.contract.contractor.appeal_en,
+                    'position': self.get_contractor_position(),
+                    'position_en': self.order.contract.contractor.position_en,
+                    'name': self.order.contract.contractor.name,
+                    'second_name': self.order.contract.contractor.second_name,
+                    'last_name': self.order.contract.contractor.last_name,
+                    'legal_address': self.order.contract.contractor.legal_address,
+                },
+                'organization': {
+                    'title': self.order.contract.organization.title,
+                    'title_en': self.order.contract.organization.title_en,
+                    'appeal': self.order.contract.organization.appeal,
+                    'appeal_en': self.order.contract.organization.appeal_en,
+                    'name': self.order.contract.organization.name,
+                    'name_en': self.order.contract.organization.name_en,
+                    'second_name': self.order.contract.organization.second_name,
+                    'second_name_en': self.order.contract.organization.second_name_en,
+                    'last_name': self.order.contract.organization.last_name,
+                    'last_name_en': self.order.contract.organization.last_name_en,
+                    'registration': self.order.contract.organization.registration,
+                    'registration_en': self.order.contract.organization.registration_en,
+                    'position': self.get_organization_position(),
+                    'position_en': self.order.contract.organization.position_en,
+                },
+                'currency': {
+                    'title': self.order.contract.currency.title,
+                    'char_code': self.order.contract.currency.char_code,
+                }
+            },
+            'currency_total_sum': round(self.order.total_sum * (
+                    self.order.contract.currency.nominal / self.order.contract.currency.cost), 1),
+            'booked_products': []
+        }
+        for i, booked_product in enumerate(ProductStoreOrderBooking.objects.all().filter(order=self.order)):
+            context['booked_products'].append({
+                'tr_number': str(i + 1),
+                'product': {
+                    'article': booked_product.product.number,
+                    'description': booked_product.product.description,
+                    'description_en': booked_product.product.description_en,
+                },
+                'total_sum': round(booked_product.total_sum * (
+                        self.order.contract.currency.nominal / self.order.contract.currency.cost), 1),
+                'total_price': round(booked_product.total_price * (
+                        self.order.contract.currency.nominal / self.order.contract.currency.cost), 1),
+                'quantity': booked_product.quantity,
+            })
+        doc.render(context)
+        doc.save(self.output_file_path)
+
+    def get_organization_position(self):
+        morph = pymorphy2.MorphAnalyzer()
+        position = ''
+        for raw_word in self.order.contract.organization.position.split(' '):
+            new_word = morph.parse(raw_word)[0]
+            position += new_word.inflect({'gent'}).word + ' '
+        return position
+
+    def get_contractor_position(self):
+        morph = pymorphy2.MorphAnalyzer()
+        position = ''
+        for raw_word in self.order.contract.contractor.position.split(' '):
+            new_word = morph.parse(raw_word)[0]
+            position += new_word.inflect({'gent'}).word + ' '
+        return position

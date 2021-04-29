@@ -69,11 +69,15 @@
     </div>
     <ul class="list-group list-group-flush">
         <li class="list-group-item">Должность: {{ object.position }}</li>
+        <li class="list-group-item">Должность(англ): {{ object.position_en }}</li>
         <li class="list-group-item">Обращение: {{ object.appeal }}</li>
+        <li class="list-group-item">Обращение(англ): {{ object.appeal_en }}</li>
         <li class="list-group-item">Имя: {{ object.name }}</li>
         <li class="list-group-item">Отчество\Второе имя: {{ object.second_name }}</li>
         <li class="list-group-item">Фамилия: {{ object.last_name }}</li>
         <li class="list-group-item">Страна: {{ object.country }}</li>
+        <li class="list-group-item">Юр. адрес: {{ object.legal_address }}</li>
+        <li class="list-group-item">Факт. адрес: {{ object.actual_address }}</li>
         <li class="list-group-item">Ответственный: {{ object.responsible }}</li>
         <li class="list-group-item">Реквизиты: {{ object.requisites }}</li>
     </ul>
@@ -97,7 +101,6 @@
         <td>{{ contact.contact_name }}</td>
     </tr>
     {% endfor %}
-
     </tbody>
 </table>
 {% endif %}
