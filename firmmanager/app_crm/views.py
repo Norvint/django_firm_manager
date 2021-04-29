@@ -118,13 +118,27 @@ class ContractorCreateView(LoginRequiredMixin, TemplateView):
             return self.render_to_response(context)
 
 
-class ContractorEditView(LoginRequiredMixin, UpdateView):
+class ContractorEditView(LoginRequiredMixin, TemplateView):
     template_name = 'app_crm/contractors/contractor_edit.html'
-    model = Contractor
-    fields = ['title', 'status', 'type_of_contractor', 'field_of_activity', 'position', 'position_en', 'appeal',
-              'appeal_en', 'name', 'second_name', 'last_name', 'country', 'tel', 'legal_address', 'actual_address',
-              'requisites']
-    success_url = '/crm/contractors'
+
+    def get_context_data(self, **kwargs):
+        context = super(ContractorEditView, self).get_context_data(**kwargs)
+        contractor = Contractor.objects.get(pk=kwargs.get('pk'))
+        form = ContractorForm(initial=contractor)
+        context['form'] = form
+        return context
+
+    def post(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        form = ContractorForm(request.POST)
+        if form.is_valid():
+            contractor = form.save(commit=False)
+            contractor.responsible = request.user
+            contractor.save()
+            return redirect('contractor_detail', pk=contractor.pk)
+        else:
+            context['form'] = form
+            return self.render_to_response(context)
 
 
 class ContractorToDeleteView(LoginRequiredMixin, View):

@@ -9,14 +9,64 @@
 <div class="mb-5 col-8">
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title">{{ object.title }}</h5>
+            <h4 class="card-title">{{ object.title }}</h4>
         </div>
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item">Адрес: {{ object.legal_address }}</li>
-            <li class="list-group-item">ИНН(TIN): {{ object.tin }}</li>
-            <li class="list-group-item">ОГРИП(PPRNIE): {{ object.pprnie }}</li>
-            <li class="list-group-item">Уведомление о постановке на учет: {{ object.registration }}</li>
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button"
+                        role="tab" aria-controls="home" aria-selected="true">Основная информация
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button"
+                        role="tab" aria-controls="profile" aria-selected="false">Контактные данные
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button"
+                        role="tab" aria-controls="contact" aria-selected="false">Реквизиты
+                </button>
+            </li>
         </ul>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Название(Англ): {{ object.title_en }}</li>
+                </ul>
+                 <div class="card-body border-top">
+                    <h5 class="card-title">Директор</h5>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Должность: {{ object.position }} ({{ object.position_en }})</li>
+                    <li class="list-group-item">Обращение: {{ object.appeal }} ({{ object.appeal_en }})</li>
+                    <li class="list-group-item">Имя: {{ object.name }} ({{ object.name_en }})</li>
+                    <li class="list-group-item">Отчество: {{ object.second_name }} ({{ object.second_name_en }})</li>
+                    <li class="list-group-item">Фамилия: {{ object.last_name }} ({{ object.last_name_en }})</li>
+                </ul>
+            </div>
+            <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Юр. адрес: {{ object.legal_address }} ({{ object.legal_address_en }})</li>
+                    <li class="list-group-item">Фактический адрес: {{ object.actual_address }}</li>
+                </ul>
+            </div>
+            <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">ИНН(TIN): {{ object.tin }}</li>
+                    <li class="list-group-item">ОГРН(ИП): {{ object.pprnie }}</li>
+                    <li class="list-group-item">Действующий на основании: {{ object.registration }} ({{ object.registration_en }})</li>
+                </ul>
+                <div class="card-body border-top">
+                    <h5 class="card-title">Банковские реквизиты</h5>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">{{ object.requisites }}</li>
+                    <li class="list-group-item">{{ object.requisites_en }}</li>
+                </ul>
+            </div>
+        </div>
+
+
         <div class="card-body">
             <a href="{% url 'organization_edit' organization.id %}" class="btn btn-primary">Редактировать</a>
         </div>

@@ -26,7 +26,7 @@ class ContractorForm(forms.ModelForm):
                   'appeal_en', 'name', 'second_name', 'last_name', 'country', 'tel', 'legal_address', 'actual_address',
                   'requisites']
         widgets = {
-            'requisites': forms.Textarea(attrs={'rows': 3, 'cols': 20}),
+            'requisites': forms.Textarea(attrs={'rows': 5, 'cols': 80}),
         }
 
 
