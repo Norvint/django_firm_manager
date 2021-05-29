@@ -5,12 +5,8 @@
 {% block content %}
 
 <a href="{% url 'orders_list' %}" class="btn btn-primary mt-2 col-3">К списку заказов</a>
-
 <p>
-    {{ answer }}
-</p>
-<p>
-    {{ errors }}
+    {{ products_on_store_error }}
 </p>
 
 <h1>Редактирование брони продукции по заказу</h1>

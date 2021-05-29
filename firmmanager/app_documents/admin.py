@@ -3,7 +3,7 @@ from django.forms import TextInput, Textarea
 from django.db import models
 
 from app_documents.models import Contract, ContractType, Currency, DeliveryConditions, PaymentConditions, Order, \
-    ShipmentMark
+    ShipmentMark, OrderWithoutContract
 from app_storage.models import ProductStoreOrderBooking
 
 
@@ -51,4 +51,9 @@ class PaymentConditionsAdmin(admin.ModelAdmin):
 
 @admin.register(ShipmentMark)
 class ShipmentMarkAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(OrderWithoutContract)
+class OrderWithoutContract(admin.ModelAdmin):
     pass

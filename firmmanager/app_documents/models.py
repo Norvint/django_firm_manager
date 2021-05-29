@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -99,7 +97,7 @@ class Order(models.Model):
     payment_conditions = models.ForeignKey(PaymentConditions, on_delete=models.CASCADE,
                                            verbose_name='Условия оплаты')
     shipment_mark = models.ForeignKey(ShipmentMark, on_delete=models.CASCADE, verbose_name='Отгрузочная метка',
-                                      blank=True)
+                                      blank=True, null=True)
     counted_sum = models.DecimalField('Расчетная сумма', max_digits=20, decimal_places=4, default=0)
     total_sum = models.DecimalField('Итоговая сумма', max_digits=20, decimal_places=4, default=0)
     to_delete = models.BooleanField('К удалению', default=False)
@@ -111,3 +109,32 @@ class Order(models.Model):
 
     def __str__(self):
         return f'№{self.number} - {self.contract.contractor.title}'
+
+
+class OrderWithoutContract(models.Model):
+    number = models.CharField('Номер заказа', max_length=30, blank=True)
+    created = models.DateField(auto_now_add=True)
+    contractor = models.ForeignKey(Contractor, on_delete=models.CASCADE, verbose_name='Клиент')
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, verbose_name='Организация поставщик')
+    currency = models.ForeignKey(Currency, on_delete=models.CASCADE, verbose_name='Валюта')
+    delivery_conditions = models.ForeignKey(DeliveryConditions, on_delete=models.CASCADE,
+                                            verbose_name='Условия поставки')
+    delivery_time = models.IntegerField('Срок поставки, дней', default=1)
+    delivery_address = models.CharField('Место поставки', max_length=100)
+    payment_conditions = models.ForeignKey(PaymentConditions, on_delete=models.CASCADE,
+                                           verbose_name='Условия оплаты')
+    shipment_mark = models.ForeignKey(ShipmentMark, on_delete=models.CASCADE, verbose_name='Отгрузочная метка',
+                                      blank=True, null=True)
+    counted_sum = models.DecimalField('Расчетная сумма', max_digits=20, decimal_places=4, default=0)
+    total_sum = models.DecimalField('Итоговая сумма', max_digits=20, decimal_places=4, default=0)
+    to_delete = models.BooleanField('К удалению', default=False)
+    responsible = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+
+    class Meta:
+        verbose_name = 'Заказ без договора'
+        verbose_name_plural = 'Заказы без договора'
+
+    def __str__(self):
+        return f'№{self.number} - {self.contractor.title}'
+
+

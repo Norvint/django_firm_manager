@@ -2,12 +2,13 @@ import mimetypes
 import os
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.forms import formset_factory
 from django.http import HttpResponse, FileResponse
 from django.shortcuts import redirect
 from django.views.generic import CreateView, ListView, DetailView, UpdateView, TemplateView
 
-from app_organizations.forms import WorkerForm, OrganizationFileForm
-from app_organizations.models import Organization, Worker, OrganizationFile
+from app_organizations.forms import WorkerForm, OrganizationFileForm, ContactForm
+from app_organizations.models import Organization, Worker, OrganizationFile, WorkerContact
 from firmmanager import settings
 
 
@@ -109,45 +110,103 @@ class WorkerCreateView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(WorkerCreateView, self).get_context_data(**kwargs)
         form = WorkerForm()
+        formset = formset_factory(ContactForm)
         context['form'] = form
+        context['formset'] = formset
         return context
 
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
         form = WorkerForm(request.POST)
-        if form.is_valid():
-            user = form.cleaned_data['user']
-            name = form.cleaned_data['name']
-            second_name = form.cleaned_data['second_name']
-            last_name = form.cleaned_data['last_name']
-            position = form.cleaned_data['position']
-            organization = form.cleaned_data['organization']
-            serial_number = form.cleaned_data['serial_number']
-            number = form.cleaned_data['number']
-            issued_by = form.cleaned_data['issued_by']
-            date = form.cleaned_data['date']
-            date_of_birth = form.cleaned_data['date_of_birth']
-            department_code = form.cleaned_data['department_code']
-            worker = Worker(user=user, name=name, second_name=second_name, last_name=last_name, position=position,
-                            organization=organization, serial_number=serial_number, number=number, issued_by=issued_by,
-                            date=date, date_of_birth=date_of_birth, department_code=department_code)
+        contacts_formset = formset_factory(ContactForm)
+        formset = contacts_formset(request.POST)
+        if form.is_valid() and formset.is_valid():
+            form_data = form.cleaned_data
+            worker = Worker(user=form_data['user'], name=form_data['name'], second_name=form_data['second_name'],
+                            last_name=form_data['last_name'], position=form_data['position'],
+                            organization=form_data['organization'], serial_number=form_data['serial_number'],
+                            number=form_data['number'], issued_by=form_data['issued_by'], date=form_data['date'],
+                            date_of_birth=form_data['date_of_birth'], department_code=form_data['department_code'])
             worker.save()
+            for i, form in enumerate(formset):
+                data = formset.cleaned_data[i]
+                if form.is_valid() and data:
+                    contact = WorkerContact(worker=worker, type_of_contact=data['type_of_contact'],
+                                            contact=data['contact'])
+                    contact.save()
             return redirect('worker_detail', worker.pk)
         else:
-            context['errors'] = form.errors
             context['form'] = form
+            context['formset'] = formset
         return self.render_to_response(context)
 
 
-class WorkerEditView(LoginRequiredMixin, UpdateView):
+class WorkerEditView(LoginRequiredMixin, TemplateView):
     template_name = 'app_organizations/worker_edit.html'
-    model = Worker
-    fields = (
-        'user', 'name', 'second_name', 'last_name', 'position', 'organization', 'serial_number', 'number', 'issued_by',
-        'date', 'date_of_birth', 'department_code')
-    success_url = '/organizations/workers'
+
+    def get_context_data(self, **kwargs):
+        context = super(WorkerEditView, self).get_context_data(**kwargs)
+        worker = Worker.objects.get(pk=kwargs.get('pk'))
+        form = WorkerForm(initial={'user': worker.user, 'name': worker.name, 'second_name': worker.second_name,
+                                   'last_name': worker.last_name, 'position': worker.position,
+                                   'organization': worker.organization, 'serial_number': worker.serial_number,
+                                   'number': worker.number, 'issued_by': worker.issued_by, 'date': worker.date,
+                                   'date_of_birth': worker.date_of_birth, 'department_code': worker.department_code})
+        contacts_formset = formset_factory(ContactForm)
+        worker_contacts = WorkerContact.objects.filter(worker=kwargs.get('pk'))
+        contacts_data = []
+        for worker_contact in worker_contacts:
+            contacts_data.append({'type_of_contact': worker_contact.type_of_contact, 'contact': worker_contact.contact})
+        formset = contacts_formset(initial=contacts_data)
+        context['form'] = form
+        context['formset'] = formset
+        return context
+
+    def post(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        form = WorkerForm(request.POST)
+        contacts_formset = formset_factory(ContactForm)
+        formset = contacts_formset(request.POST)
+        if form.is_valid() and formset.is_valid():
+            form_data = form.cleaned_data
+            worker = Worker.objects.filter(pk=kwargs.get('pk')).update(user=form_data['user'],
+                                                                       name=form_data['name'],
+                                                                       second_name=form_data['second_name'],
+                                                                       last_name=form_data['last_name'],
+                                                                       position=form_data['position'],
+                                                                       organization=form_data['organization'],
+                                                                       serial_number=form_data['serial_number'],
+                                                                       number=form_data['number'],
+                                                                       issued_by=form_data['issued_by'],
+                                                                       date=form_data['date'],
+                                                                       date_of_birth=form_data['date_of_birth'],
+                                                                       department_code=form_data['department_code'])
+            for i, form in enumerate(formset):
+                data = formset.cleaned_data[i]
+                if form.is_valid() and data:
+                    worker_contact = WorkerContact.objects.get(worker=kwargs.get('pk'),
+                                                               type_of_contact=data['type_of_contact'])
+                    if worker_contact:
+                        worker_contact.contact = data['contact']
+                        worker_contact.save()
+                    else:
+                        new_contact = WorkerContact(worker=kwargs.get('pk'), type_of_contact=data['type_of_contact'],
+                                                    contact=data['contact'])
+                        new_contact.save()
+            return redirect('worker_detail', kwargs.get('pk'))
+        else:
+            context['form'] = form
+            context['formset'] = formset
+        return self.render_to_response(context)
 
 
-class WorkerDetailView(LoginRequiredMixin, DetailView):
+class WorkerDetailView(LoginRequiredMixin, TemplateView):
     template_name = 'app_organizations/worker_detail.html'
-    model = Worker
+
+    def get_context_data(self, **kwargs):
+        context = super(WorkerDetailView, self).get_context_data(**kwargs)
+        worker = Worker.objects.get(pk=kwargs.get('pk'))
+        worker_contacts = WorkerContact.objects.filter(worker=worker)
+        context['object'] = worker
+        context['worker_contacts'] = worker_contacts
+        return context

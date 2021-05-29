@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Список приходов продукции{% endblock %}
+
+{% block content %}
+
+<h1>Список приходов продукции</h1>
+
+{% if product_store_income_list %}
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th scope="col">Склад</th>
+        <th scope="col">Продукция</th>
+        <th scope="col">Количество</th>
+        <th scope="col">Дата</th>
+        <th scope="col">Ответственный</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for product_store_income in product_store_income_list %}
+    <tr>
+        <td>
+            {{ product_store_income.store }}
+        </td>
+
+        <td>
+            {{ product_store_income.product }}
+        </td>
+
+        <td>
+            {{ product_store_income.quantity }}
+        </td>
+
+        <td>
+            {{ product_store_income.date }}
+        </td>
+
+        <td>
+            {{ product_store_income.responsible }}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+
+
+{% endblock %}

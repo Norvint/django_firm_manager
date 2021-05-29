@@ -3,18 +3,41 @@
 {% block title %}Склады{% endblock %}
 
 {% block content %}
-<ul class="nav nav-pills pt-2 pb-2 d-flex">
-    <li class="col-2">
-        <a href="" class="btn btn-primary">Приходы продукции</a>
-    </li>
 
-    <li class="col-2">
-        <a href="" class="btn btn-primary">Выпуски продукции</a>
-    </li>
-</ul>
+<div class="dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+       data-bs-toggle="dropdown" aria-expanded="false">
+        Движения по складам
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+        <li>
+            <a href="{% url 'store_income_list' 0 %}" class="dropdown-item">Приходы продукции</a>
+        </li>
+
+        <li>
+            <a href="" class="dropdown-item">Выпуски продукции</a>
+        </li>
+    </ul>
+</div>
+
+
+<div class="dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+       data-bs-toggle="dropdown" aria-expanded="false">
+        Действия со складами
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+        <li>
+            <a href="{% url 'store_income_create' 0 %}" class="dropdown-item">Оформить приход продукции</a>
+        </li>
+
+        <li>
+            <a href="{% url 'store_outcome_create' 0 %}" class="dropdown-item">Оформить выпуск продукции</a>
+        </li>
+    </ul>
+</div>
 
 <h1>Склады</h1>
-<a href="{% url 'product_store_income' 0 %}" class="btn btn-primary mb-2 mt-2">Оформить приход продукции на склад</a>
 {% if stores_list %}
 <table class="table table-striped">
     <thead>

@@ -17,11 +17,6 @@
             <a href="{% url 'contractor_orders_list' object.id %}"
                class="dropdown-item">Заказы</a>
         </li>
-
-        <li>
-            <a href="{% url 'contact_persons_list' object.id %}" class="dropdown-item">Контактные
-                лица контрагента</a>
-        </li>
     </ul>
 </div>
 
@@ -34,8 +29,8 @@
     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
         {% for file_category in files_categories %}
         <li>
-            <a href="{% url 'contractor_files_list' object.id file_category.slug %}" class="dropdown-item">{{
-                file_category.title }}</a>
+            <a href="{% url 'contractor_files_list' object.id file_category.slug %}" class="dropdown-item">
+                {{ file_category.title }}</a>
         </li>
         {% endfor %}
         <li>
@@ -46,7 +41,7 @@
 
 
 <h1>Информация о контрагенте</h1>
-<div class="card col-9">
+<div class="card col-12">
     <ul class="list-group list-group-horizontal">
         <li class="list-group-item">
             <a href="{% url 'contractor_edit' object.id %}" class="btn btn-primary">Редактировать</a>
@@ -84,6 +79,11 @@
                     role="tab" aria-controls="more" aria-selected="false">Дополнительно
             </button>
         </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="contacts-tab" data-bs-toggle="tab" data-bs-target="#contacts" type="button"
+                    role="tab" aria-controls="contacts" aria-selected="false">Контакты контрагента
+            </button>
+        </li>
     </ul>
     <div class="tab-content" id="myTabContent">
         <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
@@ -106,63 +106,101 @@
         <div class="tab-pane fade" id="more" role="tabpanel" aria-labelledby="more-tab">
             <ul class="list-group list-group-flush">
                 <li class="list-group-item">Ответственный: {{ object.responsible }}</li>
+                <li class="list-group-item">Тэги: {{ object.tag }}</li>
             </ul>
+
         </div>
-
-</div>
-
-{% if contacts %}
-<h4 class="text-center mt-4 border-top border-bottom pb-1">Контактные данные</h4>
-<table class="table" id="contact-form-wrapper">
-    <thead>
-    <tr>
-        <th scope="col">Тип контакта</th>
-        <th scope="col">Контактные данные</th>
-        <th scope="col">Имя контакта</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for contact in contacts %}
-    <tr class="contact-form-container">
-        <td>{{ contact.type_of_contact }}</td>
-        <td>{{ contact.contact }}</td>
-        <td>{{ contact.contact_name }}</td>
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
-{% endif %}
-
-{% if comments %}
-<h2>Комментарии к контрагенту</h2>
-{% for comment in comments %}
-<div class="row">
-    <div class="col-5">
-        <div class="card mb-2">
+        <div class="tab-pane fade" id="contacts" role="tabpanel" aria-labelledby="contacts-tab">
             <div class="card-body">
-                <h5 class="card-title">{{ comment.user }}</h5>
+                {% if contact_persons %}
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Имя</th>
+                        <th scope="col">Отчество</th>
+                        <th scope="col">Фамилия</th>
+                        <th scope="col">Должность</th>
+                        <th scope="col">Редактировать</th>
+                        <th scope="col">Поставить/убрать пометку на удаление</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for contact_person in contact_persons %}
+                    <tr class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}">
+
+                        <td>
+                            <a class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}"
+                               href="{% url 'contact_person_detail' object.id contact_person.id %}">
+                                {{ contact_person.name }}
+                            </a>
+                        </td>
+
+                        <td>
+                            {{ contact_person.second_name }}
+                        </td>
+
+                        <td>
+                            {{ contact_person.last_name }}
+                        </td>
+
+                        <td>
+                            {{ contact_person.position }}
+                        </td>
+
+                        <td class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}">
+                            <a class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}"
+                               href="{% url 'contact_person_edit' object.id contact_person.id %}">
+                                Кнопка
+                            </a>
+                        </td>
+
+                        <td class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}">
+                            <a class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}"
+                               href="{% url 'contact_person_to_delete' object.id contact_person.id %}">
+                                Кнопка
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>
+                    Похоже вы еще не добавили контактных лиц к этому контрагенту.
+                </p>
+                {% endif %}
+                <a href="{% url 'contact_person_create' object.id %}" class="btn btn-primary">Добавить контактное
+                    лицо</a>
             </div>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item">{{ comment.text }}</li>
-                <li class="list-group-item">Дата создания: {{ comment.created }}</li>
-            </ul>
         </div>
     </div>
 </div>
-{% endfor %}
-{% endif %}
 
-<form class="card col-4 mt-2" name="comment-form" method="post" action="{% url 'contractor_detail' object.id %}">
-    <div class="card-body">
-        <h5 class="card-title">Оставить комментарий</h5>
+
+<div class="col-12">
+    <div class="card">
+        <h4 class="border-top text-center">Комментарии к контрагенту</h4>
+        {% if comments %}
+        {% for comment in comments %}
+        <div class="card-body border-top lh-1 {% ifequal comment.user request.user %} text-end {% endifequal %} ">
+            <p class="">{{ comment.text }}</p>
+            <p class="text-black-50">{{ comment.user }} \ {{ comment.created }}</p>
+            {% ifequal comment.user request.user %}
+            <a href="{% url 'contractor_comment_edit' object.id comment.id %}">Ред.</a>
+            <a href="{% url 'contractor_comment_delete' object.id comment.id %}">Удалить</a>
+            {% endifequal %}
+        </div>
+        {% endfor %}
+        {% endif %}
     </div>
-    {% csrf_token %}
-    <ul class="list-group list-group-flush">
+    <form class="card d-flex flex-row" name="comment-form" method="post"
+          action="{% url 'contractor_detail' object.id %}">
+        {% csrf_token %}
         {{ comment_form.text.errors }}
-        <li class="list-group-item">{{ comment_form.text }}</li>
-    </ul>
-    <div class="card-body">
-        <input class="btn btn-primary col-3" type="submit" value="Добавить">
-    </div>
-</form>
+        {{ comment_form.text }}
+        <input class="btn btn-secondary" type="submit" value="Отправить">
+    </form>
+</div>
+
+
 {% endblock %}

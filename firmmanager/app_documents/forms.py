@@ -27,6 +27,7 @@ class BookingEditForm(forms.ModelForm):
         model = ProductStoreOrderBooking
         fields = ['order', 'product', 'store', 'quantity', 'total_price']
 
+
 class OrderBookingForm(forms.ModelForm):
     class Meta:
         model = ProductStoreOrderBooking
@@ -46,17 +47,16 @@ class OrderForm(forms.ModelForm):
         current_year = datetime.now().year
         order_id = len(Order.objects.all().filter(contract=data['contract'])) + 1
         if order_id < 10:
-            number = f'{current_year}-00{order_id}'
+            number = f'00{order_id}-{current_year}'
         elif 10 <= order_id < 100:
-            number = f'{current_year}-0{order_id}'
+            number = f'0{order_id}-{current_year}'
         else:
-            number = f'{current_year}-{order_id}'
+            number = f'{order_id}-{current_year}'
         order = Order(number=number, contract=data['contract'],
                       delivery_conditions=data['delivery_conditions'],
                       delivery_time=data['delivery_time'],
                       delivery_address=data['delivery_address'],
-                      payment_conditions=data['payment_conditions'],
-                      shipment_mark=data['shipment_mark'], )
+                      payment_conditions=data['payment_conditions'],)
         if commit:
             order.save()
         else:
@@ -65,7 +65,7 @@ class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
         fields = ['number', 'contract', 'delivery_conditions', 'delivery_time', 'delivery_address',
-                  'payment_conditions', 'shipment_mark']
+                  'payment_conditions']
 
 
 class ContractFilterForm(forms.Form):

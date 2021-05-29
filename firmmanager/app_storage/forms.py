@@ -1,6 +1,6 @@
 from django import forms
 
-from app_storage.models import ProductStore, Product, ProductType, ProductStoreIncome
+from app_storage.models import ProductStore, Product, ProductType, ProductStoreIncome, ProductStoreOutcome
 
 
 class ProductStoreForm(forms.ModelForm):
@@ -13,6 +13,12 @@ class ProductStoreIncomeForm(forms.ModelForm):
     class Meta:
         model = ProductStoreIncome
         fields = ['store', 'product', 'quantity']
+
+
+class ProductStoreOutcomeForm(forms.ModelForm):
+    class Meta:
+        model = ProductStoreOutcome
+        fields = ['store', 'product', 'quantity', 'reason', 'comment']
 
 
 class ProductForm(forms.ModelForm):

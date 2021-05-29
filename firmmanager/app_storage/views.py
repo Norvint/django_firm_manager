@@ -5,8 +5,8 @@ from django.forms import formset_factory
 from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView, TemplateView
 
-from app_storage.forms import ProductStoreForm, ProductForm, ProductFilterForm, ProductStoreIncomeForm
-from app_storage.models import Product, ProductStore, Store
+from app_storage.forms import ProductStoreForm, ProductForm, ProductFilterForm, ProductStoreOutcomeForm
+from app_storage.models import Product, ProductStore, Store, ProductStoreIncome, ProductStoreOutcome
 
 
 class ProductListView(LoginRequiredMixin, ListView):
@@ -65,7 +65,7 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
     def get(self, request, *args, **kwargs):
         super(ProductCreateView, self).get(request, *args, **kwargs)
         context = self.get_context_data()
-        ProductFormSet = formset_factory(ProductForm, extra=kwargs.get('forms'))
+        ProductFormSet = formset_factory(ProductForm)
         formset = ProductFormSet
         context['formset'] = formset
         return self.render_to_response(context)
@@ -73,7 +73,7 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
     def post(self, request, *args, **kwargs):
         super(ProductCreateView, self).post(request, *args, **kwargs)
         context = self.get_context_data()
-        ProductFormSet = formset_factory(ProductForm, extra=kwargs.get('forms'))
+        ProductFormSet = formset_factory(ProductForm)
         formset = ProductFormSet(request.POST)
         context['answer'] = ''
         if formset.is_valid():
@@ -103,31 +103,69 @@ class ProductStoreIncomeCreateView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(ProductStoreIncomeCreateView, self).get_context_data(**kwargs)
-        store_income_form = ProductStoreIncomeForm(initial={'store': kwargs.get('store_id')})
-        context['store_income_form'] = store_income_form
+        store_income_formset = formset_factory(ProductStoreForm, extra=0)
+        formset = store_income_formset(initial=[{'store': kwargs.get('store_id')}])
+        context['formset'] = formset
         return context
 
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
-        store_income_form = ProductStoreIncomeForm(request.POST)
-        if store_income_form.is_valid():
-            form_data = store_income_form.cleaned_data
-            product_store_income = store_income_form.save(commit=False)
-            product_store_income.responsible = request.user
-            product_store_income.save()
-            products = ProductStore.objects.all().filter(store=form_data['store'], product=form_data['product'])
-            if products:
-                for product in products:
-                    product.quantity += form_data['quantity']
-                    product.save()
-            else:
-                product_income = ProductStore(store=form_data['store'], product=form_data['product'],
-                                              quantity=form_data['quantity'], booked=0)
-                product_income.save()
+        store_income_formset = formset_factory(ProductStoreForm)
+        formset = store_income_formset(request.POST)
+        if formset.is_valid():
+            for i, form in enumerate(formset):
+                form_data = formset.cleaned_data[i]
+                if form.is_valid():
+                    product_store_income = ProductStoreIncome(store=form_data['store'], product=form_data['product'],
+                                                              quantity=form_data['quantity'], responsible=request.user)
+                    product_store_income.save()
+                    product = ProductStore.objects.all().get(store=form_data['store'], product=form_data['product'])
+                    if product:
+                        product.quantity += form_data['quantity']
+                        product.save()
+                    else:
+                        product_on_store = ProductStore(store=form_data['store'], product=form_data['product'],
+                                                        quantity=form_data['quantity'], booked=0)
+                        product_on_store.save()
             return redirect('store_detail', pk=form_data['store'].id)
         else:
-            context['store_income_form'] = store_income_form
-            context['errors'] = store_income_form.errors
+            context['formset'] = formset
+            context['errors'] = formset.errors
+        return self.render_to_response(context)
+
+
+class ProductStoreOutcomeCreateView(LoginRequiredMixin, TemplateView):
+    template_name = 'app_storage/product_store_outcome_create.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductStoreOutcomeCreateView, self).get_context_data(**kwargs)
+        product_outcome_formset = formset_factory(ProductStoreOutcomeForm, extra=0)
+        formset = product_outcome_formset(initial=[{'store': kwargs.get('store_id')}])
+        context['formset'] = formset
+        return context
+
+    def post(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        product_outcome_formset = formset_factory(ProductStoreOutcomeForm)
+        formset = product_outcome_formset(request.POST)
+        if formset.is_valid():
+            for i, form in enumerate(formset):
+                form_data = formset.cleaned_data[i]
+                if form.is_valid():
+                    product_store_outcome = ProductStoreOutcome(store=form_data['store'], product=form_data['product'],
+                                                                quantity=form_data['quantity'],
+                                                                responsible=request.user,
+                                                                reason=form_data['reason'], comment=form_data['comment'])
+                    product_store_outcome.save()
+                    product_on_store = ProductStore.objects.all().get(store=form_data['store'],
+                                                                      product=form_data['product'])
+                    if product_on_store:
+                        product_on_store.quantity -= form_data['quantity']
+                        product_on_store.save()
+            return redirect('store_detail', pk=form_data['store'].id)
+        else:
+            context['formset'] = formset
+            context['errors'] = formset.errors
         return self.render_to_response(context)
 
 
@@ -150,4 +188,14 @@ class StoreDetailView(LoginRequiredMixin, DetailView):
 
 
 class ProductStoreIncomeListView(LoginRequiredMixin, TemplateView):
-    template_name = ''
+    template_name = 'app_storage/product_store_income_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductStoreIncomeListView, self).get_context_data(**kwargs)
+        store = kwargs.get('store_id')
+        if store != 0:
+            product_store_income_list = ProductStoreIncome.objects.all().filter(store=store)
+        else:
+            product_store_income_list = ProductStoreIncome.objects.all()
+        context['product_store_income_list'] = product_store_income_list
+        return context

@@ -3,38 +3,47 @@
 {% block title %}Добавить новое контактное лицо{% endblock %}
 {% load static %}
 {% block content %}
-<h1>Новый клиент</h1>
-<form name="contact-person-create-form" method="post" action="{% url 'contact_person_create' contractor_id %}" class="row">
+<h1>Новое контактное лицо</h1>
+<form name="contact-person-create-form" method="post" action="" class="row">
     {% csrf_token %}
-    <div class="card d-flex justify-content-around p-2">
-        <div>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item d-flex justify-content-between">
+            {{ form.name.errors }}
             <label>{{ form.name.label }}</label>
             {{ form.name }}
-        </div>
+        </li>
 
-        <div>
+        <li class="list-group-item d-flex justify-content-between">
+            {{ form.second_name.errors }}
             <label>{{ form.second_name.label }}</label>
             {{ form.second_name }}
-        </div>
+        </li>
 
-        <div>
+        <li class="list-group-item d-flex justify-content-between">
+            {{ form.last_name.errors }}
             <label>{{ form.last_name.label }}</label>
             {{ form.last_name }}
-        </div>
+        </li>
 
-        <div>
+        <li class="list-group-item d-flex justify-content-between">
+            {{ form.position.errors }}
             <label>{{ form.position.label }}</label>
             {{ form.position }}
-        </div>
+        </li>
 
-        <div class="">
+        <li class="list-group-item d-flex justify-content-between">
+            {{ form.contractor.errors }}
             <label>{{ form.contractor.label }}</label>
             {{ form.contractor }}
-        </div>
-    </div>
-    <p>
-        {{ errors }}
-    </p>
+        </li>
+
+        <li class="list-group-item d-flex justify-content-between">
+            {{ form.tag.errors }}
+            <label>{{ form.tag.label }}</label>
+            {{ form.tag }}
+        </li>
+    </ul>
+
     <table class="table" id="contact-form-wrapper">
         {{ formset.management_form }}
         <thead>
@@ -46,8 +55,15 @@
         <tbody>
         {% for contact_form in formset %}
         <tr class="contact-form-container">
-            <td>{{ contact_form.type_of_contact }}</td>
-            <td>{{ contact_form.contact }}</td>
+            <td>
+                {{ contact_form.type_of_contact.errors }}
+                {{ contact_form.type_of_contact }}
+            </td>
+
+            <td>
+                {{ contact_form.errors }}
+                {{ contact_form.contact }}
+            </td>
         </tr>
         {% endfor %}
 

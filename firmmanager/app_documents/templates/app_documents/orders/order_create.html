@@ -18,10 +18,12 @@
         <ul class="list-group list-group-flush">
             <li class="list-group-item d-flex justify-content-between">
                 <div>
+                    {{ form.number.errors }}
                     {{ form.number.label }}
                     {{ form.number }}
                 </div>
                 <div>
+                    {{ form.contract.errors }}
                     {{ form.contract.label }}
                     {{ form.contract }}
                 </div>
@@ -29,14 +31,17 @@
 
             <li class="list-group-item d-flex justify-content-between">
                 <div>
+                    {{ form.delivery_conditions.errors }}
                     {{ form.delivery_conditions.label }}
                     {{ form.delivery_conditions }}
                 </div>
                 <div>
+                    {{ form.delivery_time.errors }}
                     {{ form.delivery_time.label }}
                     {{ form.delivery_time }}
                 </div>
                 <div>
+                    {{ form.delivery_address.errors }}
                     {{ form.delivery_address.label }}
                     {{ form.delivery_address }}
                 </div>
@@ -44,13 +49,9 @@
 
             <li class="list-group-item d-flex justify-content-between">
                 <div>
+                    {{ form.payment_conditions.errors }}
                     {{ form.payment_conditions.label }}
                     {{ form.payment_conditions }}
-                </div>
-
-                <div>
-                    {{ form.shipment_mark.label }}
-                    {{ form.shipment_mark }}
                 </div>
             </li>
 
@@ -59,6 +60,10 @@
             <input type="submit" value="Сохранить" class="btn btn-primary col-4">
         </div>
     </div>
+    <p>
+        {{ products_on_store_error }}
+        {{ formset_form_data_error }}
+    </p>
     <table class="table" id="booking-form-wrapper">
         {{ formset.management_form }}
         <thead>
@@ -71,9 +76,20 @@
         <tbody>
         {% for booking_form in formset %}
         <tr class="booking-form-container">
-            <td>{{ booking_form.product }}</td>
-            <td>{{ booking_form.store }}</td>
-            <td>{{ booking_form.quantity }}</td>
+            <td>
+                {{ booking_form.product.errors }}
+                {{ booking_form.product }}
+            </td>
+
+            <td>
+                {{ booking_form.store.errors }}
+                {{ booking_form.store }}
+            </td>
+
+            <td>
+                {{ booking_form.quantity.errors }}
+                {{ booking_form.quantity }}
+            </td>
         </tr>
         {% endfor %}
         </tbody>

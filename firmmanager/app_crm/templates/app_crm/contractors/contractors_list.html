@@ -5,39 +5,47 @@
 {% block content %}
 <form action="" method="post">
     {% csrf_token %}
-    <table>
+    <table class="mt-1">
         <thead>
             <tr>
-                <th>
+                <th class="ps-2 pe-2 border-start border-end border-top">
                     {{ filter.country.label }}
                 </th>
 
-                <th>
+                <th class="ps-2 pe-2 border-start border-end border-top">
                     {{ filter.type_of_contractor.label }}
                 </th>
 
-                <th>
+                <th class="ps-2 pe-2 border-start border-end border-top">
                     {{ filter.field_of_activity.label }}
                 </th>
 
-                <th></th>
+                <th class="ps-2 pe-2 border-start border-end border-top">
+                    {{ filter.tag.label }}
+                </th>
+
+                <th class="ps-2 pe-2 border-start border-end border-top"></th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>
+                <td class="ps-2 pe-2 border-start border-end border-bottom">
                     {{ filter.country }}
                 </td>
 
-                <td class="w-auto">
+                <td class="w-auto ps-2 pe-2 border-start border-end border-bottom">
                     {{ filter.type_of_contractor }}
                 </td>
 
-                <td>
+                <td class="ps-2 pe-2 border-start border-end border-bottom">
                     {{ filter.field_of_activity }}
                 </td>
 
-                <td>
+                <td class="ps-2 pe-2 border-start border-end border-bottom">
+                    {{ filter.tag }}
+                </td>
+
+                <td class="border-start border-end border-bottom">
                     <button class="btn btn-secondary mt-3 mb-3" type="submit">Отсортировать</button>
                 </td>
             </tr>

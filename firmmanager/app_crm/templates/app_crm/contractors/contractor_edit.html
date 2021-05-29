@@ -3,7 +3,7 @@
 {% block title %}{{ object.title }}{% endblock %}
 
 {% block content %}
-<form action="{% url 'contractor_edit' object.id %}" method="post" name="contractor-edit">
+<form action="{% url 'contractor_edit' contractor_id %}" method="post" name="contractor-edit">
     {% csrf_token %}
     <div class="card col-6 mt-2">
         <div class="card-body">
@@ -25,6 +25,15 @@
             <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between">
+                        {{ form.title.errors }}
+                        <label class="fw-bold">
+                            {{ form.title.label }}
+                        </label>
+                        {{ form.title }}
+                    </li>
+
+                    <li class="list-group-item d-flex justify-content-between">
+                        {{ form.type_of_contractor.errors }}
                         <label class="fw-bold">
                             {{ form.type_of_contractor.label }}
                         </label>
@@ -32,6 +41,7 @@
                     </li>
 
                     <li class="list-group-item d-flex justify-content-between">
+                        {{ form.status.errors }}
                         <label class="fw-bold">
                             {{ form.status.label }}
                         </label>
@@ -39,6 +49,7 @@
                     </li>
 
                     <li class="list-group-item d-flex justify-content-between">
+                        {{ form.field_of_activity.errors }}
                         <label class="fw-bold">
                             {{ form.field_of_activity.label }}
                         </label>
@@ -46,6 +57,7 @@
                     </li>
 
                     <li class="list-group-item d-flex justify-content-between">
+                        {{ form.position.errors }}
                         <label class="fw-bold">
                             {{ form.position.label }}
                         </label>
@@ -53,6 +65,7 @@
                     </li>
 
                     <li class="list-group-item d-flex justify-content-between">
+                        {{ form.position_en.errors }}
                         <label>
                             {{ form.position_en.label }}
                         </label>
@@ -60,6 +73,7 @@
                     </li>
 
                     <li class="list-group-item d-flex justify-content-between">
+                        {{ form.appeal.errors }}
                         <label class="fw-bold">
                             {{ form.appeal.label }}
                         </label>
@@ -67,6 +81,7 @@
                     </li>
 
                     <li class="list-group-item d-flex justify-content-between">
+                        {{ form.appeal_en.errors }}
                         <label>
                             {{ form.appeal_en.label }}
                         </label>
@@ -74,6 +89,7 @@
                     </li>
 
                     <li class="list-group-item d-flex justify-content-between">
+                        {{ form.name.errors }}
                         <label class="fw-bold">
                             {{ form.name.label }}
                         </label>
@@ -81,6 +97,7 @@
                     </li>
 
                     <li class="list-group-item d-flex justify-content-between">
+                        {{ form.second_name.errors }}
                         <label class="fw-bold">
                             {{ form.second_name.label }}
                         </label>
@@ -88,10 +105,19 @@
                     </li>
 
                     <li class="list-group-item d-flex justify-content-between">
+                        {{ form.last_name.errors }}
                         <label class="fw-bold">
                             {{ form.last_name.label }}
                         </label>
                         {{ form.last_name }}
+                    </li>
+
+                    <li class="list-group-item d-flex justify-content-between">
+                        {{ form.tag.errors }}
+                        <label class="fw-bold">
+                            {{ form.tag.label }}
+                        </label>
+                        {{ form.tag }}
                     </li>
                 </ul>
             </div>
@@ -99,6 +125,7 @@
             <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between">
+                        {{ form.tel.errors }}
                         <label class="fw-bold">
                             {{ form.tel.label }}
                         </label>
@@ -106,6 +133,7 @@
                     </li>
 
                     <li class="list-group-item d-flex justify-content-between">
+                        {{ form.country.errors }}
                         <label class="fw-bold">
                             {{ form.country.label }}
                         </label>
@@ -113,6 +141,7 @@
                     </li>
 
                     <li class="list-group-item d-flex justify-content-between">
+                        {{ form.legal_address.errors }}
                         <label class="fw-bold">
                             {{ form.legal_address.label }}
                         </label>
@@ -120,12 +149,14 @@
                     </li>
 
                     <li class="list-group-item d-flex justify-content-between">
+                        {{ form.actual_address.errors }}
                         <label class="fw-bold">
                             {{ form.actual_address.label }}
                         </label>
                         {{ form.actual_address }}
                     </li>
 
+                    {{ form.requisites.errors }}
                     <label class="text-center fw-bold">
                         {{ form.requisites.label }}
                     </label>
@@ -141,5 +172,5 @@
         </p>
     </div>
 </form>
-<a href="{% url 'contractor_detail' object.id %}" class="mt-2 mb-2 btn btn-primary">Отмена</a>
+<a href="{% url 'contractor_detail' contractor_id %}" class="mt-2 mb-2 btn btn-primary">Отмена</a>
 {% endblock %}

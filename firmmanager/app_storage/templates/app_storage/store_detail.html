@@ -3,8 +3,39 @@
 {% block title %}{{ object.title }}{% endblock %}
 
 {% block content %}
-<a href="{% url 'stores_list' %}" class="btn btn-primary mb-2 mt-2">К списку складов</a>
-<a href="{% url 'product_store_income' object.id %}" class="btn btn-primary mb-2 mt-2">Оформить приход продукции на склад</a>
+
+<div class="dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+       data-bs-toggle="dropdown" aria-expanded="false">
+        Движения по складу
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+        <li>
+            <a href="{% url 'store_income_list' object.id %}" class="dropdown-item">Приходы продукции</a>
+        </li>
+
+        <li>
+            <a href="" class="dropdown-item">Выпуски продукции</a>
+        </li>
+    </ul>
+</div>
+
+
+<div class="dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+       data-bs-toggle="dropdown" aria-expanded="false">
+        Действия со складом
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+        <li>
+            <a href="{% url 'store_income_create' object.id %}" class="dropdown-item">Оформить приход продукции</a>
+        </li>
+
+        <li>
+            <a href="{% url 'store_outcome_create' object.id %}" class="dropdown-item">Оформить выпуск продукции</a>
+        </li>
+    </ul>
+</div>
 <div class="mb-5 col-12">
     <div class="card">
         <div class="card-body">

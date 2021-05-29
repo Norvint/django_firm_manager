@@ -23,11 +23,6 @@
             <a href="{% url 'contractor_orders_list' object.contractor.id %}"
                class="dropdown-item">Заказы</a>
         </li>
-
-        <li>
-            <a href="{% url 'contact_persons_list' object.contractor.id %}" class="dropdown-item">Контактные
-                лица контрагента</a>
-        </li>
     </ul>
 </div>
 
@@ -36,7 +31,7 @@
 <div class="card col-9">
     <ul class="list-group list-group-horizontal">
         <li class="list-group-item">
-            <a href="" class="btn btn-primary">Редактировать</a>
+            <a href="{% url 'contact_person_edit' object.contractor.id object.id %}" class="btn btn-primary">Редактировать</a>
         </li>
     </ul>
     <div class="card-body d-flex justify-content-between">
@@ -47,6 +42,7 @@
         <li class="list-group-item">Имя: {{ object.name }}</li>
         <li class="list-group-item">Отчество\Второе имя: {{ object.second_name }}</li>
         <li class="list-group-item">Фамилия: {{ object.last_name }}</li>
+        <li class="list-group-item">Тэги: {{ object.tag }}</li>
     </ul>
 </div>
 

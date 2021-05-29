@@ -45,12 +45,13 @@ class Worker(models.Model):
     second_name = models.CharField('Отчество', max_length=30)
     last_name = models.CharField('Фамилия', max_length=30)
     position = models.CharField('Должность', max_length=30)
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, blank=True, verbose_name='Организация')
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, blank=True, null=True,
+                                     verbose_name='Организация')
     serial_number = models.CharField('Серия', max_length=4, blank=True)
     number = models.CharField('Номер', max_length=6, blank=True)
     issued_by = models.CharField('Кем выдан', max_length=100, blank=True)
-    date = models.DateField('Дата выдачи', default=datetime(year=1970, month=1, day=1), blank=True)
-    date_of_birth = models.DateField('Дата рождения', default=datetime(year=1970, month=1, day=1), blank=True)
+    date = models.DateField('Дата выдачи', default=datetime(year=1970, month=1, day=1), blank=True, null=True)
+    date_of_birth = models.DateField('Дата рождения', default=datetime(year=1970, month=1, day=1), blank=True, null=True)
     department_code = models.CharField('Код подразделения', max_length=20, blank=True)
 
     class Meta:
@@ -59,6 +60,30 @@ class Worker(models.Model):
 
     def __str__(self):
         return f'{self.name} {self.second_name} {self.last_name}'
+
+
+class WorkerContactType(models.Model):
+    title = models.CharField('Название', max_length=100)
+
+    class Meta:
+        verbose_name = 'Тип контакта'
+        verbose_name_plural = 'Типы контактов'
+
+    def __str__(self):
+        return self.title
+
+
+class WorkerContact(models.Model):
+    worker = models.ForeignKey(Worker, on_delete=models.CASCADE, verbose_name='Сотрудник')
+    type_of_contact = models.ForeignKey(WorkerContactType, on_delete=models.CASCADE, verbose_name='Тип контакта')
+    contact = models.CharField('Контактные данные', max_length=50)
+
+    class Meta:
+        verbose_name = 'Контакт сотрудника'
+        verbose_name_plural = 'Контакты сотрудников'
+
+    def __str__(self):
+        return f'{self.type_of_contact} {self.contact}'
 
 
 @deconstructible

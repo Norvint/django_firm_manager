@@ -11,7 +11,8 @@ from django.views.generic import DetailView, ListView, TemplateView, DeleteView,
 
 from app_documents.forms import BookingCreateForm, OrderForm, ContractFilterForm, \
     ContractForm, OrderFilterForm, OrderBookingForm, BookingEditForm
-from app_documents.models import Contract, ContractType, Currency, DeliveryConditions, PaymentConditions, Order
+from app_documents.models import Contract, ContractType, Currency, DeliveryConditions, PaymentConditions, Order, \
+    OrderWithoutContract
 from app_documents.utilities.currencies_parser import CurrenciesUpdater
 from app_documents.utilities.docx_creator import ContractCreator, SpecificationCreator, InvoiceCreator, \
     GoodsAcceptanceCreator
@@ -63,7 +64,6 @@ class ContractCreateView(LoginRequiredMixin, TemplateView):
             number = f'{current_year}-{contract_id}'
         contract_form = ContractForm(initial={'number': number, 'contractor': kwargs.get('contractor_id')})
         context['form'] = contract_form
-        context['answer'] = kwargs
         return context
 
     def post(self, request, *args, **kwargs):
@@ -186,6 +186,8 @@ class OrderListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(OrderListView, self).get_context_data()
+        orders_without_contract = OrderWithoutContract.objects.all()
+        context['orders_without_contract'] = orders_without_contract
         filter_data = OrderFilterForm()
         context['filter'] = filter_data
         return context
@@ -234,21 +236,31 @@ class OrderCreateView(LoginRequiredMixin, TemplateView):
         order_form = OrderForm(request.POST)
         product_store_book_form_set = formset_factory(OrderBookingForm)
         formset = product_store_book_form_set(request.POST)
-        if order_form.is_valid():
+        if order_form.is_valid() and formset.is_valid():
             order = order_form.save(commit=False)
             order.responsible = request.user
-            if formset.is_valid():
-                order.save()
-                for i, form in enumerate(formset):
-                    data = formset.cleaned_data[i]
-                    if form.is_valid() and data:
-                        product = data['product']
-                        products_on_store = ProductStore.objects.filter(product=data['product'], store=data['store'])
+            order.save()
+            for i, form in enumerate(formset):
+                data = formset.cleaned_data[i]
+                print(data)
+                if form.is_valid() and data != {}:
+                    product = data['product']
+                    products_on_store = ProductStore.objects.filter(product=product, store=data['store'])
+                    if products_on_store:
                         for product_on_store in products_on_store:
-                            product_on_store.quantity -= data['quantity']
-                            product_on_store.booked += data['quantity']
-                            order.counted_sum += int(data['quantity']) * product.cost
-                            product_on_store.save()
+                            if product_on_store.quantity > data['quantity']:
+                                product_on_store.quantity -= data['quantity']
+                                product_on_store.booked += data['quantity']
+                                order.counted_sum += int(data['quantity']) * product.cost
+                                product_on_store.save()
+                            else:
+                                context['formset'] = formset
+                                context['form'] = order_form
+                                context[
+                                    'products_on_store_error'] = f'На складе {data["store"]} всего продукции {product}'\
+                                                                 f' - {product_on_store.quantity} шт., требуется - ' \
+                                                                 f'{data["quantity"]} шт.'
+                                return self.render_to_response(context)
                         booking_sum = int(data['quantity']) * product.cost
                         product_booking = ProductStoreOrderBooking(order=order,
                                                                    product=data['product'],
@@ -259,19 +271,17 @@ class OrderCreateView(LoginRequiredMixin, TemplateView):
                                                                    standard_price=product.cost,
                                                                    total_price=product.cost)
                         product_booking.save()
-                order.total_sum = order.counted_sum
-                order.save()
-                return redirect('order_detail', order.id)
-            else:
-                context['formset'] = formset
-                context['formset_errors'] = formset.errors
-                context['form'] = order_form
-                context['form_errors'] = order_form.errors
+                    else:
+                        context['formset'] = formset
+                        context['form'] = order_form
+                        context['products_on_store_error'] = f'На складе {data["store"]} нет продукции {product}'
+                        return self.render_to_response(context)
+            order.total_sum = order.counted_sum
+            order.save()
+            return redirect('order_detail', order.id)
         else:
             context['formset'] = formset
-            context['formset_errors'] = formset.errors
             context['form'] = order_form
-            context['form_errors'] = order_form.errors
         return self.render_to_response(context)
 
 
@@ -285,7 +295,8 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
         order_bookings = ProductStoreOrderBooking.objects.filter(order=order)
         context['order_booking'] = order_bookings
         currency_total_sum = round(order.total_sum * (order.contract.currency.nominal / order.contract.currency.cost))
-        currency_counted_sum = round(order.counted_sum * (order.contract.currency.nominal / order.contract.currency.cost))
+        currency_counted_sum = round(
+            order.counted_sum * (order.contract.currency.nominal / order.contract.currency.cost))
         context['currency_total_sum'] = currency_total_sum
         if currency_total_sum != order.counted_sum:
             context['currency_counted_sum'] = currency_counted_sum
@@ -346,46 +357,57 @@ class OrderBookingCreateView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(OrderBookingCreateView, self).get_context_data(**kwargs)
-        product_store_book_form_set = formset_factory(BookingCreateForm, extra=0)
-        formset = product_store_book_form_set(initial=[{
+        product_store_book_formset = formset_factory(BookingCreateForm, extra=0)
+        formset = product_store_book_formset(initial=[{
             'order': kwargs.get('order_id')
         }])
         context['formset'] = formset
-        context['answer'] = kwargs
         return context
 
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
-        product_store_book_form_set = formset_factory(BookingCreateForm)
-        formset = product_store_book_form_set(request.POST)
+        product_store_book_formset = formset_factory(BookingCreateForm)
+        formset = product_store_book_formset(request.POST)
         if formset.is_valid():
             for i, form in enumerate(formset):
                 data = formset.cleaned_data[i]
                 if form.is_valid() and data:
                     product = data['product']
                     products_on_store = ProductStore.objects.filter(product=data['product'], store=data['store'])
-                    order = Order.objects.get(pk=kwargs.get('order_id'))
-                    for product_on_store in products_on_store:
-                        product_on_store.quantity -= data['quantity']
-                        product_on_store.booked += data['quantity']
-                        order.counted_sum += int(data['quantity']) * product.cost
-                        order.total_sum = order.counted_sum
-                        order.save()
-                        product_on_store.save()
-                    booking_sum = int(data['quantity']) * product.cost
-                    product_booking = ProductStoreOrderBooking(order=order,
-                                                               product=data['product'],
-                                                               store=data['store'],
-                                                               quantity=data['quantity'],
-                                                               counted_sum=booking_sum,
-                                                               total_sum=booking_sum,
-                                                               standard_price=product.cost,
-                                                               total_price=product.cost)
-                    product_booking.save()
+                    if products_on_store:
+                        order = Order.objects.get(pk=kwargs.get('order_id'))
+                        for product_on_store in products_on_store:
+                            if product_on_store.quantity > data['quantity']:
+                                product_on_store.quantity -= data['quantity']
+                                product_on_store.booked += data['quantity']
+                                order.counted_sum += int(data['quantity']) * product.cost
+                                order.total_sum = order.counted_sum
+                                order.save()
+                                product_on_store.save()
+                            else:
+                                context['formset'] = formset
+                                context[
+                                    'products_on_store_error'] = f'На складе {data["store"]} всего продукции {product}'\
+                                                                 f' - {product_on_store.quantity} шт., требуется - ' \
+                                                                 f'{data["quantity"]} шт.'
+                                return self.render_to_response(context)
+                        booking_sum = int(data['quantity']) * product.cost
+                        product_booking = ProductStoreOrderBooking(order=order,
+                                                                   product=data['product'],
+                                                                   store=data['store'],
+                                                                   quantity=data['quantity'],
+                                                                   counted_sum=booking_sum,
+                                                                   total_sum=booking_sum,
+                                                                   standard_price=product.cost,
+                                                                   total_price=product.cost)
+                        product_booking.save()
+                    else:
+                        context['formset'] = formset
+                        context['products_on_store_error'] = f'На складе {data["store"]} нет продукции {product}'
+                        return self.render_to_response(context)
             return redirect('order_detail', pk=kwargs.get('order_id'))
         else:
             context['formset'] = formset
-            context['errors'] = formset.errors
         return self.render_to_response(context)
 
 
@@ -413,11 +435,11 @@ class OrderBookingEditView(LoginRequiredMixin, TemplateView):
         context = super(OrderBookingEditView, self).get_context_data(**kwargs)
         object = ProductStoreOrderBooking.objects.get(pk=kwargs.get('order_booking_id'))
         form = BookingEditForm(initial={'order': object.order,
-                                    'product': object.product,
-                                    'store': object.store,
-                                    'quantity': object.quantity,
-                                    'total_price': object.total_price}
-                                 )
+                                        'product': object.product,
+                                        'store': object.store,
+                                        'quantity': object.quantity,
+                                        'total_price': object.total_price}
+                               )
         context['order_booking'] = object
         context['form'] = form
         return context
@@ -432,25 +454,32 @@ class OrderBookingEditView(LoginRequiredMixin, TemplateView):
             product_on_store = ProductStore.objects.get(product=product_booking.product, store=product_booking.store)
             product_on_store.booked -= product_booking.quantity
             product_on_store.quantity += product_booking.quantity
-            product_on_store.quantity -= data['quantity']
-            product_on_store.booked += data['quantity']
-            product_on_store.save()
-            product_booking.product = data['product']
-            product_booking.order = data['order']
-            product_booking.store = data['store']
-            product_booking.quantity = data['quantity']
-            product_booking.counted_sum = product_booking.product.cost * product_booking.quantity
-            product_booking.total_price = data['total_price']
-            product_booking.total_sum = product_booking.total_price * product_booking.quantity
-            product_booking.save()
-            order_bookings = ProductStoreOrderBooking.objects.filter(order=order)
-            order.total_sum = 0
-            order.counted_sum = 0
-            for order_booking in order_bookings:
-                order.total_sum += order_booking.total_sum
-                order.counted_sum += order_booking.counted_sum
-            order.save()
-            return redirect('order_detail', pk=product_booking.order.pk)
+            if product_on_store.quantity > data['quantity']:
+                product_on_store.quantity -= data['quantity']
+                product_on_store.booked += data['quantity']
+                product_on_store.save()
+                product_booking.product = data['product']
+                product_booking.order = data['order']
+                product_booking.store = data['store']
+                product_booking.quantity = data['quantity']
+                product_booking.counted_sum = product_booking.product.cost * product_booking.quantity
+                product_booking.total_price = data['total_price']
+                product_booking.total_sum = product_booking.total_price * product_booking.quantity
+                product_booking.save()
+                order_bookings = ProductStoreOrderBooking.objects.filter(order=order)
+                order.total_sum = 0
+                order.counted_sum = 0
+                for order_booking in order_bookings:
+                    order.total_sum += order_booking.total_sum
+                    order.counted_sum += order_booking.counted_sum
+                order.save()
+                return redirect('order_detail', pk=product_booking.order.pk)
+            else:
+                context['form'] = form
+                context[
+                    'products_on_store_error'] = f'На складе {data["store"]} всего продукции {product_booking.product}' \
+                                                 f' - {product_on_store.quantity} шт. (с учетом забронированой),' \
+                                                 f' требуется - {data["quantity"]} шт.'
         else:
-            context['errors'] = form.errors
+            context['form'] = form
         return self.render_to_response(context)

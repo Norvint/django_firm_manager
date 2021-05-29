@@ -75,7 +75,7 @@ class Store(models.Model):
 class ProductStore(models.Model):
     store = models.ForeignKey(Store, on_delete=models.CASCADE, verbose_name='Склад')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Продукция')
-    quantity = models.IntegerField('Количество')
+    quantity = models.PositiveIntegerField('Количество')
     booked = models.IntegerField('Забронировано')
 
     class Meta:
@@ -89,7 +89,7 @@ class ProductStore(models.Model):
 class ProductStoreIncome(models.Model):
     store = models.ForeignKey(Store, on_delete=models.CASCADE, verbose_name='Склад')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Продукция')
-    quantity = models.IntegerField('Количество')
+    quantity = models.PositiveIntegerField('Количество')
     date = models.DateField(auto_now_add=True, verbose_name='Дата прихода')
     responsible = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
@@ -101,12 +101,25 @@ class ProductStoreIncome(models.Model):
         return f'{self.product} - {self.store} - {self.quantity}'
 
 
+class ProductStoreOutcomeReason(models.Model):
+    title = models.CharField('Название', max_length=300)
+
+    class Meta:
+        verbose_name = 'Причина выпуска продукции'
+        verbose_name_plural = 'Причины выпуска продукции'
+
+    def __str__(self):
+        return self.title
+
+
 class ProductStoreOutcome(models.Model):
     store = models.ForeignKey(Store, on_delete=models.CASCADE, verbose_name='Склад')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Продукция')
-    quantity = models.IntegerField('Количество')
+    quantity = models.PositiveIntegerField('Количество')
+    reason = models.ForeignKey(ProductStoreOutcomeReason, on_delete=models.CASCADE, verbose_name='Причина выпуска', blank=True, null=True)
     date = models.DateField(auto_now_add=True, verbose_name='Дата выпуска')
     responsible = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    comment = models.CharField('Комментарий', max_length=1000)
 
     class Meta:
         verbose_name = 'Списание продукции со склада'
@@ -120,7 +133,7 @@ class ProductStoreOrderBooking(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, verbose_name='Заказ')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Продукция')
     store = models.ForeignKey(Store, on_delete=models.CASCADE, verbose_name='Склад')
-    quantity = models.IntegerField('Количество')
+    quantity = models.PositiveIntegerField('Количество')
     total_price = models.DecimalField('Итоговая цена', decimal_places=2, max_digits=18, null=True, blank=True)
     standard_price = models.DecimalField('Стандартная цена', decimal_places=2, max_digits=18, null=True, blank=True)
     counted_sum = models.DecimalField('Расчетная сумма', decimal_places=2, max_digits=18, null=True, blank=True)

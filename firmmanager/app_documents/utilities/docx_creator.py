@@ -24,6 +24,7 @@ class ContractCreator:
             'created_year': self.get_created_year(),
             'client': {
                 'title': self.contract.contractor.title,
+                'appeal_en': self.contract.contractor.appeal_en,
                 'position': self.contract.contractor.position,
                 'position_en': self.contract.contractor.position_en,
                 'name': self.contract.contractor.name,
@@ -32,6 +33,7 @@ class ContractCreator:
                 'legal_address': self.contract.contractor.legal_address,
                 'requisites': self.contract.contractor.requisites,
                 'initials': self.get_contractor_initials(),
+                'country': self.contract.contractor.country,
             },
             'organization': {
                 'title': self.contract.organization.title,
@@ -220,10 +222,6 @@ class InvoiceCreator:
                 'description_en': self.order.payment_conditions.description_en
             },
             'current_date': datetime.now().strftime('%d-%m-%Y'),
-            'shipment_mark': {
-                'description': self.order.shipment_mark.description,
-                'description_en': self.order.shipment_mark.description_en,
-            },
             'delivery_address': self.order.delivery_address,
             'delivery_conditions':
                 {

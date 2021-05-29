@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from app_storage.models import Product, ProductType, PackageOutsideType, PackageInsideType, Store, ProductStore
+from app_storage.models import Product, ProductType, PackageOutsideType, PackageInsideType, Store, ProductStore, \
+    ProductStoreIncome, ProductStoreOutcome, ProductStoreOutcomeReason
 
 
 @admin.register(Product)
@@ -31,3 +32,18 @@ class StoreAdmin(admin.ModelAdmin):
 @admin.register(ProductStore)
 class ProductStoreAdmin(admin.ModelAdmin):
     list_display = ['store', 'product', 'quantity']
+
+
+@admin.register(ProductStoreIncome)
+class ProductStoreIncomeAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(ProductStoreOutcome)
+class ProductStoreOutcomeAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(ProductStoreOutcomeReason)
+class ProductStoreOutcomeReasonAdmin(admin.ModelAdmin):
+    pass

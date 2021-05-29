@@ -4,13 +4,9 @@
 
 {% block content %}
 
-<a href="{% url 'order_detail' order_id %}" class="btn btn-primary mt-2 col-3">В карточку
-    заказа</a>
+<a href="{% url 'order_detail' order_id %}" class="btn btn-primary mt-2 col-3">В карточку заказа</a>
 <p>
-    {{ answer }}
-</p>
-<p>
-    {{ errors }}
+    {{ products_on_store_error }}
 </p>
 <h1>Выпуск продукции по спецификации</h1>
 <form name="order-booking-form" method="post" class="d-flex justify-content-start row">

@@ -24,11 +24,6 @@
             <a href="{% url 'contractor_orders_list' object.contract.contractor.id %}"
                class="dropdown-item">Заказы</a>
         </li>
-
-        <li>
-            <a href="{% url 'contact_persons_list' object.contract.contractor.id %}" class="dropdown-item">Контактные
-                лица контрагента</a>
-        </li>
     </ul>
 </div>
 {% load static %}
