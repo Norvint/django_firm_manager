@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from app_crm.models import Contractor, TypeOfContractor, FieldOfActivity, ContractorStatus, ContractorComment, \
-    ContactPersonContactType, ContractorContact, ContactPerson, ContractorFileCategory, ContractorFile, LeadStatus, Lead
+    ContactPersonContactType, ContractorContactPersonContact, ContractorContactPerson, ContractorFileCategory, ContractorFile, LeadStatus, Lead
 
 
 @admin.register(Contractor)
@@ -35,12 +35,12 @@ class ContactPersonContactTypeAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(ContractorContact)
+@admin.register(ContractorContactPersonContact)
 class ContactAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(ContactPerson)
+@admin.register(ContractorContactPerson)
 class ContactPersonAdmin(admin.ModelAdmin):
     pass
 

@@ -3,46 +3,118 @@
 {% block title %}Добавить новое контактное лицо{% endblock %}
 {% load static %}
 {% block content %}
-<h1>Новое контактное лицо</h1>
 <form name="contact-person-create-form" method="post" action="" class="row">
     {% csrf_token %}
-    <ul class="list-group list-group-flush">
-        <li class="list-group-item d-flex justify-content-between">
-            {{ form.name.errors }}
-            <label>{{ form.name.label }}</label>
-            {{ form.name }}
-        </li>
+    <div class="card col-6 mt-2">
+        <div class="card-body">
+            <h3>Новое контактное лицо</h3>
+        </div>
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button"
+                        role="tab" aria-controls="home" aria-selected="true">Основная информация
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button"
+                        role="tab" aria-controls="profile" aria-selected="false">Паспортные данные
+                </button>
+            </li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between">
+                        {{ form.name.errors }}
+                        <label>{{ form.name.label }}</label>
+                        {{ form.name }}
+                    </li>
 
-        <li class="list-group-item d-flex justify-content-between">
-            {{ form.second_name.errors }}
-            <label>{{ form.second_name.label }}</label>
-            {{ form.second_name }}
-        </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        {{ form.second_name.errors }}
+                        <label>{{ form.second_name.label }}</label>
+                        {{ form.second_name }}
+                    </li>
 
-        <li class="list-group-item d-flex justify-content-between">
-            {{ form.last_name.errors }}
-            <label>{{ form.last_name.label }}</label>
-            {{ form.last_name }}
-        </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        {{ form.last_name.errors }}
+                        <label>{{ form.last_name.label }}</label>
+                        {{ form.last_name }}
+                    </li>
 
-        <li class="list-group-item d-flex justify-content-between">
-            {{ form.position.errors }}
-            <label>{{ form.position.label }}</label>
-            {{ form.position }}
-        </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        {{ form.position.errors }}
+                        <label>{{ form.position.label }}</label>
+                        {{ form.position }}
+                    </li>
 
-        <li class="list-group-item d-flex justify-content-between">
-            {{ form.contractor.errors }}
-            <label>{{ form.contractor.label }}</label>
-            {{ form.contractor }}
-        </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        {{ form.contractor.errors }}
+                        <label>{{ form.contractor.label }}</label>
+                        {{ form.contractor }}
+                    </li>
 
-        <li class="list-group-item d-flex justify-content-between">
-            {{ form.tag.errors }}
-            <label>{{ form.tag.label }}</label>
-            {{ form.tag }}
-        </li>
-    </ul>
+                    <li class="list-group-item d-flex justify-content-between">
+                        {{ form.tag.errors }}
+                        <label>{{ form.tag.label }}</label>
+                        {{ form.tag }}
+                    </li>
+                </ul>
+            </div>
+
+            <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between">
+                        {{ form.serial_number.errors }}
+                        <label class="fw-bold">
+                            {{ form.serial_number.label }}
+                        </label>
+                        {{ form.serial_number }}
+                    </li>
+
+                    <li class="list-group-item d-flex justify-content-between">
+                        {{ form.number.errors }}
+                        <label class="fw-bold">
+                            {{ form.number.label }}
+                        </label>
+                        {{ form.number }}
+                    </li>
+
+                    <li class="list-group-item d-flex justify-content-between">
+                        {{ form.issued_by.errors }}
+                        <label class="fw-bold">
+                            {{ form.issued_by.label }}
+                        </label>
+                        {{ form.issued_by }}
+                    </li>
+
+                    <li class="list-group-item d-flex justify-content-between">
+                        {{ form.date.errors }}
+                        <label class="fw-bold">
+                            {{ form.date.label }}
+                        </label>
+                        {{ form.date }}
+                    </li>
+
+                    <li class="list-group-item d-flex justify-content-between">
+                        {{ form.date_of_birth.errors }}
+                        <label class="fw-bold">
+                            {{ form.date_of_birth.label }}
+                        </label>
+                        {{ form.date_of_birth }}
+                    </li>
+
+                    <li class="list-group-item d-flex justify-content-between">
+                        {{ form.department_code.errors }}
+                        <label class="fw-bold">
+                            {{ form.department_code.label }}
+                        </label>
+                        {{ form.department_code }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
     <table class="table" id="contact-form-wrapper">
         {{ formset.management_form }}

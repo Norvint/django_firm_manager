@@ -4,7 +4,7 @@
 {% load static %}
 {% block content %}
 
-<form name="client-create-form" method="post" action="{% url 'contractor_create' %}">
+<form name="client-create-form" method="post">
     {% csrf_token %}
     <div class="card col-6 mt-2">
         <div class="card-body">
@@ -42,7 +42,7 @@
                     </li>
 
                     <li class="list-group-item d-flex justify-content-between">
-                        {{ form.type_of_contractor.errors }}
+                        {{ form.status.errors }}
                         <label class="fw-bold">
                             {{ form.status.label }}
                         </label>

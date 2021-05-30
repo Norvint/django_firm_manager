@@ -2,9 +2,13 @@ from django.urls import path
 
 from app_crm.views import ContractorCreateView, ContractorListView, ContractorDetailView, ContractorEditView, \
     ContractorContractListView, ContractorOrderListView, ContractorToDeleteView, \
-    ContactPersonCreateView, ContactPersonDetailView, ContactPersonToDeleteView, ContractorFileList, \
-    ContractorFileCreate, ContractorCommentEditView, ContractorCommentDeleteView, ContactPersonEditView
+    ContractorContactPersonCreateView, ContractorContactPersonDetailView, ContactPersonToDeleteView, ContractorFileList, \
+    ContractorFileCreate, ContractorCommentEditView, ContractorCommentDeleteView, ContractorContactPersonEditView, \
+    LeadListView, \
+    LeadDetailView, LeadCreateView, LeadContactPersonCreateView, LeadContactPersonEditView, LeadContactPersonDetailView, \
+    LeadContactPersonToDeleteView, LeadEditView, LeadCommentEditView, LeadCommentDeleteView, LeadContractorCreateView
 
+# contractors
 urlpatterns = [
     path('contractors', ContractorListView.as_view(), name='contractors_list'),
     path('contractors/create-contractor/', ContractorCreateView.as_view(), name='contractor_create'),
@@ -25,12 +29,34 @@ urlpatterns = [
     path('contractors/<int:contractor_id>/orders', ContractorOrderListView.as_view(),
          name='contractor_orders_list'),
     path('contractors/<int:pk>/to-delete/', ContractorToDeleteView.as_view(), name='contractor_to_delete'),
-    path('contractors/<int:contractor_id>/contact-persons/create/', ContactPersonCreateView.as_view(),
-         name='contact_person_create'),
-    path('contractors/<int:contractor_id>/contact-persons/<int:pk>', ContactPersonDetailView.as_view(),
-         name='contact_person_detail'),
-    path('contractors/<int:contractor_id>/contact-persons/<int:pk>/edit', ContactPersonEditView.as_view(),
-         name='contact_person_edit'),
-    path('contactors/<int:contractor_id>/contact-persons/<int:pk>', ContactPersonToDeleteView.as_view(),
-         name='contact_person_to_delete'),
+    path('contractors/<int:contractor_id>/contact-persons/create/', ContractorContactPersonCreateView.as_view(),
+         name='contractor_contact_person_create'),
+    path('contractors/<int:contractor_id>/contact-persons/<int:pk>', ContractorContactPersonDetailView.as_view(),
+         name='contractor_contact_person_detail'),
+    path('contractors/<int:contractor_id>/contact-persons/<int:pk>/edit', ContractorContactPersonEditView.as_view(),
+         name='contractor_contact_person_edit'),
+    path('contactors/<int:contractor_id>/contact-persons/<int:pk>/to_delete', ContactPersonToDeleteView.as_view(),
+         name='contractor_contact_person_to_delete'),
+]
+
+# leads
+urlpatterns += [
+    path('leads', LeadListView.as_view(), name='leads_list'),
+    path('leads/<int:pk>', LeadDetailView.as_view(), name='lead_detail'),
+    path('leads/create-lead/', LeadCreateView.as_view(), name='lead_create'),
+    path('leads/<int:pk>/edit/', LeadEditView.as_view(), name='lead_edit'),
+    path('leads/<int:pk>/contact-persons/create/', LeadContactPersonCreateView.as_view(),
+         name='lead_contact_person_create'),
+    path('leads/<int:lead_id>/contact-persons/<int:pk>', LeadContactPersonDetailView.as_view(),
+         name='lead_contact_person_detail'),
+    path('leads/<int:lead_id>/contact-persons/<int:pk>/edit', LeadContactPersonEditView.as_view(),
+         name='lead_contact_person_edit'),
+    path('leads/<int:lead_id>/contact-persons/<int:pk>/to_delete', LeadContactPersonToDeleteView.as_view(),
+         name='lead_contact_person_to_delete'),
+    path('leads/<int:lead_id>/comments/<int:comment_id>/edit', LeadCommentEditView.as_view(),
+         name='lead_comment_edit'),
+    path('leads/<int:lead_id>/comments/<int:comment_id>/delete', LeadCommentDeleteView.as_view(),
+         name='lead_comment_delete'),
+    path('leads/<int:lead_id>/create-contractor-from-lead/', LeadContractorCreateView.as_view(),
+         name='lead_contractor_create'),
 ]

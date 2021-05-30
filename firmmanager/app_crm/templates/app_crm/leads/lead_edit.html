@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактирование лида{% endblock %}
+
+{% block content %}
+<form method="post" name="lead-edit">
+    {% csrf_token %}
+    <div class="card col-6 mt-2">
+        <div class="card-body">
+            <h3>Редактирование лида</h3>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item d-flex justify-content-between">
+                {{ form.title.errors }}
+                <label class="fw-bold">
+                    {{ form.title.label }}
+                </label>
+                {{ form.title }}
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between">
+                {{ form.status.errors }}
+                <label class="fw-bold">
+                    {{ form.status.label }}
+                </label>
+                {{ form.status }}
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between">
+                {{ form.field_of_activity.errors }}
+                <label class="fw-bold">
+                    {{ form.field_of_activity.label }}
+                </label>
+                {{ form.field_of_activity }}
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between">
+                {{ form.position.errors }}
+                <label class="fw-bold">
+                    {{ form.position.label }}
+                </label>
+                {{ form.position }}
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between">
+                {{ form.name.errors }}
+                <label class="fw-bold">
+                    {{ form.name.label }}
+                </label>
+                {{ form.name }}
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between">
+                {{ form.second_name.errors }}
+                <label class="fw-bold">
+                    {{ form.second_name.label }}
+                </label>
+                {{ form.second_name }}
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between">
+                {{ form.last_name.errors }}
+                <label class="fw-bold">
+                    {{ form.last_name.label }}
+                </label>
+                {{ form.last_name }}
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between">
+                {{ form.country.errors }}
+                <label class="fw-bold">
+                    {{ form.country.label }}
+                </label>
+                {{ form.country }}
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between">
+                {{ form.purpose.errors }}
+                <label class="fw-bold">
+                    {{ form.purpose.label }}
+                </label>
+                {{ form.purpose }}
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between">
+                {{ form.tag.errors }}
+                <label class="fw-bold">
+                    {{ form.tag.label }}
+                </label>
+                {{ form.tag }}
+            </li>
+        </ul>
+    </div>
+    <div class="card-body border-top">
+        <input type="submit" value="Сохранить лид" class="btn btn-primary mt-2">
+    </div>
+</form>
+<a href="{% url 'lead_detail' pk %}" class="mt-2 mb-2 btn btn-primary">Отмена</a>
+{% endblock %}
