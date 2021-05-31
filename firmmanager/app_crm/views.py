@@ -513,7 +513,7 @@ class LeadContactPersonCreateView(LoginRequiredMixin, TemplateView):
                                                            contact=data['contact'])
                         contact.save()
                 return redirect('lead_contact_person_detail', pk=contact_person.pk,
-                                lead_id=kwargs.get('lead_id'))
+                                lead_id=kwargs.get('pk'))
             else:
                 context['formset'] = formset
         else:
