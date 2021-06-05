@@ -16,9 +16,9 @@ class OrganizationCreateView(LoginRequiredMixin, CreateView):
     template_name = 'app_organizations/organization_create.html'
     model = Organization
     fields = (
-        'title', 'title_en', 'tin', 'pprnie', 'registration', 'registration_en', 'position', 'position_en', 'appeal',
-        'appeal_en', 'name', 'second_name', 'last_name', 'name_en', 'second_name_en', 'last_name_en', 'legal_address',
-        'legal_address_en', 'actual_address', 'requisites', 'requisites_en')
+        'title', 'title_en', 'tin', 'kpp', 'pprnie', 'registration', 'registration_en', 'position', 'position_en',
+        'appeal', 'appeal_en', 'name', 'second_name', 'last_name', 'name_en', 'second_name_en', 'last_name_en',
+        'legal_address', 'legal_address_en', 'actual_address', 'requisites', 'requisites_en')
     success_url = '/organizations'
 
 
@@ -26,9 +26,9 @@ class OrganizationEditView(LoginRequiredMixin, UpdateView):
     template_name = 'app_organizations/organization_edit.html'
     model = Organization
     fields = (
-        'title', 'title_en', 'tin', 'pprnie', 'registration', 'registration_en', 'position', 'position_en', 'appeal',
-        'appeal_en', 'name', 'second_name', 'last_name', 'name_en', 'second_name_en', 'last_name_en', 'legal_address',
-        'legal_address_en', 'actual_address', 'requisites', 'requisites_en')
+        'title', 'title_en', 'tin', 'kpp', 'pprnie', 'registration', 'registration_en', 'position', 'position_en',
+        'appeal', 'appeal_en', 'name', 'second_name', 'last_name', 'name_en', 'second_name_en', 'last_name_en',
+        'legal_address', 'legal_address_en', 'actual_address', 'requisites', 'requisites_en')
     success_url = '/organizations'
 
 

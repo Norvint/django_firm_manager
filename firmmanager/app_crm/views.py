@@ -8,9 +8,10 @@ from django.views.generic.base import View
 
 from app_crm.forms import ContractorFilterForm, ContractorCommentForm, ContractorForm, ContactForm, \
     ContractorContactPersonForm, \
-    ContractorFileForm, LeadFilterForm, LeadCommentForm, LeadForm, LeadContactPersonForm
+    ContractorFileForm, LeadFilterForm, LeadCommentForm, LeadForm, LeadContactPersonForm, ContractorRequisitesForm
 from app_crm.models import Contractor, ContractorComment, ContractorContactPersonContact, ContractorContactPerson, \
-    ContractorFile, ContractorFileCategory, Lead, LeadComment, LeadContactPerson, LeadContactPersonContact, LeadStatus
+    ContractorFile, ContractorFileCategory, Lead, LeadComment, LeadContactPerson, LeadContactPersonContact, LeadStatus, \
+    ContractorRequisites
 from app_documents.models import Contract, Order
 
 
@@ -54,6 +55,11 @@ class ContractorDetailView(LoginRequiredMixin, DetailView):
         context = super(ContractorDetailView, self).get_context_data(**kwargs)
         comments = ContractorComment.objects.filter(contractor=self.get_object()).order_by('-created')
         files_categories = ContractorFileCategory.objects.all()
+        try:
+            requisites = ContractorRequisites.objects.get(contractor=self.get_object())
+            context['requisites'] = requisites
+        except ObjectDoesNotExist:
+            context['requisites'] = None
         contact_persons = ContractorContactPerson.objects.filter(contractor=self.get_object())
         context['contact_persons'] = contact_persons
         context['comments'] = comments
@@ -186,6 +192,68 @@ class ContractorToDeleteView(LoginRequiredMixin, View):
             return redirect('contractor_detail', pk=kwargs.get('pk'))
 
 
+class ContractorRequisitesCreateView(LoginRequiredMixin, TemplateView):
+    template_name = 'app_crm/contractors/contractor_requisites_create.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ContractorRequisitesCreateView, self).get_context_data(**kwargs)
+        form = ContractorRequisitesForm()
+        context['form'] = form
+        return context
+
+    def post(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        form = ContractorRequisitesForm(request.POST)
+        contractor = Contractor.objects.get(pk=kwargs.get('contractor_id'))
+        if form.is_valid():
+            contractor_requisites = form.save(commit=False)
+            contractor_requisites.contractor = contractor
+            contractor_requisites.save()
+            return redirect('contractor_detail', pk=kwargs.get('contractor_id'))
+        else:
+            context['form'] = form
+            return self.render_to_response(context)
+
+
+class ContractorRequisitesEditView(LoginRequiredMixin, TemplateView):
+    template_name = 'app_crm/contractors/contractor_requisites_edit.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(ContractorRequisitesEditView, self).get_context_data(**kwargs)
+        contractor_requisites = ContractorRequisites.objects.get(pk=kwargs.get('contractor_requisites_id'))
+        form = ContractorRequisitesForm(initial={'short_title': contractor_requisites.short_title,
+                                                 'mailing_address': contractor_requisites.mailing_address,
+                                                 'tin': contractor_requisites.tin,
+                                                 'kpp': contractor_requisites.kpp,
+                                                 'pprnie': contractor_requisites.pprnie,
+                                                 'checking_account': contractor_requisites.checking_account,
+                                                 'correspondent_account': contractor_requisites.correspondent_account,
+                                                 'bank_bik': contractor_requisites.bank_bik,
+                                                 'bank_title': contractor_requisites.bank_title})
+        context['form'] = form
+        return context
+
+    def post(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        form = ContractorRequisitesForm(request.POST)
+        contractor = Contractor.objects.get(pk=kwargs.get('contractor_id'))
+        if form.is_valid():
+            contractor_requisites = ContractorRequisites.objects.filter(contractor=contractor).update(
+                short_title=form.cleaned_data['short_title'],
+                mailing_address=form.cleaned_data['mailing_address'],
+                tin=form.cleaned_data['tin'],
+                pprnie=form.cleaned_data['short_title'],
+                checking_account=form.cleaned_data['checking_account'],
+                correspondent_account=form.cleaned_data['correspondent_account'],
+                bank_bik=form.cleaned_data['bank_bik'],
+                bank_title=form.cleaned_data['bank_title'],
+            )
+            return redirect('contractor_detail', pk=kwargs.get('contractor_id'))
+        else:
+            context['form'] = form
+            return self.render_to_response(context)
+
+
 class ContractorFileList(LoginRequiredMixin, TemplateView):
     template_name = 'app_crm/contractors/contractor_files_list.html'
 
@@ -231,7 +299,6 @@ class ContractorFileCreate(LoginRequiredMixin, TemplateView):
             return redirect('contractor_files_list', kwargs.get('contractor_id'), form.cleaned_data['category'].slug)
         else:
             context['form'] = form
-            context['errors'] = form.errors
         return self.render_to_response(context)
 
 

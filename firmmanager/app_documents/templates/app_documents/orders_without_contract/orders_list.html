@@ -1,20 +1,8 @@
 {% extends 'base.html' %}
 
-{% block title %}Спецификации{% endblock %}
+{% block title %}Заказы без договора{% endblock %}
 
 {% block content %}
-
-<ul class="nav nav-pills pt-2 pb-2">
-  <li class="nav-item">
-    <a class="nav-link active mr-2" aria-current="page" href="{% url 'orders_list' %}">Заказы</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" aria-current="page" href="{% url 'delivery_conditions_list' %}">Условия поставки</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" href="{% url 'payment_conditions_list' %}">Условия оплаты</a>
-  </li>
-</ul>
 
 <form action="" method="post" class="mb-2">
     {% csrf_token %}
@@ -43,32 +31,32 @@
     </div>
 </form>
 
-<h1>Заказы</h1>
-<a href="{% url 'order_create' 0 0 %}" class="btn btn-primary mb-3">Добавить заказ</a>
+<h1>Заказы без договора</h1>
+<a href="{% url 'order_without_contract_create' 0 %}" class="btn btn-primary mb-3">Добавить заказ</a>
 
 {% if orders %}
 <table class="table table-striped">
     <thead>
     <tr>
         <th scope="col">Номер</th>
-        <th scope="col">Договор</th>
         <th scope="col">Контрагент</th>
+        <th scope="col">Организация</th>
     </tr>
     </thead>
     <tbody>
     {% for order in orders %}
-    <tr class="{% if order.to_delete %} text-white bg-secondary {% endif %}">
+    <tr class="{% if contract.to_delete %} text-white bg-secondary {% endif %}">
         <td>
             <a class="{% if order.to_delete %} text-white {% else %} text-reset {% endif %}"
-               href="{% url 'order_detail' order.id %}">{{ order.number }}</a>
+               href="{% url 'order_without_contract_detail' order.id %}">{{ order.number }}</a>
         </td>
         <td>
             <a class="{% if order.to_delete %} text-white {% else %} text-reset {% endif %}"
-               href="{% url 'contract_detail' order.contract.id %}">{{ order.contract }}</a>
+               href="{% url 'contractor_detail' order.contractor.id %}">{{ order.contractor }}</a>
         </td>
         <td>
             <a class="{% if order.to_delete %} text-white {% else %} text-reset {% endif %}"
-               href="{% url 'contractor_detail' order.contract.contractor.id %}">{{ order.contract.contractor }}</a>
+               href="{% url 'organization_detail' order.organization.id %}">{{ order.organization }}</a>
         </td>
     </tr>
     {% endfor %}

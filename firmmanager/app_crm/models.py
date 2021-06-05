@@ -43,7 +43,7 @@ class ContractorStatus(models.Model):
 
 
 class Contractor(models.Model):
-    title = models.CharField('Наименование', max_length=50)
+    title = models.CharField('Наименование', max_length=150)
     status = models.ForeignKey(ContractorStatus, on_delete=models.SET_NULL, null=True, verbose_name='Статус')
     type_of_contractor = models.ForeignKey(TypeOfContractor, on_delete=models.SET_NULL, null=True,
                                            verbose_name='Тип контрагента')
@@ -60,7 +60,7 @@ class Contractor(models.Model):
     tel = models.CharField('Основной номер телефона', max_length=20)
     legal_address = models.CharField('Юр. адрес', max_length=200)
     actual_address = models.CharField('Фактический адрес', max_length=200, blank=True)
-    requisites = models.TextField('Реквизиты', max_length=1000)
+    requisites = models.TextField('Реквизиты', max_length=1000, blank=True, null=True)
     to_delete = models.BooleanField('К удалению', default=False)
     tag = models.CharField('Теги', max_length=1000, blank=True, null=True)
     responsible = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
@@ -71,6 +71,26 @@ class Contractor(models.Model):
 
     def __str__(self):
         return f'{self.title} - {self.country}'
+
+
+class ContractorRequisites(models.Model):
+    contractor = models.ForeignKey(Contractor, on_delete=models.CASCADE, verbose_name='Контрагент')
+    short_title = models.CharField('Сокр. наименование', max_length=50)
+    mailing_address = models.CharField('Почтовый адрес', max_length=200)
+    tin = models.CharField('ИНН(TIN)', max_length=12)
+    kpp = models.CharField('КПП', max_length=12)
+    pprnie = models.CharField('ОГРН(ИП)', max_length=15)
+    checking_account = models.CharField('Расчетный счет', max_length=24)
+    correspondent_account = models.CharField('Корреспондентский счет', max_length=24)
+    bank_bik = models.CharField('БИК Банка', max_length=9)
+    bank_title = models.CharField('Банк', max_length=200)
+
+    class Meta:
+        verbose_name = 'Реквизиты контрагента'
+        verbose_name_plural = 'Реквизиты контрагентов'
+
+    def __str__(self):
+        return f'{self.contractor} {self.tin}/{self.pprnie}'
 
 
 class ContractorComment(models.Model):

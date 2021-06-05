@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 
 from app_crm.models import TypeOfContractor, FieldOfActivity, ContractorComment, Contractor, ContactPersonContactType, \
-    ContractorContactPerson, ContractorFile, LeadStatus, LeadComment, Lead, LeadContactPerson
+    ContractorContactPerson, ContractorFile, LeadStatus, LeadComment, Lead, LeadContactPerson, ContractorRequisites
 
 
 class ContractorFilterForm(forms.Form):
@@ -46,6 +46,12 @@ class ContractorForm(forms.ModelForm):
             'requisites': forms.Textarea(attrs={'rows': 5, 'cols': 80}),
         }
         exclude = ['to_delete', 'responsible']
+
+
+class ContractorRequisitesForm(forms.ModelForm):
+    class Meta:
+        model = ContractorRequisites
+        exclude = ['contractor']
 
 
 class ContractorContactPersonForm(forms.ModelForm):

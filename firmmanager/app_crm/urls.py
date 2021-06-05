@@ -6,7 +6,8 @@ from app_crm.views import ContractorCreateView, ContractorListView, ContractorDe
     ContractorFileCreate, ContractorCommentEditView, ContractorCommentDeleteView, ContractorContactPersonEditView, \
     LeadListView, \
     LeadDetailView, LeadCreateView, LeadContactPersonCreateView, LeadContactPersonEditView, LeadContactPersonDetailView, \
-    LeadContactPersonToDeleteView, LeadEditView, LeadCommentEditView, LeadCommentDeleteView, LeadContractorCreateView
+    LeadContactPersonToDeleteView, LeadEditView, LeadCommentEditView, LeadCommentDeleteView, LeadContractorCreateView, \
+    ContractorRequisitesCreateView, ContractorRequisitesEditView
 
 # contractors
 urlpatterns = [
@@ -37,6 +38,11 @@ urlpatterns = [
          name='contractor_contact_person_edit'),
     path('contactors/<int:contractor_id>/contact-persons/<int:pk>/to_delete', ContactPersonToDeleteView.as_view(),
          name='contractor_contact_person_to_delete'),
+    path('contractors/<int:contractor_id>/requisites/create/', ContractorRequisitesCreateView.as_view(),
+         name='contractor_requisites_create'),
+    path('contractors/<int:contractor_id>/requisites/<int:contractor_requisites_id>/edit',
+         ContractorRequisitesEditView.as_view(),
+         name='contractor_requisites_edit'),
 ]
 
 # leads

@@ -25,6 +25,7 @@ class Organization(models.Model):
     legal_address_en = models.CharField('Юр. адрес(англ)', max_length=200, blank=True)
     actual_address = models.CharField('Фактический адрес', max_length=200, blank=True)
     tin = models.CharField('ИНН(TIN)', max_length=12)
+    kpp = models.CharField('КПП', max_length=12)
     pprnie = models.CharField('ОГРН(ИП)', max_length=15)
     registration = models.CharField('Действующий на основании', max_length=100, blank=True)
     registration_en = models.CharField('Действующий на основании(англ)', max_length=100, blank=True)

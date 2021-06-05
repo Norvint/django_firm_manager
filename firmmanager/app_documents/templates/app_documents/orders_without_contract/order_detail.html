@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
 
-{% block title %}Заказ{% endblock %}
+{% block title %}Заказ без договора{% endblock %}
 
 {% block content %}
-<h1>Заказ</h1>
+<h1>Заказ без договора</h1>
 <div class="dropdown">
     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
        data-bs-toggle="dropdown" aria-expanded="false">
@@ -11,18 +11,18 @@
     </a>
     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
         <li>
-            <a href="{% url 'contractor_detail' object.contract.contractor.id %}"
+            <a href="{% url 'contractor_detail' object.contractor.id %}"
                class="dropdown-item">Контрагент</a>
         </li>
 
         <li>
-            <a href="{% url 'contractor_contracts_list' object.contract.contractor.id %}"
-               class="dropdown-item">Договоры</a>
+            <a href="{% url 'contractor_orders_list' object.contractor.id %}"
+               class="dropdown-item">Заказы</a>
         </li>
 
         <li>
-            <a href="{% url 'contractor_orders_list' object.contract.contractor.id %}"
-               class="dropdown-item">Заказы</a>
+            <a href=""
+               class="dropdown-item">Заказы без договора</a>
         </li>
     </ul>
 </div>
@@ -38,11 +38,11 @@
 
             <li class="list-group-item">
                 {% if object.to_delete %}
-                <a href="{% url 'order_to_delete' object.id %}" class="btn btn-danger">
+                <a href="{% url 'order_without_contract_to_delete' object.id %}" class="btn btn-danger">
                     Снять пометку на удаление
                 </a>
                 {% else %}
-                <a href="{% url 'order_to_delete' object.id %}" class="btn btn-danger">
+                <a href="{% url 'order_without_contract_to_delete' object.id %}" class="btn btn-danger">
                     Пометить на удаление
                 </a>
                 {% endif %}
@@ -52,48 +52,35 @@
         <div class="card-body d-flex justify-content-between">
             <h5 class="card-title">Заказ №{{ object.number }}</h5>
             {% if object.to_delete %}
-            <p class="text-danger fw-bold">Помечена на удаление</p>
+            <p class="text-danger fw-bold">Помечен на удаление</p>
             {% endif %}
         </div>
 
         <ul class="list-group list-group-flush">
-            <li class="list-group-item">Договор: {{ object.contract }}</li>
+            <li class="list-group-item">Контрагент: {{ object.contractor }}</li>
+            <li class="list-group-item">Организация: {{ object.organization }}</li>
             <li class="list-group-item">Условия поставки: {{ object.delivery_conditions }}</li>
             <li class="list-group-item">Время поставки, дней: {{ object.delivery_time }}</li>
             <li class="list-group-item">Место поставки: {{ object.delivery_address }}</li>
             <li class="list-group-item">Условия оплаты: {{ object.payment_conditions }}</li>
+            <li class="list-group-item">Валюта: {{ object.currency }}</li>
             <li class="list-group-item">Ответственный: {{ object.responsible }}</li>
             <li class="list-group-item">Дата создания: {{ object.created }}</li>
         </ul>
 
         <ul class="list-group list-group-horizontal">
             <li class="list-group-item">
-                <a href="{% url 'order_booking' object.id %}" class="btn btn-primary">
+                <a href="{% url 'order_without_contract_booking' object.id %}" class="btn btn-primary">
                     Выпустить продукцию
                 </a>
             </li>
-            {% ifequal "Россия" object.contract.contractor.country %}
+
+            {% ifequal "Россия" object.contractor.country %}
             <li class="list-group-item">
-                <a href="{% url 'download_upd' object.id %}" download
+                <a href="{% url 'download_upd_wc' object.id %}" download
                    class="btn btn-success col-offset-2">Скачать УПД</a>
             </li>
             {% endifequal %}
-            {% ifnotequal "Россия" object.contract.contractor.country %}
-            <li class="list-group-item">
-                <a href="{% url 'download_specification' object.id %}" download
-                   class="btn btn-success col-offset-2">Скачать спецификацию</a>
-            </li>
-
-            <li class="list-group-item">
-                <a href="{% url 'download_invoice' object.id %}" class="btn btn-success d-block">Скачать инвойс</a>
-            </li>
-
-            <li class="list-group-item">
-                <a href="{% url 'download_goods_acceptance' object.id %}" class="btn btn-success d-block">
-                    Скачать акт приемки товаров
-                </a>
-            </li>
-            {% endifnotequal %}
         </ul>
     </div>
 </div>
@@ -127,12 +114,12 @@
         <td>{{ document.counted_sum }}</td>
         <td>{{ document.total_sum }}</td>
         <td>
-            <a href="{% url 'order_booking_edit' document.id %}">
+            <a href="{% url 'order_without_contract_booking_edit' document.id %}">
                 <img src="{% static 'app_documents/images/edit.png' %}" alt="edit icon">
             </a>
         </td>
         <td>
-            <a href="{% url 'order_booking_delete' document.id %}">
+            <a href="{% url 'order_without_contract_booking_delete' document.id %}">
                 <img src="{% static 'app_documents/images/delete.png' %}" alt="delete icon">
             </a>
         </td>
@@ -150,7 +137,7 @@
         </div>
 
         <div>
-            <h4>{{ object.contract.currency.char_code }}: {{ currency_counted_sum }}</h4>
+            <h4>{{ object.currency.char_code }}: {{ currency_counted_sum }}</h4>
         </div>
     </div>
 </div>
@@ -163,7 +150,7 @@
         </div>
 
         <div>
-            <h4>{{ object.contract.currency.char_code }}: {{ currency_total_sum }}</h4>
+            <h4>{{ object.currency.char_code }}: {{ currency_total_sum }}</h4>
         </div>
     </div>
 </div>

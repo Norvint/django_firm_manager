@@ -1,13 +1,19 @@
 from django.contrib import admin
 
 from app_crm.models import Contractor, TypeOfContractor, FieldOfActivity, ContractorStatus, ContractorComment, \
-    ContactPersonContactType, ContractorContactPersonContact, ContractorContactPerson, ContractorFileCategory, ContractorFile, LeadStatus, Lead
+    ContactPersonContactType, ContractorContactPersonContact, ContractorContactPerson, ContractorFileCategory, \
+    ContractorFile, LeadStatus, Lead, ContractorRequisites
 
 
 @admin.register(Contractor)
 class ContractorAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'type_of_contractor', 'position', 'name', 'second_name', 'last_name', 'country')
     list_filter = ['type_of_contractor', ]
+
+
+@admin.register(ContractorRequisites)
+class ContractorRequisitesAdmin(admin.ModelAdmin):
+    pass
 
 
 @admin.register(TypeOfContractor)

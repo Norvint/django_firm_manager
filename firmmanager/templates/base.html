@@ -47,11 +47,16 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                            data-bs-toggle="dropdown" aria-expanded="false">
-                            Документы
+                            Продажи
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="{% url 'contracts_list' %}">Договоры</a></li>
                             <li><a class="dropdown-item" href="{% url 'orders_list' %}">Заказы</a></li>
+                            <li>
+                                <a class="dropdown-item" href="{% url 'orders_without_contract_list' %}">
+                                Заказы без договора
+                                </a>
+                            </li>
                         </ul>
                     </li>
 

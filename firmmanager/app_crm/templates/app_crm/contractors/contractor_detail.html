@@ -55,6 +55,21 @@
             <a href="{% url 'contractor_to_delete' object.id %}" class="btn btn-danger">Пометить на удаление</a>
         </li>
         {% endif %}
+
+        {% ifequal "Россия" object.country %}
+        <li class="list-group-item">
+            {% if requisites %}
+            <a href="{% url 'contractor_requisites_edit' object.id requisites.id %}" class="btn btn-primary">
+                Редактировать реквизиты
+            </a>
+            {% else %}
+            <a href="{% url 'contractor_requisites_create' object.id %}" class="btn btn-primary">
+                Добавить реквизиты
+            </a>
+            {% endif %}
+        </li>
+        {% endifequal %}
+
     </ul>
     <div class="card-body d-flex justify-content-between">
         <h5 class="card-title">{{ object.title }}</h5>
@@ -100,7 +115,53 @@
                 <li class="list-group-item">Страна: {{ object.country }}</li>
                 <li class="list-group-item">Юр. адрес: {{ object.legal_address }}</li>
                 <li class="list-group-item">Факт. адрес: {{ object.actual_address }}</li>
+                {% if requisites %}
+                <li class="list-group-item d-flex justify-content-between">
+                    <div>
+                        Краткое наименование: {{ requisites.short_title }}
+                    </div>
+
+                    <div>
+                        Почтовый адрес: {{ requisites.mailing_address }}
+                    </div>
+                </li>
+
+                <li class="list-group-item d-flex justify-content-between">
+                    <div>
+                        ИНН: {{ requisites.tin }}
+                    </div>
+
+                    <div>
+                        КПП: {{ requisites.kpp }}
+                    </div>
+
+                    <div>
+                        ИГРН(ИП): {{ requisites.pprnie }}
+                    </div>
+                </li>
+
+                <li class="list-group-item d-flex justify-content-between">
+                    <div>
+                        Расчетный счет: {{ requisites.checking_account }}
+                    </div>
+
+                    <div>
+                        Корреспондентный счет: {{ requisites.correspondent_account }}
+                    </div>
+                </li>
+
+                <li class="list-group-item d-flex justify-content-between">
+                    <div>
+                        Банк: {{ requisites.bank_title }}
+                    </div>
+
+                    <div>
+                        БИК банка: {{ requisites.bank_bik }}
+                    </div>
+                </li>
+                {% else %}
                 <li class="list-group-item">Реквизиты: {{ object.requisites }}</li>
+                {% endif %}
             </ul>
         </div>
         <div class="tab-pane fade" id="more" role="tabpanel" aria-labelledby="more-tab">

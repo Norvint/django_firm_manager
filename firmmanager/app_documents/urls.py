@@ -4,7 +4,9 @@ from app_documents.views import DeliveryConditionsDetailView, DeliveryConditions
     ContractDetailView, ContractListView, ContractTypeDetailView, ContractTypeListView, CurrencyDetailView, \
     CurrencyListView, OrderCreateView, OrderBookingCreateView, OrderDetailView, OrderListView, \
     PaymentConditionsListView, OrderBookingDeleteView, OrderBookingEditView, \
-    ContractToDeleteView, OrderToDeleteView, CurrencyUpdate, ContractEditView
+    ContractToDeleteView, OrderToDeleteView, CurrencyUpdate, ContractEditView, OrderWithoutContractListView, \
+    OrderWithoutContractCreateView, OrderWithoutContractDetailView, OrderWithoutContractToDeleteView, \
+    OrderWithoutContractBookingDeleteView, OrderWithoutContractBookingEditView, OrderWithoutContractBookingCreateView
 
 # contracts
 urlpatterns = [
@@ -44,4 +46,29 @@ urlpatterns += [
     path('orders/<int:pk>/download-invoice/', OrderDetailView.download_invoice, name='download_invoice'),
     path('orders/<int:pk>/download-goods-acceptance/', OrderDetailView.download_goods_acceptance,
          name='download_goods_acceptance'),
+    path('orders/<int:pk>/download-upd/', OrderDetailView.download_upd,
+         name='download_upd'),
+]
+
+# orders without contract
+urlpatterns += [
+    path('orders-without-contract/', OrderWithoutContractListView.as_view(), name='orders_without_contract_list'),
+    path('orders-without-contract/create-order/<int:contractor_id>',
+         OrderWithoutContractCreateView.as_view(),
+         name='order_without_contract_create'),
+    path('orders-without-contract/<int:pk>', OrderWithoutContractDetailView.as_view(),
+         name='order_without_contract_detail'),
+    path('orders-without-contract/bookings/<int:order_without_contract_id>/create',
+         OrderWithoutContractBookingCreateView.as_view(),
+         name='order_without_contract_booking'),
+    path('orders-without-contract/bookings/<int:order_without_contract_booking_id>/delete',
+         OrderWithoutContractBookingDeleteView.as_view(),
+         name='order_without_contract_booking_delete'),
+    path('orders-without-contract/bookings/<int:order_without_contract_booking_id>/edit',
+         OrderWithoutContractBookingEditView.as_view(),
+         name='order_without_contract_booking_edit'),
+    path('orders-without-contract/<int:pk>/to-delete/', OrderWithoutContractToDeleteView.as_view(),
+         name='order_without_contract_to_delete'),
+    path('orders-without-contract/<int:pk>/download-upd/', OrderWithoutContractDetailView.download_upd,
+         name='download_upd_wc'),
 ]
