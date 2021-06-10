@@ -27,11 +27,11 @@
     </ul>
 </div>
 {% load static %}
-<div class="mb-5 col-9">
+<div class="mb-5 col-12">
     <div class="card">
         <ul class="list-group list-group-horizontal">
             <li class="list-group-item">
-                <a href="" class="btn btn-primary">
+                <a href="{% url 'order_edit' object.id %}" class="btn btn-primary">
                     Редактирование
                 </a>
             </li>
@@ -57,10 +57,40 @@
         </div>
 
         <ul class="list-group list-group-flush">
-            <li class="list-group-item">Договор: {{ object.contract }}</li>
-            <li class="list-group-item">Условия поставки: {{ object.delivery_conditions }}</li>
-            <li class="list-group-item">Время поставки, дней: {{ object.delivery_time }}</li>
-            <li class="list-group-item">Место поставки: {{ object.delivery_address }}</li>
+            <li class="list-group-item">
+                Договор:
+                <a class="text-reset" href="{% url 'contract_detail' object.contract.id %}">
+                    {{ object.contract }}
+                </a>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+                <div>
+                    Контрагент:
+                    <a class="text-reset" href="{% url 'contractor_detail' object.contract.contractor.id %}">
+                        {{ object.contract.contractor.title }}
+                    </a>
+                </div>
+
+                <div>
+                    Организация:
+                    <a class="text-reset" href="{% url 'organization_detail' object.contract.organization.id %}">
+                        {{ object.contract.organization.title }}
+                    </a>
+                </div>
+            </li>
+            <li class="list-group-item d-flex justify-content-between">
+                <div>
+                    Условия поставки: {{ object.delivery_conditions }}
+                </div>
+
+                <div>
+                    Время поставки, дней: {{ object.delivery_time }}
+                </div>
+
+                <div>
+                    Место поставки: {{ object.delivery_address }}
+                </div>
+            </li>
             <li class="list-group-item">Условия оплаты: {{ object.payment_conditions }}</li>
             <li class="list-group-item">Ответственный: {{ object.responsible }}</li>
             <li class="list-group-item">Дата создания: {{ object.created }}</li>
@@ -72,6 +102,10 @@
                     Выпустить продукцию
                 </a>
             </li>
+
+            <li class="list-group-item">
+                <a href="{% url 'download_invoice' object.id %}" class="btn btn-success d-block">Скачать счет</a>
+            </li>
             {% ifequal "Россия" object.contract.contractor.country %}
             <li class="list-group-item">
                 <a href="{% url 'download_upd' object.id %}" download
@@ -82,10 +116,6 @@
             <li class="list-group-item">
                 <a href="{% url 'download_specification' object.id %}" download
                    class="btn btn-success col-offset-2">Скачать спецификацию</a>
-            </li>
-
-            <li class="list-group-item">
-                <a href="{% url 'download_invoice' object.id %}" class="btn btn-success d-block">Скачать инвойс</a>
             </li>
 
             <li class="list-group-item">

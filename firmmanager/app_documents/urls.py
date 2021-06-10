@@ -6,7 +6,8 @@ from app_documents.views import DeliveryConditionsDetailView, DeliveryConditions
     PaymentConditionsListView, OrderBookingDeleteView, OrderBookingEditView, \
     ContractToDeleteView, OrderToDeleteView, CurrencyUpdate, ContractEditView, OrderWithoutContractListView, \
     OrderWithoutContractCreateView, OrderWithoutContractDetailView, OrderWithoutContractToDeleteView, \
-    OrderWithoutContractBookingDeleteView, OrderWithoutContractBookingEditView, OrderWithoutContractBookingCreateView
+    OrderWithoutContractBookingDeleteView, OrderWithoutContractBookingEditView, OrderWithoutContractBookingCreateView, \
+    OrderEditView
 
 # contracts
 urlpatterns = [
@@ -30,6 +31,7 @@ urlpatterns += [
     path('orders/create-order/<int:contract_id>/contractor/<int:contractor_id>', OrderCreateView.as_view(),
          name='order_create'),
     path('orders/<int:pk>', OrderDetailView.as_view(), name='order_detail'),
+    path('orders/<int:pk>/edit', OrderEditView.as_view(), name='order_edit'),
     path('orders/<int:pk>/download-specification/', OrderDetailView.download_specification,
          name='download_specification'),
     path('orders/delivery-conditions', DeliveryConditionsListView.as_view(), name='delivery_conditions_list'),
@@ -71,4 +73,6 @@ urlpatterns += [
          name='order_without_contract_to_delete'),
     path('orders-without-contract/<int:pk>/download-upd/', OrderWithoutContractDetailView.download_upd,
          name='download_upd_wc'),
+    path('orders-without-contract/<int:pk>/download-invoice/', OrderWithoutContractDetailView.download_invoice,
+         name='download_invoice_wc'),
 ]

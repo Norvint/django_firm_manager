@@ -18,7 +18,6 @@ class UpdCreator:
         self.order = context
 
     def create_upd(self):
-        print(os.path.isfile(self.template))
         doc = DocxTemplate(self.template)
         context = {
             'order_id': self.order.id,

@@ -144,17 +144,13 @@ class ContractorEditView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(ContractorEditView, self).get_context_data(**kwargs)
         contractor = Contractor.objects.get(pk=kwargs.get('contractor_id'))
-        contractor_initial_data = {'title': contractor.title, 'status': contractor.status,
-                                   'type_of_contractor': contractor.type_of_contractor,
-                                   'field_of_activity': contractor.field_of_activity, 'position': contractor.position,
-                                   'position_en': contractor.position_en, 'appeal': contractor.appeal,
-                                   'appeal_en': contractor.appeal_en, 'name': contractor.name,
-                                   'second_name': contractor.second_name, 'last_name': contractor.last_name,
-                                   'country': contractor.country, 'tel': contractor.tel,
-                                   'legal_address': contractor.legal_address,
-                                   'actual_address': contractor.actual_address, 'requisites': contractor.requisites,
-                                   'tag': contractor.tag}
-        form = ContractorForm(initial=contractor_initial_data)
+        form = ContractorForm(initial={
+            'title': contractor.title, 'status': contractor.status, 'type_of_contractor': contractor.type_of_contractor,
+            'field_of_activity': contractor.field_of_activity, 'position': contractor.position,
+            'position_en': contractor.position_en, 'appeal': contractor.appeal, 'appeal_en': contractor.appeal_en,
+            'name': contractor.name, 'second_name': contractor.second_name, 'last_name': contractor.last_name,
+            'country': contractor.country, 'tel': contractor.tel, 'legal_address': contractor.legal_address,
+            'actual_address': contractor.actual_address, 'requisites': contractor.requisites, 'tag': contractor.tag})
         context['form'] = form
         return context
 

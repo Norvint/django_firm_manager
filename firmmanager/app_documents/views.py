@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import ObjectDoesNotExist
 from django.forms import formset_factory
 from django.http import HttpResponse
 from django.shortcuts import redirect
@@ -16,7 +17,7 @@ from app_documents.models import Contract, ContractType, Currency, DeliveryCondi
     OrderWithoutContract
 from app_documents.utilities.currencies_parser import CurrenciesUpdater
 from app_documents.utilities.docx_creator.goods_acceptance import GoodsAcceptanceCreator
-from app_documents.utilities.docx_creator.invoice import InvoiceCreator
+from app_documents.utilities.docx_creator.invoice import InvoiceCreator, RussianInvoiceCreator, RussianInvoiceWCCreator
 from app_documents.utilities.docx_creator.specification import SpecificationCreator
 from app_documents.utilities.docx_creator.contract import ContractCreator
 from app_documents.utilities.docx_creator.upd import UpdCreator, UpdWithoutContractCreator
@@ -219,15 +220,14 @@ class OrderCreateView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(OrderCreateView, self).get_context_data(**kwargs)
         contract = kwargs.get('contract_id')
-        number = 'Генерируется автоматически'
         contractor = kwargs.get('contractor_id')
         if contract:
-            order_form = OrderForm(initial={'number': number, 'contract': contract})
+            order_form = OrderForm(initial={'number': 'Генерируется автоматически', 'contract': contract})
         elif contractor and not contract:
-            order_form = OrderForm(initial={'number': number})
+            order_form = OrderForm(initial={'number': 'Генерируется автоматически'})
             order_form.fields['contract'].queryset = Contract.objects.all().filter(contractor=contractor)
         else:
-            order_form = OrderForm(initial={'number': number})
+            order_form = OrderForm(initial={'number': 'Генерируется автоматически'})
         product_store_book_form_set = formset_factory(OrderBookingForm)
         formset = product_store_book_form_set()
         context['formset'] = formset
@@ -260,7 +260,7 @@ class OrderCreateView(LoginRequiredMixin, TemplateView):
                                 context['formset'] = formset
                                 context['form'] = order_form
                                 context[
-                                    'products_on_store_error'] = f'На складе {data["store"]} всего продукции {product}'\
+                                    'products_on_store_error'] = f'На складе {data["store"]} всего продукции {product}' \
                                                                  f' - {product_on_store.quantity} шт., требуется - ' \
                                                                  f'{data["quantity"]} шт.'
                                 return self.render_to_response(context)
@@ -320,9 +320,17 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
 
     def download_invoice(request, **kwargs):
         order = Order.objects.get(pk=kwargs.get('pk'))
-        template_path = os.path.join('foreign', 'invoice_template.docx')
-        invoice_creator = InvoiceCreator(order, template_path)
-        invoice_creator.create_invoice()
+        if 'Россия' in order.contract.contractor.country:
+            if 'Геркен П.В.' in order.contract.organization.title:
+                template_path = os.path.join('russian', 'invoice_gerkenpv_template.docx')
+            else:
+                template_path = os.path.join('russian', 'invoice_gerkenea_template.docx')
+            invoice_creator = RussianInvoiceCreator(order, template_path)
+            invoice_creator.create_invoice()
+        else:
+            template_path = os.path.join('foreign', 'invoice_template.docx')
+            invoice_creator = InvoiceCreator(order, template_path)
+            invoice_creator.create_invoice()
         fl_path = os.path.join(BASE_DIR, 'static', 'app_documents', 'tmp', 'invoice.docx')
         filename = 'invoice.docx'
         fl = open(fl_path, 'rb')
@@ -356,6 +364,107 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
         response = HttpResponse(fl, content_type=mime_type)
         response['Content-Disposition'] = "attachment; filename=%s" % filename
         return response
+
+
+class OrderEditView(LoginRequiredMixin, TemplateView):
+    template_name = 'app_documents/orders/order_edit.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(OrderEditView, self).get_context_data(**kwargs)
+        order = Order.objects.get(pk=kwargs.get('pk'))
+        order_form = OrderForm(initial={'number': order.number, 'contract': order.contract,
+                                        'delivery_conditions': order.delivery_conditions,
+                                        'delivery_time': order.delivery_time,
+                                        'delivery_address': order.delivery_address,
+                                        'payment_conditions': order.payment_conditions})
+        product_bookings = ProductStoreOrderBooking.objects.all().filter(order=order)
+        product_booking_data = []
+        for product_booking in product_bookings:
+            product_booking_data.append(
+                {'product': product_booking.product, 'store': product_booking.store,
+                 'quantity': product_booking.quantity})
+        product_store_book_form_set = formset_factory(OrderBookingForm)
+        formset = product_store_book_form_set(initial=product_booking_data)
+        context['formset'] = formset
+        context['form'] = order_form
+        return context
+
+    def post(self, request, *args, **kwargs):
+        context = self.get_context_data(**kwargs)
+        order_form = OrderForm(request.POST)
+        product_store_book_form_set = formset_factory(OrderBookingForm)
+        formset = product_store_book_form_set(request.POST)
+        if order_form.is_valid() and formset.is_valid():
+            order = Order.objects.get(pk=kwargs.get('pk'))
+            overall_sum = 0
+            for i, form in enumerate(formset):
+                data = formset.cleaned_data[i]
+                if form.is_valid() and data != {}:
+                    product = data['product']
+                    products_on_store = ProductStore.objects.filter(product=product, store=data['store'])
+                    if products_on_store:
+                        try:
+                            product_booking = ProductStoreOrderBooking.objects.get(order=order,
+                                                                                   product=product)
+                        except ObjectDoesNotExist:
+                            product_booking = False
+                        for product_on_store in products_on_store:
+                            if product_booking:
+                                product_on_store.quantity += product_booking.quantity
+                                product_on_store.booked -= product_booking.quantity
+                            if product_on_store.quantity > data['quantity']:
+                                product_on_store.quantity -= data['quantity']
+                                product_on_store.booked += data['quantity']
+                                product_on_store.save()
+                            else:
+                                product_on_store.quantity -= product_booking.quantity
+                                product_on_store.booked += product_booking.quantity
+                                context['formset'] = formset
+                                context['form'] = order_form
+                                context[
+                                    'products_on_store_error'] = f'На складе {data["store"]} всего продукции {product}' \
+                                                                 f' - {product_on_store.quantity} шт., требуется - ' \
+                                                                 f'{data["quantity"]} шт.'
+                                return self.render_to_response(context)
+                        booking_sum = int(data['quantity']) * product.cost
+                        try:
+                            product_booking = ProductStoreOrderBooking.objects.get(order=order,
+                                                                                   product=product)
+                            product_booking.quantity = data['quantity']
+                            product_booking.total_sum = product_booking.total_price * data['quantity']
+                            product_booking.counted_sum = booking_sum
+                            product_booking.standard_price = product.cost
+                            product_booking.save()
+                        except ObjectDoesNotExist:
+                            new_product_booking = ProductStoreOrderBooking(order=order,
+                                                                           product=product,
+                                                                           store=data['store'],
+                                                                           quantity=data['quantity'],
+                                                                           counted_sum=booking_sum,
+                                                                           total_sum=booking_sum,
+                                                                           standard_price=product.cost,
+                                                                           total_price=product.cost)
+                            new_product_booking.save()
+                        overall_sum += booking_sum
+                    else:
+                        context['formset'] = formset
+                        context['form'] = order_form
+                        context['products_on_store_error'] = f'На складе {data["store"]} нет продукции {product}'
+                        return self.render_to_response(context)
+            order.number = order_form.cleaned_data['number']
+            order.contract = order_form.cleaned_data['contract']
+            order.delivery_conditions = order_form.cleaned_data['delivery_conditions']
+            order.delivery_time = order_form.cleaned_data['delivery_time']
+            order.delivery_address = order_form.cleaned_data['delivery_address']
+            order.payment_conditions = order_form.cleaned_data['payment_conditions']
+            order.counted_sum = overall_sum
+            order.total_sum = order.counted_sum
+            order.save()
+            return redirect('order_detail', order.id)
+        else:
+            context['formset'] = formset
+            context['form'] = order_form
+        return self.render_to_response(context)
 
 
 class OrderToDeleteView(LoginRequiredMixin, View):
@@ -406,7 +515,7 @@ class OrderBookingCreateView(LoginRequiredMixin, TemplateView):
                             else:
                                 context['formset'] = formset
                                 context[
-                                    'products_on_store_error'] = f'На складе {data["store"]} всего продукции {product}'\
+                                    'products_on_store_error'] = f'На складе {data["store"]} всего продукции {product}' \
                                                                  f' - {product_on_store.quantity} шт., требуется - ' \
                                                                  f'{data["quantity"]} шт.'
                                 return self.render_to_response(context)
@@ -576,7 +685,7 @@ class OrderWithoutContractCreateView(LoginRequiredMixin, TemplateView):
                                 context['formset'] = formset
                                 context['form'] = order_form
                                 context[
-                                    'products_on_store_error'] = f'На складе {data["store"]} всего продукции {product}'\
+                                    'products_on_store_error'] = f'На складе {data["store"]} всего продукции {product}' \
                                                                  f' - {product_on_store.quantity} шт., требуется - ' \
                                                                  f'{data["quantity"]} шт.'
                                 return self.render_to_response(context)
@@ -634,6 +743,21 @@ class OrderWithoutContractDetailView(LoginRequiredMixin, DetailView):
         response['Content-Disposition'] = "attachment; filename=%s" % filename
         return response
 
+    def download_invoice(request, **kwargs):
+        order = OrderWithoutContract.objects.get(pk=kwargs.get('pk'))
+        if 'Геркен П.В.' in order.organization.title:
+            template_path = os.path.join('russian', 'invoice_gerkenpv_template.docx')
+        else:
+            template_path = os.path.join('russian', 'invoice_gerkenea_template.docx')
+        invoice_creator = RussianInvoiceWCCreator(order, template_path)
+        invoice_creator.create_invoice()
+        fl_path = os.path.join(BASE_DIR, 'static', 'app_documents', 'tmp', 'invoice.docx')
+        filename = 'invoice.docx'
+        fl = open(fl_path, 'rb')
+        mime_type, _ = mimetypes.guess_type(fl_path)
+        response = HttpResponse(fl, content_type=mime_type)
+        response['Content-Disposition'] = "attachment; filename=%s" % filename
+        return response
 
 
 class OrderWithoutContractToDeleteView(LoginRequiredMixin, View):
@@ -758,7 +882,7 @@ class OrderWithoutContractBookingCreateView(LoginRequiredMixin, TemplateView):
                             else:
                                 context['formset'] = formset
                                 context[
-                                    'products_on_store_error'] = f'На складе {data["store"]} всего продукции {product}'\
+                                    'products_on_store_error'] = f'На складе {data["store"]} всего продукции {product}' \
                                                                  f' - {product_on_store.quantity} шт., требуется - ' \
                                                                  f'{data["quantity"]} шт.'
                                 return self.render_to_response(context)

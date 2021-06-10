@@ -75,12 +75,15 @@
                 </a>
             </li>
 
-            {% ifequal "Россия" object.contractor.country %}
             <li class="list-group-item">
                 <a href="{% url 'download_upd_wc' object.id %}" download
                    class="btn btn-success col-offset-2">Скачать УПД</a>
             </li>
-            {% endifequal %}
+
+            <li class="list-group-item">
+                <a href="{% url 'download_invoice_wc' object.id %}" download
+                   class="btn btn-success col-offset-2">Скачать счет</a>
+            </li>
         </ul>
     </div>
 </div>

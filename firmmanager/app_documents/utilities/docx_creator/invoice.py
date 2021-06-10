@@ -4,8 +4,10 @@ from pathlib import Path
 
 import pymorphy2
 from docxtpl import DocxTemplate
+from num2words import num2words
 
-from app_storage.models import ProductStoreOrderBooking
+from app_crm.models import ContractorRequisites
+from app_storage.models import ProductStoreOrderBooking, ProductStoreOrderWithoutContractBooking
 
 
 class InvoiceCreator:
@@ -126,3 +128,138 @@ class InvoiceCreator:
             new_word = morph.parse(raw_word)[0]
             position += new_word.inflect({'gent'}).word + ' '
         return position
+
+
+class RussianInvoiceCreator:
+    BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
+
+    def __init__(self, context, template):
+        self.template = os.path.join(self.BASE_DIR, 'static', 'app_documents', 'layouts', template)
+        self.output_file_path = os.path.join(self.BASE_DIR, 'static', 'app_documents', 'tmp', 'invoice.docx')
+        self.order = context
+
+    def create_invoice(self):
+        doc = DocxTemplate(self.template)
+        context = {
+            'order_id': self.order.id,
+            'current_date': datetime.now().strftime('%d.%m.%Y'),
+            'contractor': {
+                'title': self.order.contract.contractor.title,
+                'legal_address': self.order.contract.contractor.legal_address,
+                'tin': self.get_contractor_requisites().tin,
+                'kpp': self.get_contractor_requisites().kpp,
+            },
+            'currency_total_sum': round(self.order.total_sum * (
+                    self.order.contract.currency.nominal / self.order.contract.currency.cost), 2),
+            'booked_products': [],
+            'date': {
+                'day': datetime.now().day,
+                'month': self.get_russian_month(datetime.now().month),
+                'year': datetime.now().year,
+            },
+            'total_sum_ru': self.get_total_sum_ru()
+        }
+        for i, booked_product in enumerate(ProductStoreOrderBooking.objects.all().filter(order=self.order)):
+            context['booked_products'].append({
+                'tr_number': str(i + 1),
+                'product': {
+                    'article': booked_product.product.number,
+                    'description': booked_product.product.description,
+                },
+                'total_sum': round(booked_product.total_sum * (
+                        self.order.contract.currency.nominal / self.order.contract.currency.cost), 2),
+                'total_price': round(booked_product.total_price * (
+                        self.order.contract.currency.nominal / self.order.contract.currency.cost), 2),
+                'quantity': booked_product.quantity,
+            })
+        context['products_num'] = i
+        doc.render(context)
+        doc.save(self.output_file_path)
+
+    def get_russian_month(self, month):
+        russian_months = {1: 'Января', 2: 'Ферваля', 3: 'Марта', 4: 'Апреля', 5: 'Мая', 6: 'Июня',
+                          7: 'Июля', 8: 'Августа', 9: 'Сентября', 10: 'Октрября', 11: 'Ноября', 12: 'Декабря'}
+        return russian_months[month]
+
+    def get_contractor_requisites(self):
+        requisites = ContractorRequisites.objects.get(contractor=self.order.contract.contractor)
+        return requisites
+
+    def get_total_sum_ru(self):
+        total_sum_rub = num2words(int(self.order.total_sum * (
+                    self.order.contract.currency.nominal / self.order.contract.currency.cost)), lang='ru')
+        drob = str(self.order.total_sum * (
+                    self.order.contract.currency.nominal / self.order.contract.currency.cost)).split('.')
+        if len(drob) > 1:
+            total_sum_cop = num2words(drob[1][:2], lang='ru')
+        else:
+            total_sum_cop = 0
+        return f'{total_sum_rub} рублей {total_sum_cop} копеек'.capitalize()
+
+
+class RussianInvoiceWCCreator:
+    BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
+
+    def __init__(self, context, template):
+        self.template = os.path.join(self.BASE_DIR, 'static', 'app_documents', 'layouts', template)
+        self.output_file_path = os.path.join(self.BASE_DIR, 'static', 'app_documents', 'tmp', 'invoice.docx')
+        self.order = context
+
+    def create_invoice(self):
+        doc = DocxTemplate(self.template)
+        context = {
+            'order_id': self.order.id,
+            'current_date': datetime.now().strftime('%d.%m.%Y'),
+            'contractor': {
+                'title': self.order.contractor.title,
+                'legal_address': self.order.contractor.legal_address,
+                'tin': self.get_contractor_requisites().tin,
+                'kpp': self.get_contractor_requisites().kpp,
+            },
+            'currency_total_sum': round(self.order.total_sum * (
+                    self.order.currency.nominal / self.order.currency.cost), 2),
+            'booked_products': [],
+            'date': {
+                'day': datetime.now().day,
+                'month': self.get_russian_month(datetime.now().month),
+                'year': datetime.now().year,
+            },
+            'total_sum_ru': self.get_total_sum_ru()
+        }
+        for i, booked_product in enumerate(ProductStoreOrderWithoutContractBooking.objects.all().filter(
+                order=self.order)):
+            context['booked_products'].append({
+                'tr_number': str(i + 1),
+                'product': {
+                    'article': booked_product.product.number,
+                    'description': booked_product.product.description,
+                },
+                'total_sum': round(booked_product.total_sum * (
+                        self.order.currency.nominal / self.order.currency.cost), 2),
+                'total_price': round(booked_product.total_price * (
+                        self.order.currency.nominal / self.order.currency.cost), 2),
+                'quantity': booked_product.quantity,
+            })
+        context['products_num'] = i
+        doc.render(context)
+        doc.save(self.output_file_path)
+
+    def get_russian_month(self, month):
+        russian_months = {1: 'Января', 2: 'Ферваля', 3: 'Марта', 4: 'Апреля', 5: 'Мая', 6: 'Июня',
+                          7: 'Июля', 8: 'Августа', 9: 'Сентября', 10: 'Октрября', 11: 'Ноября', 12: 'Декабря'}
+        return russian_months[month]
+
+    def get_contractor_requisites(self):
+        requisites = ContractorRequisites.objects.get(contractor=self.order.contractor)
+        return requisites
+
+    def get_total_sum_ru(self):
+        total_sum_rub = num2words(int(self.order.total_sum * (
+                    self.order.currency.nominal / self.order.currency.cost)), lang='ru')
+        drob = str(self.order.total_sum * (
+                    self.order.currency.nominal / self.order.currency.cost)).split('.')
+        if len(drob) > 1:
+            total_sum_cop = num2words(drob[1][:2], lang='ru')
+        else:
+            total_sum_cop = 0
+        return f'{total_sum_rub} рублей {total_sum_cop} копеек'.capitalize()
