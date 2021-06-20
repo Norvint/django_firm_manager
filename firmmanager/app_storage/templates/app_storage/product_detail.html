@@ -3,22 +3,53 @@
 {% block title %}{{ object.title }}{% endblock %}
 
 {% block content %}
-<a href="{% url 'products_list' %}" class="btn btn-primary mb-2 mt-2">К списку продукции</a>
-<div class="mb-5 col-12">
+<div class="mt-1 col-12">
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title">{{ object.type_of_product.title }}</h5>
+            <h3 class="card-title">{{ object.type_of_product.title }}</h3>
         </div>
         <ul class="list-group list-group-flush">
-            <li class="list-group-item">Артикул: {{ object.number }}</li>
-            <li class="list-group-item">Модель: {{ object.model }}</li>
-            <li class="list-group-item">Размер: {{ object.size }}</li>
-            <li class="list-group-item">Версия: {{ object.version }}</li>
-            <li class="list-group-item">Материалы: {{ object.materials }}</li>
-            <li class="list-group-item">Цвет: {{ object.color }}</li>
-            <li class="list-group-item">Внутренняя упаковка: {{ object.packing_inside }}</li>
-            <li class="list-group-item">Внешняя упаковка: {{ object.packing_outside }}</li>
-            <li class="list-group-item">Страна: {{ object.country }}</li>
+            <li class="list-group-item d-flex justify-content-between">
+                <div>
+                    Артикул: {{ object.number }}
+                </div>
+
+                <div>
+                    Модель: {{ object.model }}
+                </div>
+
+                <div>
+                    Размер: {{ object.size }}
+                </div>
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between">
+                <div>
+                    Версия: {{ object.version }}
+                </div>
+
+                <div>
+                    Материалы: {{ object.materials }}
+                </div>
+
+                <div>
+                    Цвет: {{ object.color }}
+                </div>
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between">
+                <div>
+                    Страна: {{ object.country }}
+                </div>
+
+                <div>
+                    Внутренняя упаковка: {{ object.packing_inside }}
+                </div>
+
+                <div>
+                    Внешняя упаковка: {{ object.packing_outside }}
+                </div>
+            </li>
         </ul>
         <div class="card-body">
             <a href="{% url 'product_edit' object.id %}" class="btn btn-primary">Редактировать</a>
@@ -27,12 +58,13 @@
 </div>
 
 {% if stores_with_product %}
-    <h2>Продукции на складах</h2>
+<div class="border rounded mt-2">
+    <h3 class="ps-2 pt-2">Продукции на складах</h3>
     <table class="table table-striped">
         <thead>
         <tr>
             <th scope="col">Склад</th>
-            <th scope="col">Количество на складе</th>
+            <th scope="col">Свободно на складе</th>
             <th scope="col">Забронировано на складе</th>
         </tr>
         </thead>
@@ -40,7 +72,9 @@
         {% for store_with_product in stores_with_product %}
         <tr>
             <td>
-                <a href="{% url 'store_detail' store_with_product.store.id %}">{{ store_with_product.store }}</a>
+                <a href="{% url 'store_detail' store_with_product.store.id %}" class="text-reset">
+                    {{ store_with_product.store }}
+                </a>
             </td>
             <td>{{ store_with_product.quantity }}</td>
             <td>{{ store_with_product.booked }}</td>
@@ -48,6 +82,7 @@
         {% endfor %}
         </tbody>
     </table>
+</div>
 {% endif %}
 
 {% endblock %}

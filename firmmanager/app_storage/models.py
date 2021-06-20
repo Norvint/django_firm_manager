@@ -85,6 +85,19 @@ class ProductStore(models.Model):
     def __str__(self):
         return f'{self.store} / {self.product} / {self.quantity} / {self.booked}'
 
+    def book_product(self, quantity):
+        self.quantity -= quantity
+        self.booked += quantity
+
+    def cancel_book_product(self, quantity):
+        self.quantity += quantity
+        self.booked -= quantity
+
+    def less_then_needed_error(self, quantity):
+        return f'На складе {self.store} всего продукции {self.product}' \
+               f' - {self.quantity} шт. (с учетом забронированой),' \
+               f' требуется - {quantity} шт.'
+
 
 class ProductStoreIncome(models.Model):
     store = models.ForeignKey(Store, on_delete=models.CASCADE, verbose_name='Склад')
@@ -116,10 +129,11 @@ class ProductStoreOutcome(models.Model):
     store = models.ForeignKey(Store, on_delete=models.CASCADE, verbose_name='Склад')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Продукция')
     quantity = models.PositiveIntegerField('Количество')
-    reason = models.ForeignKey(ProductStoreOutcomeReason, on_delete=models.CASCADE, verbose_name='Причина выпуска', blank=True, null=True)
+    reason = models.ForeignKey(ProductStoreOutcomeReason, on_delete=models.CASCADE, verbose_name='Причина выпуска',
+                               blank=True, null=True)
     date = models.DateField(auto_now_add=True, verbose_name='Дата выпуска')
     responsible = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
-    comment = models.CharField('Комментарий', max_length=1000)
+    comment = models.CharField('Комментарий', max_length=1000, blank=True, null=True)
 
     class Meta:
         verbose_name = 'Списание продукции со склада'
@@ -130,7 +144,8 @@ class ProductStoreOutcome(models.Model):
 
 
 class ProductStoreOrderBooking(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, verbose_name='Заказ')
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, verbose_name='Заказ',
+                              related_name='orders_bookings', related_query_name='order_bookings')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Продукция')
     store = models.ForeignKey(Store, on_delete=models.CASCADE, verbose_name='Склад')
     quantity = models.PositiveIntegerField('Количество')
@@ -146,8 +161,22 @@ class ProductStoreOrderBooking(models.Model):
     def __str__(self):
         return f'{self.product} - {self.store} - {self.quantity}'
 
+    def update_booking(self, form_data: dict):
+        if form_data.get('product'):
+            self.product = form_data.get('product')
+        if form_data.get('store'):
+            self.store = form_data.get('store')
+        if form_data.get('quantity'):
+            self.quantity = form_data.get('quantity')
+        if form_data.get('total_price'):
+            self.total_price = form_data.get('total_price')
+        if form_data.get('standard_price'):
+            self.standard_price = form_data.get('standard_price')
+        self.counted_sum = self.product.cost * self.quantity
+        self.total_sum = self.total_price * self.quantity
 
-class ProductStoreOrderWithoutContractBooking(models.Model):
+
+class ProductStoreOrderWCBooking(models.Model):
     order = models.ForeignKey(OrderWithoutContract, on_delete=models.CASCADE, verbose_name='Заказ')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Продукция')
     store = models.ForeignKey(Store, on_delete=models.CASCADE, verbose_name='Склад')
@@ -163,3 +192,17 @@ class ProductStoreOrderWithoutContractBooking(models.Model):
 
     def __str__(self):
         return f'{self.product} - {self.store} - {self.quantity}'
+
+    def update_booking(self, form_data: dict):
+        if form_data.get('product'):
+            self.product = form_data.get('product')
+        if form_data.get('store'):
+            self.store = form_data.get('store')
+        if form_data.get('quantity'):
+            self.quantity = form_data.get('quantity')
+        if form_data.get('total_price'):
+            self.total_price = form_data.get('total_price')
+        if form_data.get('standard_price'):
+            self.standard_price = form_data.get('standard_price')
+        self.counted_sum = self.product.cost * self.quantity
+        self.total_sum = self.total_price * self.quantity

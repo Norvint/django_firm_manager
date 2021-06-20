@@ -8,6 +8,7 @@
 <a href="#" id="add_product" class="btn btn-success mt-2">+</a>
 
 <form name="product-create-form" method="post" class="d-flex justify-content-evenly col-12 row">
+    {% csrf_token %}
     {{ formset.management_form }}
     <div id="product-form-wrapper">
         {% for form in formset %}

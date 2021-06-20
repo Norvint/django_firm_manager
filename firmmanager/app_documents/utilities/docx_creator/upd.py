@@ -6,7 +6,7 @@ import pymorphy2
 from docxtpl import DocxTemplate
 
 from app_crm.models import ContractorRequisites
-from app_storage.models import ProductStoreOrderBooking, ProductStoreOrderWithoutContractBooking
+from app_storage.models import ProductStoreOrderBooking, ProductStoreOrderWCBooking
 
 
 class UpdCreator:
@@ -150,7 +150,7 @@ class UpdWithoutContractCreator:
                 'year': datetime.now().year,
             }
         }
-        for i, booked_product in enumerate(ProductStoreOrderWithoutContractBooking.objects.all().filter(
+        for i, booked_product in enumerate(ProductStoreOrderWCBooking.objects.all().filter(
                 order=self.order)):
             context['booked_products'].append({
                 'tr_number': str(i + 1),

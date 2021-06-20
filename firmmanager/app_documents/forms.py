@@ -4,7 +4,7 @@ from django import forms
 
 from app_crm.models import Contractor
 from app_documents.models import Order, Contract, OrderWithoutContract
-from app_storage.models import ProductStoreOrderBooking, ProductStoreOrderWithoutContractBooking
+from app_storage.models import ProductStoreOrderBooking, ProductStoreOrderWCBooking
 
 
 class BookingCreateForm(forms.ModelForm):
@@ -22,19 +22,19 @@ class BookingCreateForm(forms.ModelForm):
         spec_booking.save()
 
 
-class OrderWithoutContractBookingCreateForm(forms.ModelForm):
+class OrderWCBookingCreateForm(forms.ModelForm):
     class Meta:
-        model = ProductStoreOrderWithoutContractBooking
+        model = ProductStoreOrderWCBooking
         fields = ['order', 'product', 'store', 'quantity', 'counted_sum']
 
     def save(self, commit=True):
         data = self.cleaned_data
         product = data['product']
         counted_sum = product.cost * int(data['quantity'])
-        spec_booking = ProductStoreOrderWithoutContractBooking(order=data['order'], product=data['product'],
-                                                               price=product.cost, store=data['store'],
-                                                               quantity=data['quantity'], counted_sum=counted_sum,
-                                                               total_sum=counted_sum)
+        spec_booking = ProductStoreOrderWCBooking(order=data['order'], product=data['product'],
+                                                  price=product.cost, store=data['store'],
+                                                  quantity=data['quantity'], counted_sum=counted_sum,
+                                                  total_sum=counted_sum)
         spec_booking.save()
 
 
@@ -46,7 +46,7 @@ class BookingEditForm(forms.ModelForm):
 
 class OrderWithoutContractBookingEditForm(forms.ModelForm):
     class Meta:
-        model = ProductStoreOrderWithoutContractBooking
+        model = ProductStoreOrderWCBooking
         fields = ['order', 'product', 'store', 'quantity', 'total_price']
 
 

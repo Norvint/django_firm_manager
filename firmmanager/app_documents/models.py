@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import QuerySet
 
 from app_crm.models import Contractor
 from app_organizations.models import Organization
@@ -110,6 +111,27 @@ class Order(models.Model):
     def __str__(self):
         return f'№{self.number} - {self.contract.contractor.title}'
 
+    def update_order(self, form_data: dict):
+        if form_data.get('number'):
+            self.number = form_data.get('number')
+        if form_data.get('contract'):
+            self.contract = form_data.get('contract')
+        if form_data.get('delivery_conditions'):
+            self.delivery_conditions = form_data.get('delivery_conditions')
+        if form_data.get('delivery_time'):
+            self.delivery_time = form_data.get('delivery_time')
+        if form_data.get('delivery_address'):
+            self.delivery_address = form_data.get('delivery_address')
+        if form_data.get('payment_conditions'):
+            self.payment_conditions = form_data.get('payment_conditions')
+
+    def recalculate_amounts(self, bookings: QuerySet):
+        self.total_sum = 0
+        self.counted_sum = 0
+        for booking in bookings:
+            self.total_sum += booking.total_sum
+            self.counted_sum += booking.counted_sum
+
 
 class OrderWithoutContract(models.Model):
     number = models.CharField('Номер заказа', max_length=30, blank=True)
@@ -136,5 +158,12 @@ class OrderWithoutContract(models.Model):
 
     def __str__(self):
         return f'№{self.number} - {self.contractor.title}'
+
+    def recalculate_amounts(self, bookings: QuerySet):
+        self.total_sum = 0
+        self.counted_sum = 0
+        for booking in bookings:
+            self.total_sum += booking.total_sum
+            self.counted_sum += booking.counted_sum
 
 

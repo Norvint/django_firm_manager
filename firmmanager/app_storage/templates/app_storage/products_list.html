@@ -3,7 +3,7 @@
 {% block title %}Список продукции{% endblock %}
 
 {% block content %}
-<form action="" method="post">
+<form method="post">
     {% csrf_token %}
     <div  class="d-flex flex-row col-10 justify-content-between mb-2 flex-wrap">
         <div class="d-flex flex-column col-2 mt-2">
@@ -54,6 +54,8 @@
         <th scope="col">Модель</th>
         <th scope="col">Версия</th>
         <th scope="col">Страна</th>
+        <th scope="col"></th>
+        <th scope="col"></th>
     </tr>
     </thead>
     <tbody>
@@ -64,7 +66,7 @@
         </td>
 
         <td>
-            <a class="text-reset" href="{% url 'product_detail' product.id %}">{{ product.number }}</a>
+            {{ product.number }}
         </td>
 
         <td>
@@ -78,6 +80,14 @@
         <td>
             {{ product.country }}
         </td>
+
+        <td>
+            <a class="text-reset" href="{% url 'product_detail' product.id %}">Открыть</a>
+        </td>
+
+       <td>
+           <a class="text-reset" href="{% url 'product_edit' product.id %}">Редактировать</a>
+       </td>
     </tr>
     {% endfor %}
     </tbody>

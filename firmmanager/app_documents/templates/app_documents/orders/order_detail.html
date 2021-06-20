@@ -4,6 +4,12 @@
 
 {% block content %}
 <h1>Заказ</h1>
+<script>
+    var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'))
+    var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+      return new bootstrap.Popover(popoverTriggerEl)
+    })
+</script>
 <div class="dropdown">
     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
        data-bs-toggle="dropdown" aria-expanded="false">
@@ -27,7 +33,7 @@
     </ul>
 </div>
 {% load static %}
-<div class="mb-5 col-12">
+<div class="mb-1 col-12">
     <div class="card">
         <ul class="list-group list-group-horizontal">
             <li class="list-group-item">
@@ -52,7 +58,7 @@
         <div class="card-body d-flex justify-content-between">
             <h5 class="card-title">Заказ №{{ object.number }}</h5>
             {% if object.to_delete %}
-            <p class="text-danger fw-bold">Помечена на удаление</p>
+            <p class="text-danger fw-bold">Помечен на удаление</p>
             {% endif %}
         </div>
 
@@ -91,9 +97,44 @@
                     Место поставки: {{ object.delivery_address }}
                 </div>
             </li>
-            <li class="list-group-item">Условия оплаты: {{ object.payment_conditions }}</li>
+            <li class="list-group-item d-flex justify-content-between">
+                <div>
+                    Условия оплаты:
+                    <a tabindex="0" class="text-reset payment-condition-popover"
+                       role="button" data-bs-toggle="popover" title="{{ object.payment_conditions.title }}"
+                       data-bs-content="{{ object.payment_conditions.description }}">
+                        {{ object.payment_conditions }}
+                    </a>
+
+                    <script>
+                    var popover = new bootstrap.Popover(document.querySelector('.payment-condition-popover'), {
+                      trigger: 'focus'
+                    })
+
+
+                    </script>
+                </div>
+
+                <div>
+                    Валюта:
+                    <a tabindex="0" class="text-reset currency-popover"
+                       role="button" data-bs-toggle="popover" title="{{ object.contract.currency.title }}"
+                       data-bs-content="{{ object.contract.currency.nominal }} {{ object.contract.currency.char_code }} = {{ object.contract.currency.cost }} RUB">
+                        {{ object.contract.currency }}
+                    </a>
+
+                    <script>
+                    var popover = new bootstrap.Popover(document.querySelector('.currency-popover'), {
+                      trigger: 'focus'
+                    })
+                    </script>
+                </div>
+
+                <div>
+                    Дата создания: {{ object.created }}
+                </div>
+            </li>
             <li class="list-group-item">Ответственный: {{ object.responsible }}</li>
-            <li class="list-group-item">Дата создания: {{ object.created }}</li>
         </ul>
 
         <ul class="list-group list-group-horizontal">
@@ -103,16 +144,46 @@
                 </a>
             </li>
 
-            <li class="list-group-item">
-                <a href="{% url 'download_invoice' object.id %}" class="btn btn-success d-block">Скачать счет</a>
-            </li>
             {% ifequal "Россия" object.contract.contractor.country %}
             <li class="list-group-item">
-                <a href="{% url 'download_upd' object.id %}" download
-                   class="btn btn-success col-offset-2">Скачать УПД</a>
+                {% if contractor_requisites %}
+                <a href="{% url 'download_invoice' object.id %}" class="btn btn-success d-block">Скачать счет</a>
+                {% else %}
+                <a tabindex="0" class="btn btn-danger invoice-popover"
+                   role="button" data-bs-toggle="popover" title="Отказ"
+                   data-bs-content="Чтобы сформировать инвойс, необходимо заполнить реквизиты в карточке контрагента">
+                    Скачать счет
+                </a>
+                <script>
+                    var popover = new bootstrap.Popover(document.querySelector('.invoice-popover'), {
+                      trigger: 'focus'
+                    })
+                </script>
+                {% endif %}
+            </li>
+            <li class="list-group-item">
+                {% if contractor_requisites %}
+                <a href="{% url 'download_upd' object.id %}" download class="btn btn-success col-offset-2">
+                    Скачать УПД
+                </a>
+                {% else %}
+                <a tabindex="0" class="btn btn-danger upd-popover"
+                   role="button" data-bs-toggle="popover" title="Отказ"
+                   data-bs-content="Чтобы сформировать УПД, необходимо заполнить реквизиты в карточке контрагента">
+                    Скачать УПД
+                </a>
+                <script>
+                    var popover = new bootstrap.Popover(document.querySelector('.upd-popover'), {
+                      trigger: 'focus'
+                    })
+                </script>
+                {% endif %}
             </li>
             {% endifequal %}
             {% ifnotequal "Россия" object.contract.contractor.country %}
+            <li class="list-group-item">
+                <a href="{% url 'download_invoice' object.id %}" class="btn btn-success d-block">Скачать счет</a>
+            </li>
             <li class="list-group-item">
                 <a href="{% url 'download_specification' object.id %}" download
                    class="btn btn-success col-offset-2">Скачать спецификацию</a>
@@ -128,7 +199,6 @@
     </div>
 </div>
 
-{% if order_booking %}
 <h2>Выпускаемая продукция</h2>
 <table class="table">
     <thead>
@@ -145,10 +215,10 @@
     </tr>
     </thead>
     <tbody>
-    {% for document in order_booking %}
+    {% for document in order_booking.all %}
     <tr>
         <td>
-            <a href="{% url 'product_detail' document.product.id %}">{{ document.product }}</a>
+            <a href="{% url 'product_detail' document.product.id %}" class="text-reset">{{ document.product }}</a>
         </td>
         <td>{{ document.store }}</td>
         <td>{{ document.quantity }}</td>
@@ -169,34 +239,30 @@
     </tr>
     {% endfor %}
     </tbody>
+    <tfoot>
+        <tr>
+            <td>Итого:</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>{{ object.counted_sum }}</td>
+            <td>{{ object.total_sum }}</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Итого в {{ object.contract.currency.char_code }}:</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>{{ currency_counted_sum }}</td>
+            <td>{{ currency_total_sum }}</td>
+            <td></td>
+            <td></td>
+        </tr>
+    </tfoot>
 </table>
-{% endif %}
-
-<div>
-    <h3>Расчетная сумма</h3>
-    <div class="d-flex justify-content-between">
-        <div>
-            <h4>RUB: {{ object.counted_sum }}</h4>
-        </div>
-
-        <div>
-            <h4>{{ object.contract.currency.char_code }}: {{ currency_counted_sum }}</h4>
-        </div>
-    </div>
-</div>
-
-<div>
-    <h3>Итоговая сумма</h3>
-    <div class="d-flex justify-content-between">
-        <div>
-            <h4>RUB: {{ object.total_sum }}</h4>
-        </div>
-
-        <div>
-            <h4>{{ object.contract.currency.char_code }}: {{ currency_total_sum }}</h4>
-        </div>
-    </div>
-</div>
-
 
 {% endblock %}

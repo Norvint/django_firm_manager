@@ -18,7 +18,13 @@ class ProductStoreIncomeForm(forms.ModelForm):
 class ProductStoreOutcomeForm(forms.ModelForm):
     class Meta:
         model = ProductStoreOutcome
-        fields = ['store', 'product', 'quantity', 'reason', 'comment']
+        fields = ['store', 'product', 'quantity', 'reason']
+
+
+class ProductStoreOutcomeAdditionForm(forms.ModelForm):
+    class Meta:
+        model = ProductStoreOutcome
+        fields = ['comment']
 
 
 class ProductForm(forms.ModelForm):

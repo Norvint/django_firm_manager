@@ -74,7 +74,8 @@ class Contractor(models.Model):
 
 
 class ContractorRequisites(models.Model):
-    contractor = models.ForeignKey(Contractor, on_delete=models.CASCADE, verbose_name='Контрагент')
+    contractor = models.ForeignKey(Contractor, on_delete=models.CASCADE, verbose_name='Контрагент',
+                                   related_name='contractors_requisites', related_query_name='contractor_requisites')
     short_title = models.CharField('Сокр. наименование', max_length=50)
     mailing_address = models.CharField('Почтовый адрес', max_length=200)
     tin = models.CharField('ИНН(TIN)', max_length=12)

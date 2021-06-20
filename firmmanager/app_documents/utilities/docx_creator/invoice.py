@@ -7,7 +7,7 @@ from docxtpl import DocxTemplate
 from num2words import num2words
 
 from app_crm.models import ContractorRequisites
-from app_storage.models import ProductStoreOrderBooking, ProductStoreOrderWithoutContractBooking
+from app_storage.models import ProductStoreOrderBooking, ProductStoreOrderWCBooking
 
 
 class InvoiceCreator:
@@ -226,7 +226,7 @@ class RussianInvoiceWCCreator:
             },
             'total_sum_ru': self.get_total_sum_ru()
         }
-        for i, booked_product in enumerate(ProductStoreOrderWithoutContractBooking.objects.all().filter(
+        for i, booked_product in enumerate(ProductStoreOrderWCBooking.objects.all().filter(
                 order=self.order)):
             context['booked_products'].append({
                 'tr_number': str(i + 1),
