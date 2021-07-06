@@ -143,6 +143,8 @@ class RussianInvoiceCreator:
         context = {
             'order_id': self.order.id,
             'current_date': datetime.now().strftime('%d.%m.%Y'),
+            'currency': self.order.contract.currency,
+            'currency_second': self.get_currency_second(),
             'contractor': {
                 'title': self.order.contract.contractor.title,
                 'legal_address': self.order.contract.contractor.legal_address,
@@ -172,7 +174,7 @@ class RussianInvoiceCreator:
                         self.order.contract.currency.nominal / self.order.contract.currency.cost), 2),
                 'quantity': booked_product.quantity,
             })
-        context['products_num'] = i
+        context['products_num'] = len(context['booked_products'])
         doc.render(context)
         doc.save(self.output_file_path)
 
@@ -186,15 +188,30 @@ class RussianInvoiceCreator:
         return requisites
 
     def get_total_sum_ru(self):
-        total_sum_rub = num2words(int(self.order.total_sum * (
+        total_sum_rus = num2words(int(self.order.total_sum * (
                     self.order.contract.currency.nominal / self.order.contract.currency.cost)), lang='ru')
         drob = str(self.order.total_sum * (
                     self.order.contract.currency.nominal / self.order.contract.currency.cost)).split('.')
         if len(drob) > 1:
-            total_sum_cop = num2words(drob[1][:2], lang='ru')
+            total_sum_fractional_rus = num2words(drob[1][:2], lang='ru')
         else:
-            total_sum_cop = 0
-        return f'{total_sum_rub} рублей {total_sum_cop} копеек'.capitalize()
+            total_sum_fractional_rus = 0
+        if 'RUB' in self.order.contract.currency.char_code:
+            return f'{total_sum_rus} рублей {total_sum_fractional_rus} копеек'.capitalize()
+        elif 'EUR' in self.order.contract.currency.char_code:
+            return f'{total_sum_rus} Евро {total_sum_fractional_rus} евро центов'.capitalize()
+        elif 'USD' in self.order.contract.currency.char_code:
+            return f'{total_sum_rus} Долларов США {total_sum_fractional_rus} центов'.capitalize()
+        else:
+            return f'{total_sum_rus} {self.order.contract.currency.title} {total_sum_fractional_rus} др.'.capitalize()
+
+    def get_currency_second(self):
+        morph = pymorphy2.MorphAnalyzer()
+        currency = ''
+        for raw_word in self.order.contract.currency.title.split(' '):
+            new_word = morph.parse(raw_word)[0]
+            currency += new_word.inflect({'gent'}).word + ' '
+        return currency.capitalize()
 
 
 class RussianInvoiceWCCreator:
@@ -210,6 +227,8 @@ class RussianInvoiceWCCreator:
         context = {
             'order_id': self.order.id,
             'current_date': datetime.now().strftime('%d.%m.%Y'),
+            'currency': self.order.currency,
+            'currency_second': self.get_currency_second(),
             'contractor': {
                 'title': self.order.contractor.title,
                 'legal_address': self.order.contractor.legal_address,
@@ -254,12 +273,27 @@ class RussianInvoiceWCCreator:
         return requisites
 
     def get_total_sum_ru(self):
-        total_sum_rub = num2words(int(self.order.total_sum * (
+        total_sum_rus = num2words(int(self.order.total_sum * (
                     self.order.currency.nominal / self.order.currency.cost)), lang='ru')
         drob = str(self.order.total_sum * (
                     self.order.currency.nominal / self.order.currency.cost)).split('.')
         if len(drob) > 1:
-            total_sum_cop = num2words(drob[1][:2], lang='ru')
+            total_sum_fractional_rus = num2words(drob[1][:2], lang='ru')
         else:
-            total_sum_cop = 0
-        return f'{total_sum_rub} рублей {total_sum_cop} копеек'.capitalize()
+            total_sum_fractional_rus = 0
+        if 'RUB' in self.order.currency.char_code:
+            return f'{total_sum_rus} рублей {total_sum_fractional_rus} копеек'.capitalize()
+        elif 'EUR' in self.order.currency.char_code:
+            return f'{total_sum_rus} Евро {total_sum_fractional_rus} евро центов'.capitalize()
+        elif 'USD' in self.order.currency.char_code:
+            return f'{total_sum_rus} Долларов США {total_sum_fractional_rus} центов'.capitalize()
+        else:
+            return f'{total_sum_rus} {self.order.currency.title} {total_sum_fractional_rus} др.'.capitalize()
+
+    def get_currency_second(self):
+        morph = pymorphy2.MorphAnalyzer()
+        currency = ''
+        for raw_word in self.order.currency.title.split(' '):
+            new_word = morph.parse(raw_word)[0]
+            currency += new_word.inflect({'gent'}).word + ' '
+        return currency.capitalize()

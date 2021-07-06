@@ -2,7 +2,8 @@ from django import forms
 from django.contrib.auth.models import User
 
 from app_crm.models import TypeOfContractor, FieldOfActivity, ContractorComment, Contractor, ContactPersonContactType, \
-    ContractorContactPerson, ContractorFile, LeadStatus, LeadComment, Lead, LeadContactPerson, ContractorRequisites
+    ContractorContactPerson, ContractorFile, LeadStatus, LeadComment, Lead, LeadContactPerson, ContractorRequisites, \
+    LeadContact
 
 
 class ContractorFilterForm(forms.Form):
@@ -81,4 +82,10 @@ class LeadContactPersonForm(forms.ModelForm):
     class Meta:
         model = LeadContactPerson
         exclude = ['to_delete']
+
+
+class LeadContactForm(forms.ModelForm):
+    class Meta:
+        model = LeadContact
+        exclude = ['lead']
 

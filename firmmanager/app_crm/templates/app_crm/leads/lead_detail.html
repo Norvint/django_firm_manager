@@ -8,14 +8,26 @@
         <li class="list-group-item">
             <a href="{% url 'lead_edit' object.id %}" class="btn btn-primary">Редактировать</a>
         </li>
-
-        <li class="list-group-item">
-            <a href="{% url 'lead_contractor_create' object.id %}" class="btn btn-primary">Создать контрагента на основании</a>
-        </li>
     </ul>
     <div class="card-body d-flex justify-content-between">
         <h5 class="card-title">{{ object.title }}</h5>
-        <p class="text-success">{{ object.status }}</p>
+        <a class="nav-link dropdown-toggle btn btn-outline-primary" href="#" id="navbarDropdown" role="button"
+           data-bs-toggle="dropdown" aria-expanded="false">
+            {{ object.status }}
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            {% ifnotequal object.status.title 'Конвертирован' %}
+            <li><a class="dropdown-item" href="{% url 'lead_contractor_create' object.id %}">Конвертированый</a></li>
+            {% endifnotequal %}
+
+            {% ifnotequal object.status.title 'Некачественный' %}
+            <li><a class="dropdown-item" href="{% url 'lead_status_substandard' object.id %}">Некачественный</a></li>
+            {% endifnotequal %}
+
+            {% ifnotequal object.status.title 'Отложенный' %}
+            <li><a class="dropdown-item" href="{% url 'lead_status_deferred' object.id %}">Отложенный</a></li>
+            {% endifnotequal %}
+        </ul>
     </div>
     <ul class="nav nav-tabs" id="myTab" role="tablist">
         <li class="nav-item" role="presentation">
@@ -29,32 +41,56 @@
             </button>
         </li>
         <li class="nav-item" role="presentation">
+            <button class="nav-link" id="contact-person-tab" data-bs-toggle="tab" data-bs-target="#contact-person" type="button"
+                    role="tab" aria-controls="contact-person" aria-selected="false">Контактные лица
+            </button>
+        </li>
+
+        <li class="nav-item" role="presentation">
             <button class="nav-link" id="contacts-tab" data-bs-toggle="tab" data-bs-target="#contacts" type="button"
-                    role="tab" aria-controls="contacts" aria-selected="false">Контакты лида
+                    role="tab" aria-controls="contacts" aria-selected="false">Контакты
             </button>
         </li>
     </ul>
     <div class="tab-content" id="myTabContent">
         <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
             <ul class="list-group list-group-flush">
-                <li class="list-group-item">Должность: {{ object.position }}</li>
-                <li class="list-group-item">Имя: {{ object.name }}</li>
-                <li class="list-group-item">Отчество: {{ object.second_name }}</li>
-                <li class="list-group-item">Фамилия: {{ object.last_name }}</li>
-                <li class="list-group-item">Страна: {{ object.country }}</li>
+                <li class="list-group-item d-flex justify-content-between">
+                    <div>
+                        Имя: {{ object.name }}
+                    </div>
+
+                    <div>
+                        Отчество: {{ object.second_name }}
+                    </div>
+
+                    <div>
+                        Фамилия: {{ object.last_name }}
+                    </div>
+                </li>
+
+                <li class="list-group-item d-flex justify-content-between">
+                    <div>
+                        Должность: {{ object.position }}
+                    </div>
+
+                   <div>
+                       Страна: {{ object.country }}
+                   </div>
+                </li>
             </ul>
         </div>
 
         <div class="tab-pane fade" id="more" role="tabpanel" aria-labelledby="more-tab">
             <ul class="list-group list-group-flush">
-                <li class="list-group-item">Сфера деятельности: {{ object.responsible }}</li>
-                <li class="list-group-item">Цель сотрудничества: {{ object.field_of_activity }}</li>
+                <li class="list-group-item">Сфера деятельности: {{ object.field_of_activity }}</li>
+                <li class="list-group-item">Цель сотрудничества: {{ object.purpose }}</li>
                 <li class="list-group-item">Ответственный: {{ object.responsible }}</li>
                 <li class="list-group-item">Тэги: {{ object.tag }}</li>
             </ul>
         </div>
 
-        <div class="tab-pane fade" id="contacts" role="tabpanel" aria-labelledby="contacts-tab">
+        <div class="tab-pane fade" id="contact-person" role="tabpanel" aria-labelledby="contact-person-tab">
             <div class="card-body">
                 {% if contact_persons %}
                 <table class="table">
@@ -116,6 +152,38 @@
                 <a href="{% url 'lead_contact_person_create' object.id %}" class="btn btn-primary">
                     Добавить контактное лицо
                 </a>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="contacts" role="tabpanel" aria-labelledby="contact-person-tab">
+            <div class="card-body">
+                {% if contacts %}
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Вид контакта</th>
+                        <th scope="col">Контакт</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for lead_contact in contacts %}
+                    <tr class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}">
+                        <td>
+                            {{ lead_contact.type_of_contact }}
+                        </td>
+
+                        <td>
+                            {{ lead_contact.contact }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>
+                    Похоже вы еще не добавили контактны к этому лиду.
+                </p>
+                {% endif %}
             </div>
         </div>
     </div>

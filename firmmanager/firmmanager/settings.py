@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import os
 from pathlib import Path
 
-from firmmanager.local_settings import LOCAL_ALLOWED_HOSTS, LOCAL_KEY, LOCAL_DATABASE
+from firmmanager.local_settings import LOCAL_ALLOWED_HOSTS, LOCAL_KEY, LOCAL_DATABASE, WEBPUSH_LOCAL_SETTINGS
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -49,6 +49,7 @@ INSTALLED_APPS += [
     'app_pages',
     'app_users',
     'app_storage',
+    'webpush',
 ]
 
 MIDDLEWARE = [
@@ -110,6 +111,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+WEBPUSH_SETTINGS = WEBPUSH_LOCAL_SETTINGS
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/

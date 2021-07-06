@@ -2,7 +2,8 @@ from django.contrib import admin
 
 from app_crm.models import Contractor, TypeOfContractor, FieldOfActivity, ContractorStatus, ContractorComment, \
     ContactPersonContactType, ContractorContactPersonContact, ContractorContactPerson, ContractorFileCategory, \
-    ContractorFile, LeadStatus, Lead, ContractorRequisites
+    ContractorFile, LeadStatus, Lead, ContractorRequisites, LeadContact, LeadContactPerson, LeadContactPersonContact, \
+    LeadContactType
 
 
 @admin.register(Contractor)
@@ -43,12 +44,12 @@ class ContactPersonContactTypeAdmin(admin.ModelAdmin):
 
 @admin.register(ContractorContactPersonContact)
 class ContactAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['contact_person', 'type_of_contact', 'contact']
 
 
 @admin.register(ContractorContactPerson)
-class ContactPersonAdmin(admin.ModelAdmin):
-    pass
+class ContractorContactPersonAdmin(admin.ModelAdmin):
+    list_display = ['contractor', 'last_name', 'name', 'position']
 
 
 @admin.register(ContractorFileCategory)
@@ -65,9 +66,29 @@ class ContractorFileAdmin(admin.ModelAdmin):
 
 @admin.register(LeadStatus)
 class LeadStatusAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['title', ]
 
 
 @admin.register(Lead)
 class LeadAdmin(admin.ModelAdmin):
     pass
+
+
+@admin.register(LeadContact)
+class LeadContactAdmin(admin.ModelAdmin):
+    list_display = ['lead', 'type_of_contact', 'contact']
+
+
+@admin.register(LeadContactPerson)
+class LeadContactPersonAdmin(admin.ModelAdmin):
+    list_display = ['lead', 'last_name', 'name', 'position']
+
+
+@admin.register(LeadContactPersonContact)
+class LeadContactPersonContactAdmin(admin.ModelAdmin):
+    list_display = ['contact_person', 'type_of_contact', 'contact']
+
+
+@admin.register(LeadContactType)
+class LeadContactTypeAdmin(admin.ModelAdmin):
+    list_display = ['title',]

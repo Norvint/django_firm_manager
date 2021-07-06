@@ -112,8 +112,8 @@ class ContactPersonContactType(models.Model):
     title = models.CharField('Название', max_length=100)
 
     class Meta:
-        verbose_name = 'Тип контакта'
-        verbose_name_plural = 'Типы контактов'
+        verbose_name = 'Тип контакта контактного лица'
+        verbose_name_plural = 'Типы контактов контактных лиц'
 
     def __str__(self):
         return self.title
@@ -137,8 +137,8 @@ class ContractorContactPerson(models.Model):
     to_delete = models.BooleanField('К удалению', default=False)
 
     class Meta:
-        verbose_name = 'Контактное лицо'
-        verbose_name_plural = 'Контактные лица'
+        verbose_name = 'Контактное лицо контрагента'
+        verbose_name_plural = 'Контактные лица контрагентов'
 
     def __str__(self):
         return f'{self.name} {self.second_name} {self.last_name} - {self.contractor}'
@@ -204,10 +204,10 @@ class Lead(models.Model):
     status = models.ForeignKey(LeadStatus, on_delete=models.SET_NULL, null=True, verbose_name='Статус')
     field_of_activity = models.ForeignKey(FieldOfActivity, on_delete=models.SET_NULL, null=True,
                                           verbose_name='Сфера деятельности')
-    name = models.CharField('Имя', max_length=30)
+    name = models.CharField('Имя', max_length=30, blank=True, null=True)
     second_name = models.CharField('Отчество', max_length=30, blank=True, null=True)
     last_name = models.CharField('Фамилия', max_length=30, blank=True, null=True)
-    position = models.CharField('Должность', max_length=30)
+    position = models.CharField('Должность', max_length=30, blank=True, null=True)
     purpose = models.CharField('Цель сотрудничества', max_length=1000)
     tag = models.CharField('Теги', max_length=1000, blank=True, null=True)
     responsible = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
@@ -219,6 +219,32 @@ class Lead(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class LeadContactType(models.Model):
+    title = models.CharField('Название', max_length=100)
+
+    class Meta:
+        verbose_name = 'Тип контакта лида'
+        verbose_name_plural = 'Типы контактов лидов'
+
+    def __str__(self):
+        return self.title
+
+
+class LeadContact(models.Model):
+    lead = models.ForeignKey(Lead, on_delete=models.CASCADE, blank=True, null=True, verbose_name='Лид',
+                             related_name='leads_contacts', related_query_name='lead_contacts')
+    type_of_contact = models.ForeignKey(LeadContactType, on_delete=models.CASCADE, verbose_name='Вид контакта',
+                                        blank=True, null=True)
+    contact = models.CharField('Контактные данные', max_length=50, blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'Контакт лида'
+        verbose_name_plural = 'Контакты лидов'
+
+    def __str__(self):
+        return self.contact
 
 
 class LeadComment(models.Model):

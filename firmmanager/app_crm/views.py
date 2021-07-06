@@ -1,18 +1,22 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms import formset_factory
-from django.http import FileResponse
-from django.shortcuts import redirect
+from django.http import FileResponse, JsonResponse
+from django.shortcuts import redirect, get_object_or_404
 from django.views.generic import ListView, DetailView, TemplateView, UpdateView
 from django.views.generic.base import View
+from webpush import send_user_notification
 
 from app_crm.forms import ContractorFilterForm, ContractorCommentForm, ContractorForm, ContactForm, \
     ContractorContactPersonForm, \
-    ContractorFileForm, LeadFilterForm, LeadCommentForm, LeadForm, LeadContactPersonForm, ContractorRequisitesForm
+    ContractorFileForm, LeadFilterForm, LeadCommentForm, LeadForm, LeadContactPersonForm, ContractorRequisitesForm, \
+    LeadContactForm
 from app_crm.models import Contractor, ContractorComment, ContractorContactPersonContact, ContractorContactPerson, \
     ContractorFile, ContractorFileCategory, Lead, LeadComment, LeadContactPerson, LeadContactPersonContact, LeadStatus, \
-    ContractorRequisites
+    ContractorRequisites, LeadContact
 from app_documents.models import Contract, Order
+from firmmanager import settings
 
 
 class ContractorListView(LoginRequiredMixin, ListView):
@@ -21,7 +25,7 @@ class ContractorListView(LoginRequiredMixin, ListView):
     queryset = Contractor.objects.all()
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        context = super(ContractorListView, self).get_context_data()
+        context = super(ContractorListView, self).get_context_data(**kwargs)
         contractors_filter = ContractorFilterForm()
         context['filter'] = contractors_filter
         return context
@@ -261,6 +265,7 @@ class ContractorFileList(LoginRequiredMixin, TemplateView):
             files = ContractorFile.objects.all().filter(contractor=contractor, category__slug=category_slug)
         else:
             files = ContractorFile.objects.all().filter(contractor=contractor)
+            context['category_slug'] = 'Все'
         files_categories = ContractorFileCategory.objects.all()
         context['files_categories'] = files_categories
         context['files'] = files
@@ -456,7 +461,7 @@ class LeadListView(LoginRequiredMixin, TemplateView):
             field_of_activity = filter_data.cleaned_data['field_of_activity']
             tag = filter_data.cleaned_data['tag']
             if status:
-                leads = leads.filter(responsible=status)
+                leads = leads.filter(status=status)
             if responsible:
                 leads = leads.filter(responsible=responsible)
             if field_of_activity:
@@ -477,8 +482,10 @@ class LeadDetailView(LoginRequiredMixin, DetailView):
         context = super(LeadDetailView, self).get_context_data(**kwargs)
         comments = LeadComment.objects.filter(lead=self.get_object()).order_by('-created')
         contact_persons = LeadContactPerson.objects.filter(lead=self.get_object())
+        # contacts = LeadContact.objects.filter(lead=self.get_object())
         context['contact_persons'] = contact_persons
         context['comments'] = comments
+        context['contacts'] = self.get_object().leads_contacts.all()
         comment_form = LeadCommentForm()
         context['comment_form'] = comment_form
         return context
@@ -504,18 +511,30 @@ class LeadCreateView(LoginRequiredMixin, TemplateView):
         context = super(LeadCreateView, self).get_context_data(**kwargs)
         form = LeadForm()
         context['form'] = form
+        lead_contact_formset = formset_factory(LeadContactForm)
+        formset = lead_contact_formset()
+        context['formset'] = formset
         return context
 
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
         form = LeadForm(request.POST)
-        if form.is_valid():
+        lead_contact_formset = formset_factory(LeadContactForm)
+        formset = lead_contact_formset(request.POST)
+        if form.is_valid() and formset.is_valid():
             lead = form.save(commit=False)
             lead.responsible = request.user
             lead.save()
+            for i, form in enumerate(formset):
+                data = formset.cleaned_data[i]
+                if form.is_valid() and data != {}:
+                    lead_contact = LeadContact(lead=lead, type_of_contact=data['type_of_contact'],
+                                               contact=data['contact'])
+                    lead_contact.save()
             return redirect('lead_detail', pk=lead.pk)
         else:
             context['form'] = form
+            context['formset'] = formset
             return self.render_to_response(context)
 
 
@@ -530,12 +549,19 @@ class LeadEditView(LoginRequiredMixin, TemplateView):
                                  'name': lead.name, 'second_name': lead.second_name, 'last_name': lead.last_name,
                                  'country': lead.country, 'purpose': lead.purpose, 'tag': lead.tag})
         context['form'] = form
+        lead_contacts_data = [{'type_of_contact': lead_contact.type_of_contact, 'contact': lead_contact.contact}
+                              for lead_contact in lead.leads_contacts.all()]
+        lead_contact_formset = formset_factory(LeadContactForm)
+        formset = lead_contact_formset(initial=lead_contacts_data)
+        context['formset'] = formset
         return context
 
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
         form = LeadForm(request.POST)
-        if form.is_valid():
+        lead_contact_formset = formset_factory(LeadContactForm)
+        formset = lead_contact_formset(request.POST)
+        if form.is_valid() and formset.is_valid():
             leads = Lead.objects.filter(pk=kwargs.get('pk')).update(
                 title=form.cleaned_data['title'], status=form.cleaned_data['status'],
                 field_of_activity=form.cleaned_data['field_of_activity'], position=form.cleaned_data['position'],
@@ -543,6 +569,18 @@ class LeadEditView(LoginRequiredMixin, TemplateView):
                 last_name=form.cleaned_data['last_name'], country=form.cleaned_data['country'],
                 purpose=form.cleaned_data['purpose'], tag=form.cleaned_data['tag'],
                 responsible=request.user)
+            for i, form in enumerate(formset):
+                data = formset.cleaned_data[i]
+                if form.is_valid() and data != {}:
+                    try:
+                        lead_contact = LeadContact.objects.get(lead=kwargs.get('pk'),
+                                                               type_of_contact=data['type_of_contact'])
+                        lead_contact.contact = data['contact']
+                        lead_contact.save()
+                    except LeadContact.DoesNotExist:
+                        lead_contact = LeadContact(lead=kwargs.get('pk'), type_of_contact=data['type_of_contact'],
+                                                   contact=data['contact'])
+                        lead_contact.save()
             return redirect('lead_detail', pk=kwargs.get('pk'))
         else:
             context['form'] = form
@@ -618,22 +656,18 @@ class LeadContactPersonEditView(LoginRequiredMixin, TemplateView):
 
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
-        contact_person_form = ContractorContactPersonForm(request.POST)
+        contact_person_form = LeadContactPersonForm(request.POST)
         contacts_formset = formset_factory(ContactForm)
         formset = contacts_formset(request.POST)
         if contact_person_form.is_valid() and formset.is_valid():
             form_data = contact_person_form.cleaned_data
-            contact_person = ContractorContactPerson.objects.filter(pk=kwargs.get('pk')).update(
-                name=form_data['name'],
-                second_name=form_data['second_name'],
-                last_name=form_data['last_name'],
-                position=form_data['position'],
-                contractor=form_data['contractor'],
-                tag=form_data['tag'])
+            contact_person = LeadContactPerson.objects.filter(pk=kwargs.get('pk')).update(
+                name=form_data['name'], second_name=form_data['second_name'], last_name=form_data['last_name'],
+                position=form_data['position'], lead=form_data['lead'], tag=form_data['tag'])
             for i, form in enumerate(formset):
                 data = formset.cleaned_data[i]
-                if form.is_valid() and data:
-                    contact_person_contact = ContractorContactPersonContact.objects.get(
+                if form.is_valid() and data != {}:
+                    contact_person_contact = LeadContactPersonContact.objects.get(
                         contact_person=kwargs.get('pk'),
                         type_of_contact=data['type_of_contact'])
                     if contact_person_contact:
@@ -645,9 +679,9 @@ class LeadContactPersonEditView(LoginRequiredMixin, TemplateView):
                             type_of_contact=data['type_of_contact'],
                             contact=data['contact'])
                         new_contact.save()
-            return redirect('contractor_contact_person_detail',
+            return redirect('lead_contact_person_detail',
                             pk=kwargs.get('pk'),
-                            contractor_id=kwargs.get('contractor_id'))
+                            lead_id=form_data['lead'].id)
         else:
             context['form'] = contact_person_form
             context['formset'] = formset
@@ -722,9 +756,9 @@ class LeadContractorCreateView(LoginRequiredMixin, TemplateView):
             contractor = form.save(commit=False)
             contractor.save()
             try:
-                new_lead_status = LeadStatus.objects.get(title__icontains='В работу')
+                new_lead_status = LeadStatus.objects.get(title__icontains='Конвертирован')
             except ObjectDoesNotExist:
-                new_lead_status = LeadStatus(title='В работу', description='Лид переведен в контрагенты').save()
+                new_lead_status = LeadStatus(title='Конвертирован', description='Лид переведен в контрагенты').save()
             lead.status = new_lead_status
             lead.save()
             lead_contact_persons = LeadContactPerson.objects.all().filter(lead=lead)
@@ -749,3 +783,32 @@ class LeadContractorCreateView(LoginRequiredMixin, TemplateView):
             context['form'] = form
             return self.render_to_response(context)
 
+
+class LeadStatusSubstandard(LoginRequiredMixin, View):
+
+    def get(self, request, *args, **kwargs):
+        obj = Lead.objects.get(pk=kwargs.get('pk'))
+        if obj:
+            try:
+                new_lead_status = LeadStatus.objects.get(title__icontains='Некачественный')
+            except ObjectDoesNotExist:
+                new_lead_status = LeadStatus(title='Некачественный',
+                                             description='Нет смысла продаолжать работу с лидом').save()
+            obj.status = new_lead_status
+            obj.save()
+            return redirect('lead_detail', pk=kwargs.get('pk'))
+
+
+class LeadStatusDeferred(LoginRequiredMixin, View):
+
+    def get(self, request, *args, **kwargs):
+        obj = Lead.objects.get(pk=kwargs.get('pk'))
+        if obj:
+            try:
+                new_lead_status = LeadStatus.objects.get(title__icontains='Отложенный')
+            except ObjectDoesNotExist:
+                new_lead_status = LeadStatus(title='Отложенный',
+                                             description='Работа с лидом отложена на некоторое время').save()
+            obj.status = new_lead_status
+            obj.save()
+            return redirect('lead_detail', pk=kwargs.get('pk'))

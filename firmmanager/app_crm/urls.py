@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.generic import TemplateView
 
 from app_crm.views import ContractorCreateView, ContractorListView, ContractorDetailView, ContractorEditView, \
     ContractorContractListView, ContractorOrderListView, ContractorToDeleteView, \
@@ -7,7 +8,7 @@ from app_crm.views import ContractorCreateView, ContractorListView, ContractorDe
     LeadListView, \
     LeadDetailView, LeadCreateView, LeadContactPersonCreateView, LeadContactPersonEditView, LeadContactPersonDetailView, \
     LeadContactPersonToDeleteView, LeadEditView, LeadCommentEditView, LeadCommentDeleteView, LeadContractorCreateView, \
-    ContractorRequisitesCreateView, ContractorRequisitesEditView
+    ContractorRequisitesCreateView, ContractorRequisitesEditView, LeadStatusSubstandard, LeadStatusDeferred
 
 # contractors
 urlpatterns = [
@@ -65,4 +66,8 @@ urlpatterns += [
          name='lead_comment_delete'),
     path('leads/<int:lead_id>/create-contractor-from-lead/', LeadContractorCreateView.as_view(),
          name='lead_contractor_create'),
+    path('leads/<int:pk>/change-lead-status/substandard', LeadStatusSubstandard.as_view(),
+         name='lead_status_substandard'),
+    path('leads/<int:pk>/change-lead-status/deferred', LeadStatusDeferred.as_view(),
+         name='lead_status_deferred'),
 ]

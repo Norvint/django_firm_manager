@@ -3,47 +3,55 @@
 {% block title %}Добавить новое контактное лицо лида{% endblock %}
 {% load static %}
 {% block content %}
-<h1>Новое контактное лицо лида</h1>
-<form name="contact-person-create-form" method="post" class="row">
+
+<form name="contact-person-create-form" method="post">
     {% csrf_token %}
-    <ul class="list-group list-group-flush">
-        <li class="list-group-item d-flex justify-content-between">
-            {{ form.name.errors }}
-            <label>{{ form.name.label }}</label>
-            {{ form.name }}
-        </li>
+    <div class="card">
+        <div class="card-body">
+            <h3>Новое контактное лицо лида</h3>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item d-flex justify-content-between">
+                <div>
+                    {{ form.name.errors }}
+                    <label>{{ form.name.label }}</label>
+                    {{ form.name }}
+                </div>
 
-        <li class="list-group-item d-flex justify-content-between">
-            {{ form.second_name.errors }}
-            <label>{{ form.second_name.label }}</label>
-            {{ form.second_name }}
-        </li>
+                <div>
+                    {{ form.second_name.errors }}
+                    <label>{{ form.second_name.label }}</label>
+                    {{ form.second_name }}
+                </div>
 
-        <li class="list-group-item d-flex justify-content-between">
-            {{ form.last_name.errors }}
-            <label>{{ form.last_name.label }}</label>
-            {{ form.last_name }}
-        </li>
+                <div>
+                    {{ form.last_name.errors }}
+                    <label>{{ form.last_name.label }}</label>
+                    {{ form.last_name }}
+                </div>
+            </li>
 
-        <li class="list-group-item d-flex justify-content-between">
-            {{ form.position.errors }}
-            <label>{{ form.position.label }}</label>
-            {{ form.position }}
-        </li>
+            <li class="list-group-item d-flex justify-content-between">
+                <div>
+                    {{ form.position.errors }}
+                    <label>{{ form.position.label }}</label>
+                    {{ form.position }}
+                </div>
 
-        <li class="list-group-item d-flex justify-content-between">
-            {{ form.lead.errors }}
-            <label>{{ form.lead.label }}</label>
-            {{ form.lead }}
-        </li>
+                <div>
+                    {{ form.lead.errors }}
+                    <label>{{ form.lead.label }}</label>
+                    {{ form.lead }}
+                </div>
 
-        <li class="list-group-item d-flex justify-content-between">
-            {{ form.tag.errors }}
-            <label>{{ form.tag.label }}</label>
-            {{ form.tag }}
-        </li>
-    </ul>
-
+                <div>
+                    {{ form.tag.errors }}
+                    <label>{{ form.tag.label }}</label>
+                    {{ form.tag }}
+                </div>
+            </li>
+        </ul>
+    </div>
     <table class="table" id="contact-form-wrapper">
         {{ formset.management_form }}
         <thead>

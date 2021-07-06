@@ -21,7 +21,7 @@ class UserAccountView(LoginRequiredMixin, TemplateView):
         context = super(UserAccountView, self).get_context_data(**kwargs)
         try:
             worker = Worker.objects.get(user=kwargs.get('pk'))
-            if worker:
-                context['worker'] = worker
+            context['worker'] = worker
         except ObjectDoesNotExist:
-            return context
+            context['worker'] = None
+        return context
