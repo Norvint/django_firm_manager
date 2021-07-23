@@ -4,9 +4,9 @@ from app_documents.views import DeliveryConditionsDetailView, DeliveryConditions
     ContractDetailView, ContractListView, ContractTypeDetailView, ContractTypeListView, CurrencyDetailView, \
     CurrencyListView, OrderCreateView, OrderBookingCreateView, OrderDetailView, OrderListView, \
     PaymentConditionsListView, OrderBookingDeleteView, OrderBookingEditView, \
-    ContractToDeleteView, OrderToDeleteView, CurrencyUpdate, ContractEditView, OrderWithoutContractListView, \
-    OrderWithoutContractCreateView, OrderWCDetailView, OrderWithoutContractToDeleteView, \
-    OrderWithoutContractBookingDeleteView, OrderWCBookingEditView, OrderWCBookingCreateView, \
+    ContractToDeleteView, OrderToDeleteView, CurrencyUpdate, ContractEditView, OrderWCListView, \
+    OrderWCCreateView, OrderWCDetailView, OrderWCToDeleteView, \
+    OrderWCBookingDeleteView, OrderWCBookingEditView, OrderWCBookingCreateView, \
     OrderEditView
 
 # contracts
@@ -54,9 +54,9 @@ urlpatterns += [
 
 # orders without contract
 urlpatterns += [
-    path('orders-without-contract/', OrderWithoutContractListView.as_view(), name='orders_without_contract_list'),
+    path('orders-without-contract/', OrderWCListView.as_view(), name='orders_without_contract_list'),
     path('orders-without-contract/create-order/<int:contractor_id>',
-         OrderWithoutContractCreateView.as_view(),
+         OrderWCCreateView.as_view(),
          name='order_without_contract_create'),
     path('orders-without-contract/<int:pk>', OrderWCDetailView.as_view(),
          name='order_without_contract_detail'),
@@ -64,12 +64,12 @@ urlpatterns += [
          OrderWCBookingCreateView.as_view(),
          name='order_without_contract_booking'),
     path('orders-without-contract/bookings/<int:order_without_contract_booking_id>/delete',
-         OrderWithoutContractBookingDeleteView.as_view(),
+         OrderWCBookingDeleteView.as_view(),
          name='order_without_contract_booking_delete'),
     path('orders-without-contract/bookings/<int:order_without_contract_booking_id>/edit',
          OrderWCBookingEditView.as_view(),
          name='order_without_contract_booking_edit'),
-    path('orders-without-contract/<int:pk>/to-delete/', OrderWithoutContractToDeleteView.as_view(),
+    path('orders-without-contract/<int:pk>/to-delete/', OrderWCToDeleteView.as_view(),
          name='order_without_contract_to_delete'),
     path('orders-without-contract/<int:pk>/download-upd/', OrderWCDetailView.download_upd,
          name='download_upd_wc'),

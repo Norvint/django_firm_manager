@@ -162,11 +162,7 @@ class ProductStoreOutcomeCreateView(LoginRequiredMixin, TemplateView):
                                                                       product=form_data['product'])
                     if outcome_form.is_valid():
                         if form_data['quantity'] <= product_on_store.quantity:
-                            product_store_outcome = ProductStoreOutcome(store=form_data['store'],
-                                                                        product=form_data['product'],
-                                                                        quantity=form_data['quantity'],
-                                                                        responsible=request.user,
-                                                                        reason=form_data['reason'],
+                            product_store_outcome = ProductStoreOutcome(**form_data, responsible=request.user,
                                                                         comment=form.cleaned_data['comment'])
                             product_store_outcome.save()
                             product_on_store.quantity -= form_data['quantity']

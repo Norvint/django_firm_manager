@@ -44,7 +44,7 @@ class ContractorForm(forms.ModelForm):
     class Meta:
         model = Contractor
         widgets = {
-            'requisites': forms.Textarea(attrs={'rows': 5, 'cols': 80}),
+            'requisites': forms.Textarea(attrs={'rows': 3, 'cols': 80}),
         }
         exclude = ['to_delete', 'responsible']
 

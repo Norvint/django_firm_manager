@@ -54,11 +54,12 @@ class ContractCreator:
                 'requisites_en': self.contract.organization.requisites_en,
                 'position': self.get_position(),
                 'position_en': self.contract.organization.position_en,
+                'initials': self.get_organization_initials(),
             },
             'currency': {
                 'title': self.contract.currency.title,
                 'char_code': self.contract.currency.char_code,
-            }
+            },
         }
         doc.render(context)
         doc.save(self.output_file_path)
@@ -71,6 +72,9 @@ class ContractCreator:
 
     def get_contractor_initials(self):
         return f'{self.contract.contractor.name[:1]}. {self.contract.contractor.second_name[:1]}.'
+
+    def get_organization_initials(self):
+        return f'{self.contract.organization.name[:1]}. {self.contract.organization.second_name[:1]}.'
 
     def get_created_year(self):
         created_year = self.contract.created.strftime('%Y')

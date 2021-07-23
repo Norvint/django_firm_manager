@@ -21,7 +21,19 @@
 </div>
 
 <h1>Заказы</h1>
-<a href="{% url 'order_create' 0 contractor_id %}" class="btn btn-primary mb-3">Добавить заказ</a>
+<div class="dropdown">
+  <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+    Добавить
+  </a>
+
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+    <li><a class="dropdown-item" href="{% url 'order_create' 0 contractor_id %}">Заказ</a></li>
+
+    <li>
+        <a class="dropdown-item" href="{% url 'order_without_contract_create' contractor_id %}">Заказ без договора</a>
+    </li>
+  </ul>
+</div>
 {% if orders %}
 <table class="table table-striped">
     <thead>

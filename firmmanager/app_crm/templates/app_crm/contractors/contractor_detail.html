@@ -44,26 +44,26 @@
 <div class="card col-12">
     <ul class="list-group list-group-horizontal">
         <li class="list-group-item">
-            <a href="{% url 'contractor_edit' object.id %}" class="btn btn-primary">Редактировать</a>
+            <a href="{% url 'contractor_edit' object.id %}" class="btn btn-outline-dark">Редактировать</a>
         </li>
         {% if contractor.to_delete %}
         <li class="list-group-item">
-            <a href="{% url 'contractor_to_delete' object.id %}" class="btn btn-danger">Снять пометку на удаление</a>
+            <a href="{% url 'contractor_to_delete' object.id %}" class="btn btn-outline-danger">Снять пометку на удаление</a>
         </li>
         {% else %}
         <li class="list-group-item">
-            <a href="{% url 'contractor_to_delete' object.id %}" class="btn btn-danger">Пометить на удаление</a>
+            <a href="{% url 'contractor_to_delete' object.id %}" class="btn btn-outline-danger">Пометить на удаление</a>
         </li>
         {% endif %}
 
         {% ifequal "Россия" object.country %}
         <li class="list-group-item">
             {% if requisites %}
-            <a href="{% url 'contractor_requisites_edit' object.id requisites.id %}" class="btn btn-primary">
+            <a href="{% url 'contractor_requisites_edit' object.id requisites.id %}" class="btn btn-outline-dark">
                 Редактировать реквизиты
             </a>
             {% else %}
-            <a href="{% url 'contractor_requisites_create' object.id %}" class="btn btn-primary">
+            <a href="{% url 'contractor_requisites_create' object.id %}" class="btn btn-outline-dark">
                 Добавить реквизиты
             </a>
             {% endif %}

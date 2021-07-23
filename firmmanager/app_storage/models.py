@@ -152,7 +152,11 @@ class ProductStoreOrderBooking(models.Model):
     total_price = models.DecimalField('Итоговая цена', decimal_places=2, max_digits=18, null=True, blank=True)
     standard_price = models.DecimalField('Стандартная цена', decimal_places=2, max_digits=18, null=True, blank=True)
     counted_sum = models.DecimalField('Расчетная сумма', decimal_places=2, max_digits=18, null=True, blank=True)
+    currency_counted_sum = models.DecimalField('Расчетная сумма в валюте', decimal_places=2, max_digits=18,
+                                               null=True, blank=True)
     total_sum = models.DecimalField('Итоговая сумма', decimal_places=2, max_digits=18, null=True, blank=True)
+    currency_total_sum = models.DecimalField('Итоговая сумма в валюте', decimal_places=2, max_digits=18,
+                                             null=True, blank=True)
 
     class Meta:
         verbose_name = 'Бронь продукции по заказу'

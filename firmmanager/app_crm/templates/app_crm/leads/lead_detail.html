@@ -17,7 +17,7 @@
         </a>
         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
             {% ifnotequal object.status.title 'Конвертирован' %}
-            <li><a class="dropdown-item" href="{% url 'lead_contractor_create' object.id %}">Конвертированый</a></li>
+            <li><a class="dropdown-item" href="{% url 'lead_contractor_create' object.id %}">Перевсти в контрагенты</a></li>
             {% endifnotequal %}
 
             {% ifnotequal object.status.title 'Некачественный' %}

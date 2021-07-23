@@ -53,7 +53,8 @@ class UpdCreator:
                 'day': datetime.now().day,
                 'month': self.get_russian_month(datetime.now().month),
                 'year': datetime.now().year,
-            }
+            },
+            'shipping_document': self.get_shipping_document(),
         }
         for i, booked_product in enumerate(ProductStoreOrderBooking.objects.all().filter(order=self.order)):
             context['booked_products'].append({
@@ -102,6 +103,13 @@ class UpdCreator:
         requisites = ContractorRequisites.objects.get(contractor=self.order.contract.contractor)
         return f'{requisites.tin}/{requisites.kpp}'
 
+    def get_shipping_document(self):
+        products = len(ProductStoreOrderBooking.objects.all().filter(order=self.order))
+        if products == 1:
+            return f'№ п/п 1 № {self.order.id} от {self.order.created}'
+        else:
+            return f'№ п/п 1-{products} № {self.order.id} от {self.order.created}'
+
 
 class UpdWithoutContractCreator:
     BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
@@ -148,7 +156,8 @@ class UpdWithoutContractCreator:
                 'day': datetime.now().day,
                 'month': self.get_russian_month(datetime.now().month),
                 'year': datetime.now().year,
-            }
+            },
+            'shipping_document': self.get_shipping_document(),
         }
         for i, booked_product in enumerate(ProductStoreOrderWCBooking.objects.all().filter(
                 order=self.order)):
@@ -197,3 +206,10 @@ class UpdWithoutContractCreator:
     def get_contractor_tin_and_kpp(self):
         requisites = ContractorRequisites.objects.get(contractor=self.order.contractor)
         return f'{requisites.tin}/{requisites.kpp}'
+
+    def get_shipping_document(self):
+        products = len(ProductStoreOrderWCBooking.objects.all().filter(order=self.order))
+        if products == 1:
+            return f'№ п/п 1 № {self.order.id} от {self.order.created}'
+        else:
+            return f'№ п/п 1-{products} № {self.order.id} от {self.order.created}'

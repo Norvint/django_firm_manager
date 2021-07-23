@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.forms import formset_factory
+from django.forms import formset_factory, model_to_dict
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.views import View
@@ -99,7 +99,14 @@ class ContractDetailView(LoginRequiredMixin, DetailView):
     def download_contract(request, **kwargs):
         contract = Contract.objects.get(pk=kwargs.get('pk'))
         if contract:
-            template_path = os.path.join('foreign', 'contract_template.docx')
+            if contract.type.title == 'Экскл. Дистриб-во (Экспорт)':
+                template_path = os.path.join('foreign', 'contract_template_distr_export.docx')
+            elif contract.type.title == 'Поставка (Косвенный Реэкспорт)':
+                template_path = os.path.join('foreign', 'contract_template.docx')
+            elif contract.type.title == 'Экскл. Дистриб-во (Косв. Реэкспорт)':
+                template_path = os.path.join('foreign', 'contract_template_distr_reexport.docx')
+            elif contract.type.title == 'Поставка (Экспорт)':
+                template_path = os.path.join('foreign', 'contract_template_export.docx')
             contract_creator = ContractCreator(contract, template_path)
             contract_creator.create_contract()
             fl_path = os.path.join(BASE_DIR, 'static', 'app_documents', 'tmp', 'contract.docx')
@@ -252,11 +259,9 @@ class OrderCreateView(LoginRequiredMixin, TemplateView):
                             product_on_store.book_product(quantity=data['quantity'])
                             product_on_store.save()
                             product_booking = ProductStoreOrderBooking(
-                                order=order, product=data['product'], store=data['store'], quantity=data['quantity'],
-                                counted_sum=int(data['quantity']) * data['product'].cost,
-                                total_price=data['product'].cost,
-                                total_sum=int(data['quantity']) * data['product'].cost,
-                                standard_price=data['product'].cost)
+                                **data, order=order, counted_sum=int(data['quantity']) * data['product'].cost,
+                                total_price=data['product'].cost, standard_price=data['product'].cost,
+                                total_sum=int(data['quantity']) * data['product'].cost)
                             product_booking.save()
                         else:
                             context['formset'] = formset
@@ -345,7 +350,10 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
 
     def download_upd(request, **kwargs):
         order = Order.objects.get(pk=kwargs.get('pk'))
-        template_path = os.path.join('russian', 'upd_template.docx')
+        if order.created.year == 2021 and order.created.month < 7:
+            template_path = os.path.join('russian', 'upd_template.docx')
+        else:
+            template_path = os.path.join('russian', 'upd_template_2021.docx')
         upd_creator = UpdCreator(order, template_path)
         upd_creator.create_upd()
         fl_path = os.path.join(BASE_DIR, 'static', 'app_documents', 'tmp', 'upd.docx')
@@ -363,15 +371,10 @@ class OrderEditView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(OrderEditView, self).get_context_data(**kwargs)
         order = Order.objects.get(pk=kwargs.get('pk'))
-        product_booking_data = [{'product': product_booking.product, 'store': product_booking.store,
-                                 'quantity': product_booking.quantity} for product_booking in order.orders_bookings.all()]
+        product_booking_data = [{**model_to_dict(product_booking)} for product_booking in order.orders_bookings.all()]
         product_store_book_formset = formset_factory(OrderBookingForm)
         context['formset'] = product_store_book_formset(initial=product_booking_data)
-        context['form'] = OrderForm(initial={'number': order.number, 'contract': order.contract,
-                                             'delivery_conditions': order.delivery_conditions,
-                                             'delivery_time': order.delivery_time,
-                                             'delivery_address': order.delivery_address,
-                                             'payment_conditions': order.payment_conditions})
+        context['form'] = OrderForm(initial={**model_to_dict(order)})
         return context
 
     def post(self, request, *args, **kwargs):
@@ -511,11 +514,7 @@ class OrderBookingEditView(LoginRequiredMixin, TemplateView):
         context = super(OrderBookingEditView, self).get_context_data(**kwargs)
         object = ProductStoreOrderBooking.objects.get(pk=kwargs.get('order_booking_id'))
         context['order_booking'] = object
-        context['form'] = BookingEditForm(initial={'order': object.order,
-                                                   'product': object.product,
-                                                   'store': object.store,
-                                                   'quantity': object.quantity,
-                                                   'total_price': object.total_price})
+        context['form'] = BookingEditForm(initial={**model_to_dict(object)})
         return context
 
     def post(self, request, *args, **kwargs):
@@ -543,13 +542,13 @@ class OrderBookingEditView(LoginRequiredMixin, TemplateView):
         return self.render_to_response(context)
 
 
-class OrderWithoutContractListView(LoginRequiredMixin, ListView):
+class OrderWCListView(LoginRequiredMixin, ListView):
     template_name = 'app_documents/orders_without_contract/orders_list.html'
     queryset = OrderWithoutContract.objects.all()
     context_object_name = 'orders'
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        context = super(OrderWithoutContractListView, self).get_context_data(**kwargs)
+        context = super(OrderWCListView, self).get_context_data(**kwargs)
         filter_data = OrderWithoutContractFilterForm()
         context['filter'] = filter_data
         return context
@@ -572,11 +571,11 @@ class OrderWithoutContractListView(LoginRequiredMixin, ListView):
         return self.render_to_response(context)
 
 
-class OrderWithoutContractCreateView(LoginRequiredMixin, TemplateView):
+class OrderWCCreateView(LoginRequiredMixin, TemplateView):
     template_name = 'app_documents/orders_without_contract/order_create.html'
 
     def get_context_data(self, **kwargs):
-        context = super(OrderWithoutContractCreateView, self).get_context_data(**kwargs)
+        context = super(OrderWCCreateView, self).get_context_data(**kwargs)
         number = 'Генерируется автоматически'
         contractor = kwargs.get('contractor_id')
         if contractor:
@@ -656,7 +655,10 @@ class OrderWCDetailView(LoginRequiredMixin, DetailView):
 
     def download_upd(request, **kwargs):
         order = OrderWithoutContract.objects.get(pk=kwargs.get('pk'))
-        template_path = os.path.join('russian', 'upd_template.docx')
+        if order.created.year == 2021 and order.created.month < 7:
+            template_path = os.path.join('russian', 'upd_template.docx')
+        else:
+            template_path = os.path.join('russian', 'upd_template_2021.docx')
         upd_creator = UpdWithoutContractCreator(order, template_path)
         upd_creator.create_upd()
         fl_path = os.path.join(BASE_DIR, 'static', 'app_documents', 'tmp', 'upd.docx')
@@ -684,7 +686,7 @@ class OrderWCDetailView(LoginRequiredMixin, DetailView):
         return response
 
 
-class OrderWithoutContractToDeleteView(LoginRequiredMixin, View):
+class OrderWCToDeleteView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         obj = OrderWithoutContract.objects.get(pk=kwargs.get('pk'))
@@ -697,7 +699,7 @@ class OrderWithoutContractToDeleteView(LoginRequiredMixin, View):
             return redirect('order_without_contract_detail', pk=kwargs.get('pk'))
 
 
-class OrderWithoutContractBookingDeleteView(LoginRequiredMixin, DeleteView):
+class OrderWCBookingDeleteView(LoginRequiredMixin, DeleteView):
 
     def get(self, request, *args, **kwargs):
         obj = ProductStoreOrderWCBooking.objects.get(pk=kwargs.get('order_booking_id'))
@@ -719,18 +721,14 @@ class OrderWCBookingEditView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(OrderWCBookingEditView, self).get_context_data(**kwargs)
         object = ProductStoreOrderWCBooking.objects.get(pk=kwargs.get('order_without_contract_booking_id'))
-        form = OrderWithoutContractBookingEditForm(initial={
-            'order': object.order, 'product': object.product, 'store': object.store, 'quantity': object.quantity,
-            'total_price': object.total_price})
         context['order_booking'] = object
-        context['form'] = form
+        context['form'] = OrderWithoutContractBookingEditForm(initial={**model_to_dict(object)})
         return context
 
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
         form = OrderWithoutContractBookingEditForm(request.POST)
-        product_booking = ProductStoreOrderWCBooking.objects.get(
-            pk=kwargs.get('order_without_contract_booking_id'))
+        product_booking = ProductStoreOrderWCBooking.objects.get(pk=kwargs.get('order_without_contract_booking_id'))
         order = product_booking.order
         if form.is_valid():
             data = form.cleaned_data

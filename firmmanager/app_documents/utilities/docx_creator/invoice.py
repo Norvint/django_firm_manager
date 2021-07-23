@@ -81,7 +81,7 @@ class InvoiceCreator:
             },
             'currency_total_sum': round(self.order.total_sum * (
                     self.order.contract.currency.nominal / self.order.contract.currency.cost), 1),
-            'booked_products': []
+            'booked_products': [],
         }
         for i, booked_product in enumerate(ProductStoreOrderBooking.objects.all().filter(order=self.order)):
             context['booked_products'].append({
@@ -154,6 +154,7 @@ class RussianInvoiceCreator:
             'currency_total_sum': round(self.order.total_sum * (
                     self.order.contract.currency.nominal / self.order.contract.currency.cost), 2),
             'booked_products': [],
+            'foreign_payment_condition': self.get_foreign_payment_condition(),
             'date': {
                 'day': datetime.now().day,
                 'month': self.get_russian_month(datetime.now().month),
@@ -186,6 +187,12 @@ class RussianInvoiceCreator:
     def get_contractor_requisites(self):
         requisites = ContractorRequisites.objects.get(contractor=self.order.contract.contractor)
         return requisites
+
+    def get_foreign_payment_condition(self):
+        if self.order.contract.currency.char_code != 'RUB':
+            return 'Оплата производится в Российских Рублях по курсу ЦБ на день оплаты.'
+        else:
+            return ''
 
     def get_total_sum_ru(self):
         total_sum_rus = num2words(int(self.order.total_sum * (
@@ -238,6 +245,7 @@ class RussianInvoiceWCCreator:
             'currency_total_sum': round(self.order.total_sum * (
                     self.order.currency.nominal / self.order.currency.cost), 2),
             'booked_products': [],
+            'foreign_payment_condition': self.get_foreign_payment_condition(),
             'date': {
                 'day': datetime.now().day,
                 'month': self.get_russian_month(datetime.now().month),
@@ -267,6 +275,12 @@ class RussianInvoiceWCCreator:
         russian_months = {1: 'Января', 2: 'Ферваля', 3: 'Марта', 4: 'Апреля', 5: 'Мая', 6: 'Июня',
                           7: 'Июля', 8: 'Августа', 9: 'Сентября', 10: 'Октрября', 11: 'Ноября', 12: 'Декабря'}
         return russian_months[month]
+
+    def get_foreign_payment_condition(self):
+        if self.order.contract.currency.char_code != 'RUB':
+            return 'Оплата производится в Российских Рублях по курсу ЦБ на день оплаты.'
+        else:
+            return ''
 
     def get_contractor_requisites(self):
         requisites = ContractorRequisites.objects.get(contractor=self.order.contractor)

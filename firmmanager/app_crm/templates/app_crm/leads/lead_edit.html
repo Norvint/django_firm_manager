@@ -80,6 +80,14 @@
                 </div>
 
                 <div>
+                    {{ form.city.errors }}
+                    <label class="">
+                        {{ form.city.label }}
+                    </label>
+                    {{ form.city }}
+                </div>
+
+                <div>
                     {{ form.purpose.errors }}
                     <label class="fw-bold">
                         {{ form.purpose.label }}

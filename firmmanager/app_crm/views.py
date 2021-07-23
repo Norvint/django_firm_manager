@@ -13,10 +13,9 @@ from app_crm.forms import ContractorFilterForm, ContractorCommentForm, Contracto
     ContractorFileForm, LeadFilterForm, LeadCommentForm, LeadForm, LeadContactPersonForm, ContractorRequisitesForm, \
     LeadContactForm
 from app_crm.models import Contractor, ContractorComment, ContractorContactPersonContact, ContractorContactPerson, \
-    ContractorFile, ContractorFileCategory, Lead, LeadComment, LeadContactPerson, LeadContactPersonContact, LeadStatus, \
+    ContractorFile, ContractorFileCategory, Lead, LeadComment, LeadContactPerson, LeadContactPersonContact, LeadStatus,\
     ContractorRequisites, LeadContact
 from app_documents.models import Contract, Order
-from firmmanager import settings
 
 
 class ContractorListView(LoginRequiredMixin, ListView):
@@ -149,12 +148,13 @@ class ContractorEditView(LoginRequiredMixin, TemplateView):
         context = super(ContractorEditView, self).get_context_data(**kwargs)
         contractor = Contractor.objects.get(pk=kwargs.get('contractor_id'))
         form = ContractorForm(initial={
-            'title': contractor.title, 'status': contractor.status, 'type_of_contractor': contractor.type_of_contractor,
-            'field_of_activity': contractor.field_of_activity, 'position': contractor.position,
-            'position_en': contractor.position_en, 'appeal': contractor.appeal, 'appeal_en': contractor.appeal_en,
-            'name': contractor.name, 'second_name': contractor.second_name, 'last_name': contractor.last_name,
-            'country': contractor.country, 'tel': contractor.tel, 'legal_address': contractor.legal_address,
-            'actual_address': contractor.actual_address, 'requisites': contractor.requisites, 'tag': contractor.tag})
+            'title': contractor.title, 'work_title': contractor.work_title, 'status': contractor.status,
+            'type_of_contractor': contractor.type_of_contractor, 'field_of_activity': contractor.field_of_activity,
+            'position': contractor.position, 'position_en': contractor.position_en, 'appeal': contractor.appeal,
+            'appeal_en': contractor.appeal_en, 'name': contractor.name, 'second_name': contractor.second_name,
+            'last_name': contractor.last_name, 'country': contractor.country, 'tel': contractor.tel,
+            'legal_address': contractor.legal_address, 'actual_address': contractor.actual_address,
+            'requisites': contractor.requisites, 'tag': contractor.tag, 'city': contractor.city})
         context['form'] = form
         return context
 
@@ -163,11 +163,11 @@ class ContractorEditView(LoginRequiredMixin, TemplateView):
         form = ContractorForm(request.POST)
         if form.is_valid():
             contractor = Contractor.objects.filter(pk=kwargs.get('contractor_id')).update(
-                title=form.cleaned_data['title'], status=form.cleaned_data['status'],
-                type_of_contractor=form.cleaned_data['type_of_contractor'],
+                title=form.cleaned_data['title'], work_title=form.cleaned_data['work_title'],
+                status=form.cleaned_data['status'], type_of_contractor=form.cleaned_data['type_of_contractor'],
                 field_of_activity=form.cleaned_data['field_of_activity'], position=form.cleaned_data['position'],
                 position_en=form.cleaned_data['position_en'], appeal=form.cleaned_data['appeal'],
-                appeal_en=form.cleaned_data['appeal_en'], name=form.cleaned_data['name'],
+                appeal_en=form.cleaned_data['appeal_en'], name=form.cleaned_data['name'], city=form.cleaned_data['city'],
                 second_name=form.cleaned_data['second_name'], last_name=form.cleaned_data['last_name'],
                 country=form.cleaned_data['country'], tel=form.cleaned_data['tel'],
                 legal_address=form.cleaned_data['legal_address'], actual_address=form.cleaned_data['actual_address'],
@@ -544,7 +544,7 @@ class LeadEditView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(LeadEditView, self).get_context_data(**kwargs)
         lead = Lead.objects.get(pk=kwargs.get('pk'))
-        form = LeadForm(initial={'title': lead.title, 'status': lead.status,
+        form = LeadForm(initial={'title': lead.title, 'status': lead.status, 'city': lead.city,
                                  'field_of_activity': lead.field_of_activity, 'position': lead.position,
                                  'name': lead.name, 'second_name': lead.second_name, 'last_name': lead.last_name,
                                  'country': lead.country, 'purpose': lead.purpose, 'tag': lead.tag})
@@ -563,7 +563,7 @@ class LeadEditView(LoginRequiredMixin, TemplateView):
         formset = lead_contact_formset(request.POST)
         if form.is_valid() and formset.is_valid():
             leads = Lead.objects.filter(pk=kwargs.get('pk')).update(
-                title=form.cleaned_data['title'], status=form.cleaned_data['status'],
+                title=form.cleaned_data['title'], status=form.cleaned_data['status'], city=form.cleaned_data['city'],
                 field_of_activity=form.cleaned_data['field_of_activity'], position=form.cleaned_data['position'],
                 name=form.cleaned_data['name'], second_name=form.cleaned_data['second_name'],
                 last_name=form.cleaned_data['last_name'], country=form.cleaned_data['country'],
@@ -789,12 +789,7 @@ class LeadStatusSubstandard(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         obj = Lead.objects.get(pk=kwargs.get('pk'))
         if obj:
-            try:
-                new_lead_status = LeadStatus.objects.get(title__icontains='Некачественный')
-            except ObjectDoesNotExist:
-                new_lead_status = LeadStatus(title='Некачественный',
-                                             description='Нет смысла продаолжать работу с лидом').save()
-            obj.status = new_lead_status
+            obj.status = LeadStatus.objects.get(title__icontains='Некачественный')
             obj.save()
             return redirect('lead_detail', pk=kwargs.get('pk'))
 
@@ -804,11 +799,6 @@ class LeadStatusDeferred(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         obj = Lead.objects.get(pk=kwargs.get('pk'))
         if obj:
-            try:
-                new_lead_status = LeadStatus.objects.get(title__icontains='Отложенный')
-            except ObjectDoesNotExist:
-                new_lead_status = LeadStatus(title='Отложенный',
-                                             description='Работа с лидом отложена на некоторое время').save()
-            obj.status = new_lead_status
+            obj.status = LeadStatus.objects.get(title__icontains='Отложенный')
             obj.save()
             return redirect('lead_detail', pk=kwargs.get('pk'))

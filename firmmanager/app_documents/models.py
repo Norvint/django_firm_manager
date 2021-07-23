@@ -100,7 +100,9 @@ class Order(models.Model):
     shipment_mark = models.ForeignKey(ShipmentMark, on_delete=models.CASCADE, verbose_name='Отгрузочная метка',
                                       blank=True, null=True)
     counted_sum = models.DecimalField('Расчетная сумма', max_digits=20, decimal_places=4, default=0)
+    currency_counted_sum = models.DecimalField('Расчетная сумма в валюте', max_digits=20, decimal_places=2, default=0)
     total_sum = models.DecimalField('Итоговая сумма', max_digits=20, decimal_places=4, default=0)
+    currency_total_sum = models.DecimalField('Итоговая сумма в валюте', max_digits=20, decimal_places=2, default=0)
     to_delete = models.BooleanField('К удалению', default=False)
     responsible = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 

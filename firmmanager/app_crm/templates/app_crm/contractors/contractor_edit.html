@@ -33,6 +33,14 @@
                     </li>
 
                     <li class="list-group-item d-flex justify-content-between">
+                        {{ form.work_title.errors }}
+                        <label>
+                            {{ form.work_title.label }}
+                        </label>
+                        {{ form.work_title }}
+                    </li>
+
+                    <li class="list-group-item d-flex justify-content-between">
                         {{ form.type_of_contractor.errors }}
                         <label class="fw-bold">
                             {{ form.type_of_contractor.label }}
@@ -138,6 +146,14 @@
                             {{ form.country.label }}
                         </label>
                         {{ form.country }}
+                    </li>
+
+                    <li class="list-group-item d-flex justify-content-between">
+                        {{ form.city.errors }}
+                        <label class="">
+                            {{ form.city.label }}
+                        </label>
+                        {{ form.city }}
                     </li>
 
                     <li class="list-group-item d-flex justify-content-between">

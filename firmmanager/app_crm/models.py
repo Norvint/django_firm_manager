@@ -43,7 +43,8 @@ class ContractorStatus(models.Model):
 
 
 class Contractor(models.Model):
-    title = models.CharField('Наименование', max_length=150)
+    title = models.CharField('Юр. наименование', max_length=150)
+    work_title = models.CharField('Рабочее наименование', max_length=150, blank=True, null=True)
     status = models.ForeignKey(ContractorStatus, on_delete=models.SET_NULL, null=True, verbose_name='Статус')
     type_of_contractor = models.ForeignKey(TypeOfContractor, on_delete=models.SET_NULL, null=True,
                                            verbose_name='Тип контрагента')
@@ -52,14 +53,15 @@ class Contractor(models.Model):
     position = models.CharField('Должность', max_length=30)
     position_en = models.CharField('Должность(англ)', max_length=30, blank=True)
     appeal = models.CharField('Обращение', max_length=30, default='г-н')
-    appeal_en = models.CharField('Обращение(англ)', max_length=30, default='Mr.', blank=True)
+    appeal_en = models.CharField('Обращение(англ)', max_length=30, default='Mr.', blank=True, null=True)
     name = models.CharField('Имя', max_length=30)
-    second_name = models.CharField('Отчество', max_length=30, blank=True)
+    second_name = models.CharField('Отчество', max_length=30, blank=True, null=True)
     last_name = models.CharField('Фамилия', max_length=30)
     country = models.CharField('Страна', max_length=30)
+    city = models.CharField('Город', max_length=40, null=True, blank=True)
     tel = models.CharField('Основной номер телефона', max_length=20)
     legal_address = models.CharField('Юр. адрес', max_length=200)
-    actual_address = models.CharField('Фактический адрес', max_length=200, blank=True)
+    actual_address = models.CharField('Фактический адрес', max_length=200, blank=True, null=True)
     requisites = models.TextField('Реквизиты', max_length=1000, blank=True, null=True)
     to_delete = models.BooleanField('К удалению', default=False)
     tag = models.CharField('Теги', max_length=1000, blank=True, null=True)
@@ -121,9 +123,9 @@ class ContactPersonContactType(models.Model):
 
 class ContractorContactPerson(models.Model):
     name = models.CharField('Имя', max_length=30)
-    second_name = models.CharField('Отчество', max_length=30, blank=True)
-    last_name = models.CharField('Фамилия', max_length=30)
-    position = models.CharField('Должность', max_length=30)
+    second_name = models.CharField('Отчество', max_length=30, blank=True, null=True)
+    last_name = models.CharField('Фамилия', max_length=30, blank=True, null=True)
+    position = models.CharField('Должность', max_length=30, blank=True, null=True)
     contractor = models.ForeignKey(Contractor, on_delete=models.CASCADE, blank=True, null=True,
                                    verbose_name='Контрагент')
     tag = models.CharField('Теги', max_length=1000, blank=True, null=True)
@@ -187,6 +189,33 @@ class ContractorFile(models.Model):
         return self.title
 
 
+class ContractorContactType(models.Model):
+    title = models.CharField('Название', max_length=100)
+
+    class Meta:
+        verbose_name = 'Тип контакта контрагента'
+        verbose_name_plural = 'Типы контактов контрагента'
+
+    def __str__(self):
+        return self.title
+
+
+class ContractorContact(models.Model):
+    contractor = models.ForeignKey(Contractor, on_delete=models.CASCADE, blank=True, null=True,
+                                   verbose_name='Контрагент', related_name='contractors_contacts',
+                                   related_query_name='contractor_contacts')
+    type_of_contact = models.ForeignKey(ContractorContactType, on_delete=models.CASCADE, verbose_name='Вид контакта',
+                                        blank=True, null=True)
+    contact = models.CharField('Контактные данные', max_length=50, blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'Контакт контрагента'
+        verbose_name_plural = 'Контакты контрагентов'
+
+    def __str__(self):
+        return self.contact
+
+
 class LeadStatus(models.Model):
     title = models.CharField('Название', max_length=50, unique=True)
     description = models.CharField('Описание', max_length=150, blank=True, null=True)
@@ -212,6 +241,7 @@ class Lead(models.Model):
     tag = models.CharField('Теги', max_length=1000, blank=True, null=True)
     responsible = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     country = models.CharField('Страна', max_length=100)
+    city = models.CharField('Город', max_length=40, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Лид'
@@ -264,8 +294,8 @@ class LeadComment(models.Model):
 class LeadContactPerson(models.Model):
     name = models.CharField('Имя', max_length=30)
     second_name = models.CharField('Отчество', max_length=30, blank=True, null=True)
-    last_name = models.CharField('Фамилия', max_length=30)
-    position = models.CharField('Должность', max_length=30)
+    last_name = models.CharField('Фамилия', max_length=30, blank=True, null=True)
+    position = models.CharField('Должность', max_length=30, blank=True, null=True)
     lead = models.ForeignKey(Lead, on_delete=models.CASCADE, blank=True, null=True, verbose_name='Лид')
     tag = models.CharField('Теги', max_length=1000, blank=True, null=True)
     to_delete = models.BooleanField('К удалению', default=False)
