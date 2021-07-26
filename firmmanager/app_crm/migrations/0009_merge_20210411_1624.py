@@ -7,7 +7,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('app_crm', '0008_contractorfile_contractorfilecategory'),
-        ('app_crm', '0003_auto_20210328_2226'),
+        ('app_crm', '0003_auto_20210401_0812'),
     ]
 
     operations = [

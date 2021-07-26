@@ -10,12 +10,12 @@
     </a>
     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
         <li>
-            <a href="{% url 'contractor_detail' contractor_id %}"
+            <a href="{% url 'contractor_detail' pk %}"
                class="dropdown-item">Контрагент</a>
         </li>
 
         <li>
-            <a href="{% url 'contractor_contracts_list' contractor_id %}" class="dropdown-item">Договоры</a>
+            <a href="{% url 'contractor_contracts_list' pk %}" class="dropdown-item">Договоры</a>
         </li>
     </ul>
 </div>
@@ -27,10 +27,10 @@
   </a>
 
   <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-    <li><a class="dropdown-item" href="{% url 'order_create' 0 contractor_id %}">Заказ</a></li>
+    <li><a class="dropdown-item" href="{% url 'order_create' 0 pk %}">Заказ</a></li>
 
     <li>
-        <a class="dropdown-item" href="{% url 'order_without_contract_create' contractor_id %}">Заказ без договора</a>
+        <a class="dropdown-item" href="{% url 'order_without_contract_create' pk %}">Заказ без договора</a>
     </li>
   </ul>
 </div>

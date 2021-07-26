@@ -5,7 +5,7 @@
 {% block content %}
 <h1>Новый файл</h1>
 {{ errors }}
-<form name="organization-file-create-form" method="post" action="{% url 'contractor_file_create' contractor_id %}"
+<form name="organization-file-create-form" method="post" action="{% url 'contractor_file_create' pk %}"
       enctype="multipart/form-data" class="card p-2 col-4 row">
     {% csrf_token %}
     {{ form.as_table }}

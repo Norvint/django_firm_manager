@@ -3,7 +3,7 @@
 {% block title %}{{ object.title }}{% endblock %}
 
 {% block content %}
-<form action="{% url 'contractor_edit' contractor_id %}" method="post" name="contractor-edit">
+<form method="post" name="contractor-edit">
     {% csrf_token %}
     <div class="card col-6 mt-2">
         <div class="card-body">
@@ -188,5 +188,5 @@
         </p>
     </div>
 </form>
-<a href="{% url 'contractor_detail' contractor_id %}" class="mt-2 mb-2 btn btn-primary">Отмена</a>
+<a href="{% url 'contractor_detail' pk %}" class="mt-2 mb-2 btn btn-primary">Отмена</a>
 {% endblock %}

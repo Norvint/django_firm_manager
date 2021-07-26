@@ -10,12 +10,12 @@
     </a>
     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
         <li>
-            <a href="{% url 'contractor_detail' contractor_id %}"
+            <a href="{% url 'contractor_detail' pk %}"
                class="dropdown-item">Контрагент</a>
         </li>
 
         <li>
-            <a href="{% url 'contractor_orders_list' contractor_id %}"
+            <a href="{% url 'contractor_orders_list' pk %}"
                class="dropdown-item">Заказы</a>
         </li>
     </ul>
@@ -23,7 +23,7 @@
 
 <h1>Договоры</h1>
 
-<a href="{% url 'contract_create' contractor_id %}" class="btn btn-primary mb-3">Добавить договор</a>
+<a href="{% url 'contract_create' pk %}" class="btn btn-primary mb-3">Добавить договор</a>
 
 {% if contracts %}
 <table class="table table-striped">
