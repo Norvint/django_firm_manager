@@ -60,7 +60,7 @@ class ContactAdmin(admin.ModelAdmin):
 
 @admin.register(ContractorContactPerson)
 class ContractorContactPersonAdmin(admin.ModelAdmin):
-    list_display = ['contractor', 'last_name', 'name', 'position']
+    list_display = ['pk', 'contractor', 'last_name', 'name', 'position']
 
 
 @admin.register(ContractorFileCategory)

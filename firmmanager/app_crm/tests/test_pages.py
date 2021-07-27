@@ -8,8 +8,11 @@ from app_crm.models import TypeOfContractor, FieldOfActivity, Contractor, Contra
 
 class CRMPagesTests(TestCase):
     def setUp(self) -> None:
+        self.client.force_login(User.objects.get(username='testuser'))
+
+    @classmethod
+    def setUpTestData(cls):
         user = User.objects.create_superuser(username='testuser')
-        self.client.force_login(user)
         contractor_status = ContractorStatus(title='Новый')
         contractor_status.save()
         type_of_contractor = TypeOfContractor(title='Клиент')

@@ -238,8 +238,7 @@
         {% endfor %}
         {% endif %}
     </div>
-    <form class="card d-flex flex-row" name="comment-form" method="post"
-          action="{% url 'contractor_detail' object.id %}">
+    <form class="card d-flex flex-row" name="comment-form" method="post">
         {% csrf_token %}
         {{ comment_form.text.errors }}
         {{ comment_form.text }}

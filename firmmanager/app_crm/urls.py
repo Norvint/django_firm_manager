@@ -20,7 +20,7 @@ urlpatterns = [
             path('to-delete/', ContractorToDeleteView.as_view(), name='contractor_to_delete'),
             path('files/', include([
                 path('list/', ContractorFileList.as_view(), name='contractor_files_list'),
-                path('<int:file_id>/', ContractorFileList.download, name='contractor_file_download'),
+                path('<int:file_pk>/', ContractorFileList.download, name='contractor_file_download'),
                 path('create/', ContractorFileCreate.as_view(), name='contractor_file_create'),
             ])),
             path('comments/<int:comment_pk>/', include([

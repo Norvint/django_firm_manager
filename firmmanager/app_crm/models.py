@@ -177,7 +177,7 @@ class ContractorFile(models.Model):
     contractor = models.ForeignKey(Contractor, on_delete=models.CASCADE, verbose_name='Организация')
     file = models.FileField('Файл', upload_to=UploadToPathAndRename(
         os.path.join(MEDIA_ROOT, 'app_organizations', 'organization_files')), max_length=500)
-    description = models.TextField('Описание', blank=True)
+    description = models.TextField('Описание', blank=True, null=True)
     category = models.ForeignKey(ContractorFileCategory, on_delete=models.CASCADE, verbose_name='Категория')
     created_at = models.DateTimeField('Создан', auto_now_add=True)
 
