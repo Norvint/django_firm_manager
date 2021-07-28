@@ -512,7 +512,7 @@ class OrderBookingEditView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(OrderBookingEditView, self).get_context_data(**kwargs)
-        object = ProductStoreOrderBooking.objects.get(pk=kwargs.get('order_booking_id'))
+        object = ProductStoreOrderBooking.objects.get(pk=kwargs.get('pk'))
         context['order_booking'] = object
         context['form'] = BookingEditForm(initial={**model_to_dict(object)})
         return context
@@ -520,7 +520,7 @@ class OrderBookingEditView(LoginRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
         form = BookingEditForm(request.POST)
-        product_booking = ProductStoreOrderBooking.objects.get(pk=kwargs.get('order_booking_id'))
+        product_booking = ProductStoreOrderBooking.objects.get(pk=kwargs.get('pk'))
         if form.is_valid():
             data = form.cleaned_data
             product_on_store = ProductStore.objects.get(product=product_booking.product, store=product_booking.store)
@@ -720,7 +720,7 @@ class OrderWCBookingEditView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(OrderWCBookingEditView, self).get_context_data(**kwargs)
-        object = ProductStoreOrderWCBooking.objects.get(pk=kwargs.get('order_without_contract_booking_id'))
+        object = ProductStoreOrderWCBooking.objects.get(pk=kwargs.get('pk'))
         context['order_booking'] = object
         context['form'] = OrderWithoutContractBookingEditForm(initial={**model_to_dict(object)})
         return context
@@ -728,7 +728,7 @@ class OrderWCBookingEditView(LoginRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
         form = OrderWithoutContractBookingEditForm(request.POST)
-        product_booking = ProductStoreOrderWCBooking.objects.get(pk=kwargs.get('order_without_contract_booking_id'))
+        product_booking = ProductStoreOrderWCBooking.objects.get(pk=kwargs.get('pk'))
         order = product_booking.order
         if form.is_valid():
             data = form.cleaned_data

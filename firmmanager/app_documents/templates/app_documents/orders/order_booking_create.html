@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<a href="{% url 'order_detail' order_id %}" class="btn btn-primary mt-2 col-3">В карточку заказа</a>
+<a href="{% url 'order_detail' pk %}" class="btn btn-primary mt-2 col-3">В карточку заказа</a>
 <p>
     {{ products_on_store_error }}
 </p>

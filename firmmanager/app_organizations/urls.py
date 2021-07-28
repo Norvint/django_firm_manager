@@ -2,7 +2,7 @@ from django.urls import path
 
 from app_organizations.views import OrganizationCreateView, \
     OrganizationDetailView, OrganizationListView, WorkerCreateView, WorkerDetailView, WorkerListView, WorkerEditView, \
-    OrganizationFileList, download_organization_file, OrganizationFileCreate, OrganizationEditView
+    OrganizationFileList, OrganizationFileCreate, OrganizationEditView
 
 urlpatterns = [
     path('', OrganizationListView.as_view(), name='organizations_list'),
