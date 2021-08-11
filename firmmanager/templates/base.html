@@ -77,8 +77,12 @@
                     </li>
                 </ul>
             </div>
+
             {% if request.user.is_authenticated %}
-            <a href="{% url 'account' request.user.id %}" class="btn btn-secondary">Профиль</a>
+                {% if request.user.cart %}
+                    <a href="{% url 'cart' %}" class="btn btn-outline-dark">Корзина</a>
+                {% endif %}
+            <a href="{% url 'account' %}" class="btn btn-secondary">Профиль</a>
             <span>&nbsp;</span>
             <a href="{% url 'logout' %}" class="btn btn-warning">Выйти</a>
             {% endif %}

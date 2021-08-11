@@ -22,6 +22,7 @@ from app_documents.utilities.docx_creator.specification import SpecificationCrea
 from app_documents.utilities.docx_creator.contract import ContractCreator
 from app_documents.utilities.docx_creator.upd import UpdCreator, UpdWithoutContractCreator
 from app_storage.models import ProductStore, ProductStoreOrderBooking, ProductStoreOrderWCBooking
+from app_users.models import CartProduct
 from firmmanager.settings import BASE_DIR
 
 
@@ -235,9 +236,6 @@ class OrderCreateView(LoginRequiredMixin, TemplateView):
             order_form.fields['contract'].queryset = Contract.objects.all().filter(contractor=contractor)
         else:
             order_form = OrderForm(initial={'number': 'Генерируется автоматически'})
-        product_store_book_form_set = formset_factory(OrderBookingForm)
-        formset = product_store_book_form_set()
-        context['formset'] = formset
         context['form'] = order_form
         return context
 
@@ -245,41 +243,24 @@ class OrderCreateView(LoginRequiredMixin, TemplateView):
         context = self.get_context_data(**kwargs)
         order_form = OrderForm(request.POST)
         product_store_book_form_set = formset_factory(OrderBookingForm)
-        formset = product_store_book_form_set(request.POST)
-        if order_form.is_valid() and formset.is_valid():
+        if order_form.is_valid():
             order = order_form.save(commit=False)
             order.responsible = request.user
             order.save()
-            for i, form in enumerate(formset):
-                data = formset.cleaned_data[i]
-                if form.is_valid() and data != {}:
-                    try:
-                        product_on_store = ProductStore.objects.get(product=data['product'], store=data['store'])
-                        if product_on_store.quantity >= data['quantity']:
-                            product_on_store.book_product(quantity=data['quantity'])
-                            product_on_store.save()
-                            product_booking = ProductStoreOrderBooking(
-                                **data, order=order, counted_sum=int(data['quantity']) * data['product'].cost,
-                                total_price=data['product'].cost, standard_price=data['product'].cost,
-                                total_sum=int(data['quantity']) * data['product'].cost)
-                            product_booking.save()
-                        else:
-                            context['formset'] = formset
-                            context['form'] = order_form
-                            context['products_on_store_error'] = product_on_store.less_then_needed_error(
-                                data['quantity'])
-                            return self.render_to_response(context)
-                    except ProductStore.DoesNotExist:
-                        context['formset'] = formset
-                        context['form'] = order_form
-                        context['products_on_store_error'] = f'На складе {data["store"]} нет продукции {data["product"]}'
-                        return self.render_to_response(context)
+            for product_in_cart in CartProduct.objects.filter(cart=self.request.user.cart):
+                product_in_cart: CartProduct
+                product_booking = ProductStoreOrderBooking(
+                    order=order, counted_sum=product_in_cart.quantity * product_in_cart.product.cost,
+                    store=product_in_cart.store, quantity=product_in_cart.quantity, product=product_in_cart.product,
+                    total_price=product_in_cart.product.cost, standard_price=product_in_cart.product.cost,
+                    total_sum=product_in_cart.quantity * product_in_cart.product.cost)
+                product_booking.save()
+                product_in_cart.delete()
             bookings = ProductStoreOrderBooking.objects.filter(order=order)
             order.recalculate_amounts(bookings)
             order.save()
             return redirect('order_detail', order.id)
         else:
-            context['formset'] = formset
             context['form'] = order_form
         return self.render_to_response(context)
 
@@ -737,7 +718,6 @@ class OrderWCBookingEditView(LoginRequiredMixin, TemplateView):
             if product_on_store.quantity > data['quantity']:
                 product_on_store.book_product(data['quantity'])
                 product_on_store.save()
-                product_booking.order = data['order']
                 product_booking.update_booking(data)
                 product_booking.save()
                 bookings = ProductStoreOrderWCBooking.objects.filter(order=order)

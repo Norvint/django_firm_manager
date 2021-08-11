@@ -166,6 +166,8 @@ class ProductStoreOrderBooking(models.Model):
         return f'{self.product} - {self.store} - {self.quantity}'
 
     def update_booking(self, form_data: dict):
+        if form_data.get('order'):
+            self.order = form_data.get('order')
         if form_data.get('product'):
             self.product = form_data.get('product')
         if form_data.get('store'):

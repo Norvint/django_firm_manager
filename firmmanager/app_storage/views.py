@@ -4,11 +4,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import formset_factory
 from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView, TemplateView
+from django.views.generic.base import View
 
 from app_storage.forms import ProductStoreForm, ProductForm, ProductFilterForm, ProductStoreOutcomeForm, \
     ProductStoreOutcomeAdditionForm
 from app_storage.models import Product, ProductStore, Store, ProductStoreIncome, ProductStoreOutcome, \
     ProductStoreOrderBooking, ProductStoreOrderWCBooking
+from app_users.models import Cart, CartProduct
 
 
 class ProductListView(LoginRequiredMixin, ListView):
@@ -55,6 +57,12 @@ class ProductDetailView(LoginRequiredMixin, DetailView):
         context = self.get_context_data()
         stores_with_product = ProductStore.objects.all().filter(product=self.object)
         context['stores_with_product'] = stores_with_product
+        try:
+            cart = Cart.objects.get(user=self.request.user)
+            products_in_cart = CartProduct.objects.filter(product=self.object, cart=cart)
+            context['products_in_cart'] = products_in_cart
+        except Cart.DoesNotExist:
+            pass
         return self.render_to_response(context)
 
 
@@ -108,7 +116,7 @@ class ProductStoreIncomeCreateView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(ProductStoreIncomeCreateView, self).get_context_data(**kwargs)
         store_income_formset = formset_factory(ProductStoreForm, extra=0)
-        formset = store_income_formset(initial=[{'store': kwargs.get('store_id')}])
+        formset = store_income_formset(initial=[{'store': kwargs.get('pk')}])
         context['formset'] = formset
         return context
 
@@ -143,7 +151,7 @@ class ProductStoreOutcomeCreateView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(ProductStoreOutcomeCreateView, self).get_context_data(**kwargs)
         product_outcome_formset = formset_factory(ProductStoreOutcomeForm, extra=0)
-        formset = product_outcome_formset(initial=[{'store': kwargs.get('store_id')}])
+        formset = product_outcome_formset(initial=[{'store': kwargs.get('pk')}])
         context['formset'] = formset
         form = ProductStoreOutcomeAdditionForm()
         context['form'] = form
@@ -188,7 +196,7 @@ class ProductStoreOutcomeListView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(ProductStoreOutcomeListView, self).get_context_data(**kwargs)
-        store = kwargs.get('store_id')
+        store = kwargs.get('pk')
         if store != 0:
             product_store_outcome_list = ProductStoreOutcome.objects.all().filter(store=store)
             product_store_orders_outcome_list = ProductStoreOrderBooking.objects.all().filter(store=store)
@@ -227,10 +235,59 @@ class ProductStoreIncomeListView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(ProductStoreIncomeListView, self).get_context_data(**kwargs)
-        store = kwargs.get('store_id')
+        store = kwargs.get('pk')
         if store != 0:
             product_store_income_list = ProductStoreIncome.objects.all().filter(store=store)
         else:
             product_store_income_list = ProductStoreIncome.objects.all()
         context['product_store_income_list'] = product_store_income_list
         return context
+
+
+class AddProductToCart(LoginRequiredMixin, View):
+
+    def post(self, request, *args, **kwargs):
+        product = Product.objects.get(pk=kwargs.get('pk'))
+        store = Store.objects.get(pk=kwargs.get('store_pk'))
+        cart = Cart.objects.get(user=self.request.user)
+        product_in_store = ProductStore.objects.get(store=store, product=product)
+        try:
+            item_in_cart = CartProduct.objects.get(cart=cart, store=store, product=product)
+            item_in_cart.quantity += 1
+            item_in_cart.save()
+        except CartProduct.DoesNotExist:
+            CartProduct.objects.create(product=product, store=store, cart=cart, quantity=1)
+        product_in_store.quantity -= 1
+        product_in_store.save()
+        cart.total_sum += product.cost
+        cart.items += 1
+        cart.save()
+        if cart != 0:
+            return redirect('cart')
+        else:
+            return redirect('product_detail', product.pk)
+
+
+class DismissProductFromCart(LoginRequiredMixin, View):
+
+    def post(self, request, *args, **kwargs):
+        product = Product.objects.get(pk=kwargs.get('pk'))
+        store = Store.objects.get(pk=kwargs.get('store_pk'))
+        cart = Cart.objects.get(user=self.request.user)
+        product_in_store = ProductStore.objects.get(store=store, product=product)
+        item_in_cart = CartProduct.objects.get(cart=cart, store=store, product=product)
+        item_in_cart.quantity -= 1
+        if item_in_cart.quantity == 0:
+            item_in_cart.delete()
+        else:
+            item_in_cart.save()
+        product_in_store.quantity += 1
+        product_in_store.save()
+        cart.total_sum -= product.cost
+        cart.items -= 1
+        cart.save()
+        cart = kwargs.get('cart_pk')
+        if cart != 0:
+            return redirect('cart')
+        else:
+            return redirect('product_detail', product.pk)

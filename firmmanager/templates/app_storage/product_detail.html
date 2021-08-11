@@ -66,6 +66,7 @@
             <th scope="col">Склад</th>
             <th scope="col">Свободно на складе</th>
             <th scope="col">Забронировано на складе</th>
+            <th scope="col">Добавить в корзину</th>
         </tr>
         </thead>
         <tbody>
@@ -78,6 +79,45 @@
             </td>
             <td>{{ store_with_product.quantity }}</td>
             <td>{{ store_with_product.booked }}</td>
+            <td>
+                <form action="{% url 'add_product_to_cart' object.pk store_with_product.store.pk 0 %}" method="post">
+                    {% csrf_token %}
+                    <input class="btn btn-outline-success" type="submit" name="add" value="+" />
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+{% if products_in_cart %}
+<div class="border rounded mt-2">
+    <h3 class="ps-2 pt-2">В корзине</h3>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">Склад</th>
+            <th scope="col">Количество</th>
+            <th scope="col">Убрать</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for product_in_cart in products_in_cart %}
+        <tr>
+            <td>
+                <a href="{% url 'store_detail' product_in_cart.store.id %}" class="text-reset">
+                    {{ product_in_cart.store }}
+                </a>
+            </td>
+            <td>{{ product_in_cart.quantity }}</td>
+            <td>
+                <form action="{% url 'dismiss_product_from_cart' object.pk product_in_cart.store.pk 0 %}" method="post">
+                    {% csrf_token %}
+                    <input class="btn btn-outline-danger" type="submit" name="dismiss" value="-" />
+                </form>
+            </td>
         </tr>
         {% endfor %}
         </tbody>
