@@ -41,8 +41,8 @@
 
         {% ifequal "Россия" object.country %}
         <li class="list-group-item">
-            {% if requisites %}
-            <a href="{% url 'contractor_requisites_edit' object.id requisites.id %}" class="btn btn-outline-dark">
+            {% if object.russian_requisites %}
+            <a href="{% url 'contractor_requisites_edit' object.id object.russian_requisites.id %}" class="btn btn-outline-dark">
                 Редактировать реквизиты
             </a>
             {% else %}
@@ -98,52 +98,52 @@
                 <li class="list-group-item">Страна: {{ object.country }}</li>
                 <li class="list-group-item">Юр. адрес: {{ object.legal_address }}</li>
                 <li class="list-group-item">Факт. адрес: {{ object.actual_address }}</li>
-                {% if requisites %}
+                {% if object.russian_requisites %}
                 <li class="list-group-item d-flex justify-content-between">
                     <div>
-                        Краткое наименование: {{ requisites.short_title }}
+                        Краткое наименование: {{ object.russian_requisites.short_title }}
                     </div>
 
                     <div>
-                        Почтовый адрес: {{ requisites.mailing_address }}
+                        Почтовый адрес: {{ object.russian_requisites.mailing_address }}
                     </div>
                 </li>
 
                 <li class="list-group-item d-flex justify-content-between">
                     <div>
-                        ИНН: {{ requisites.tin }}
+                        ИНН: {{ object.russian_requisites.tin }}
                     </div>
 
                     <div>
-                        КПП: {{ requisites.kpp }}
+                        КПП: {{ object.russian_requisites.kpp }}
                     </div>
 
                     <div>
-                        ИГРН(ИП): {{ requisites.pprnie }}
-                    </div>
-                </li>
-
-                <li class="list-group-item d-flex justify-content-between">
-                    <div>
-                        Расчетный счет: {{ requisites.checking_account }}
-                    </div>
-
-                    <div>
-                        Корреспондентный счет: {{ requisites.correspondent_account }}
+                        ИГРН(ИП): {{ object.russian_requisites.pprnie }}
                     </div>
                 </li>
 
                 <li class="list-group-item d-flex justify-content-between">
                     <div>
-                        Банк: {{ requisites.bank_title }}
+                        Расчетный счет: {{ object.russian_requisites.checking_account }}
                     </div>
 
                     <div>
-                        БИК банка: {{ requisites.bank_bik }}
+                        Корреспондентный счет: {{ object.russian_requisites.correspondent_account }}
+                    </div>
+                </li>
+
+                <li class="list-group-item d-flex justify-content-between">
+                    <div>
+                        Банк: {{ object.russian_requisites.bank_title }}
+                    </div>
+
+                    <div>
+                        БИК банка: {{ object.russian_requisites.bank_bik }}
                     </div>
                 </li>
                 {% else %}
-                <li class="list-group-item">Реквизиты: {{ object.requisites }}</li>
+                <li class="list-group-item">Реквизиты: {{ object.russian_requisites }}</li>
                 {% endif %}
             </ul>
         </div>
@@ -156,7 +156,7 @@
         </div>
         <div class="tab-pane fade" id="contacts" role="tabpanel" aria-labelledby="contacts-tab">
             <div class="card-body">
-                {% if contact_persons %}
+                {% if object.contact_persons.all %}
                 <table class="table">
                     <thead>
                     <tr>
@@ -169,7 +169,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {% for contact_person in contact_persons %}
+                    {% for contact_person in object.contact_persons.all %}
                     <tr class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}">
 
                         <td>
@@ -225,8 +225,8 @@
 <div class="col-12">
     <div class="card">
         <h4 class="border-top text-center">Комментарии к контрагенту</h4>
-        {% if comments %}
-        {% for comment in comments %}
+        {% if object.comments.all %}
+        {% for comment in object.comments.all %}
         <div class="card-body border-top lh-1 {% ifequal comment.user request.user %} text-end {% endifequal %} ">
             <p class="">{{ comment.text }}</p>
             <p class="text-black-50">{{ comment.user }} \ {{ comment.created }}</p>

@@ -76,8 +76,8 @@ class Contractor(models.Model):
 
 
 class ContractorRequisites(models.Model):
-    contractor = models.ForeignKey(Contractor, on_delete=models.CASCADE, verbose_name='Контрагент',
-                                   related_name='contractors_requisites', related_query_name='contractor_requisites')
+    contractor = models.OneToOneField(Contractor, on_delete=models.CASCADE, verbose_name='Контрагент',
+                                      related_name='russian_requisites')
     short_title = models.CharField('Сокр. наименование', max_length=50)
     mailing_address = models.CharField('Почтовый адрес', max_length=200)
     tin = models.CharField('ИНН(TIN)', max_length=12)
@@ -100,7 +100,8 @@ class ContractorComment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='Пользователь')
     text = models.TextField('Текст комментария', max_length=500)
     created = models.DateTimeField('Дата создания', auto_now=True)
-    contractor = models.ForeignKey(Contractor, on_delete=models.CASCADE, verbose_name='Контрагент')
+    contractor = models.ForeignKey(Contractor, on_delete=models.CASCADE, verbose_name='Контрагент',
+                                   related_name='comments')
 
     class Meta:
         verbose_name = 'Комментарий к контрагенту'
@@ -127,7 +128,7 @@ class ContractorContactPerson(models.Model):
     last_name = models.CharField('Фамилия', max_length=30, blank=True, null=True)
     position = models.CharField('Должность', max_length=30, blank=True, null=True)
     contractor = models.ForeignKey(Contractor, on_delete=models.CASCADE, blank=True, null=True,
-                                   verbose_name='Контрагент')
+                                   verbose_name='Контрагент', related_name='contact_persons')
     tag = models.CharField('Теги', max_length=1000, blank=True, null=True)
     serial_number = models.CharField('Серия', max_length=4, blank=True, null=True)
     number = models.CharField('Номер', max_length=6, blank=True, null=True)
@@ -148,7 +149,7 @@ class ContractorContactPerson(models.Model):
 
 class ContractorContactPersonContact(models.Model):
     contact_person = models.ForeignKey(ContractorContactPerson, on_delete=models.CASCADE, blank=True, null=True,
-                                       verbose_name='Контактое лицо')
+                                       verbose_name='Контактое лицо', related_name='contacts')
     type_of_contact = models.ForeignKey(ContactPersonContactType, on_delete=models.CASCADE, verbose_name='Вид контакта')
     contact = models.CharField('Контактные данные', max_length=50)
 

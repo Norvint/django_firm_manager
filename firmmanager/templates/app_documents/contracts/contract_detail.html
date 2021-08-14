@@ -35,15 +35,19 @@
             </li>
             {% if object.to_delete %}
             <li class="list-group-item">
-                <a href="{% url 'contract_to_delete' object.id %}" class="btn btn-danger">
-                    Снять пометку на удаление
-                </a>
+                <form method="post" action="{% url 'contract_to_delete' object.id %}">
+                    {% csrf_token %}
+                    <input type="submit" name="unmark-to-delete" value="Снять пометку на удаление"
+                           class="btn btn-outline-danger">
+                </form>
             </li>
             {% else %}
             <li class="list-group-item">
-                <a href="{% url 'contract_to_delete' object.id %}" class="btn btn-danger">
-                    Пометить на удаление
-                </a>
+                <form method="post" action="{% url 'contract_to_delete' object.id %}">
+                    {% csrf_token %}
+                    <input type="submit" name="mark-to-delete" value="Пометить на удаление"
+                           class="btn btn-outline-danger">
+                </form>
             </li>
             {% endif %}
         </ul>

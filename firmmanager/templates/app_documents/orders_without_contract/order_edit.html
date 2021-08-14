@@ -1,19 +1,16 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Добавить новый заказ без договора{% endblock %}
+{% block title %}Редактирование заказа{% endblock %}
 
 {% block content %}
 
-<a href="{% url 'orders_without_contract_list' %}" class="btn btn-primary mt-2">К списку заказов без договора</a>
+<a href="{% url 'orders_list' %}" class="btn btn-primary mt-2">К списку заказов</a>
 
-<p>
-    {{ errors }}
-</p>
-<form name="order-create-form" method="post">
+<form name="order-wc-edit-form" method="post">
     {% csrf_token %}
     <div class="card">
         <div class="card-body">
-            <h5 class="card-title">Новый заказ</h5>
+            <h5 class="card-title">Редактирование заказа</h5>
         </div>
         <ul class="list-group list-group-flush">
             <li class="list-group-item d-flex justify-content-between">
@@ -36,6 +33,11 @@
 
             <li class="list-group-item d-flex justify-content-between">
                 <div>
+                    {{ form.currency.errors }}
+                    {{ form.currency.label }}
+                    {{ form.currency }}
+                </div>
+                <div>
                     {{ form.delivery_conditions.errors }}
                     {{ form.delivery_conditions.label }}
                     {{ form.delivery_conditions }}
@@ -45,23 +47,19 @@
                     {{ form.delivery_time.label }}
                     {{ form.delivery_time }}
                 </div>
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between">
                 <div>
                     {{ form.delivery_address.errors }}
                     {{ form.delivery_address.label }}
                     {{ form.delivery_address }}
                 </div>
-            </li>
 
-            <li class="list-group-item d-flex justify-content-between">
                 <div>
                     {{ form.payment_conditions.errors }}
                     {{ form.payment_conditions.label }}
                     {{ form.payment_conditions }}
-                </div>
-                <div>
-                    {{ form.currency.errors }}
-                    {{ form.currency.label }}
-                    {{ form.currency }}
                 </div>
             </li>
 
@@ -70,5 +68,57 @@
             <input type="submit" value="Сохранить" class="btn btn-primary col-4">
         </div>
     </div>
+    <p>
+        {{ products_on_store_error }}
+        {{ formset_form_data_error }}
+    </p>
+    <table class="table" id="booking-form-wrapper">
+        {{ formset.management_form }}
+        <thead>
+        <tr>
+            <th scope="col">Продукция</th>
+            <th scope="col">Склад</th>
+            <th scope="col">Количество</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for booking_form in formset %}
+        <tr class="booking-form-container">
+            <td>
+                {{ booking_form.product.errors }}
+                {{ booking_form.product }}
+            </td>
+
+            <td>
+                {{ booking_form.store.errors }}
+                {{ booking_form.store }}
+            </td>
+
+            <td>
+                {{ booking_form.quantity.errors }}
+                {{ booking_form.quantity }}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr>
+            <td>
+                <a href="#" id="add_booking" class="btn btn-success col-1 mt-2 fw-bold">
+                    +
+                </a>
+            </td>
+
+            <td>
+
+            </td>
+        </tr>
+        </tfoot>
+    </table>
 </form>
+
+{% block extrascripts %}
+<script type="text/JavaScript" src="{%  static 'app_documents/js/booking.js' %}"></script>
+{% endblock %}
+
 {% endblock %}

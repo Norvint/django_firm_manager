@@ -56,6 +56,12 @@ class OrderBookingForm(forms.ModelForm):
         fields = ['product', 'store', 'quantity']
 
 
+class OrderWCBookingForm(forms.ModelForm):
+    class Meta:
+        model = ProductStoreOrderWCBooking
+        fields = ['product', 'store', 'quantity']
+
+
 class ContractForm(forms.ModelForm):
     class Meta:
         model = Contract
@@ -102,7 +108,7 @@ class OrderWithoutContractForm(forms.ModelForm):
         else:
             number = f'{order_id}-{current_year}'
         order = OrderWithoutContract(number=number, contractor=data['contractor'], organization=data['organization'],
-                                     currency=data['currency'],delivery_conditions=data['delivery_conditions'],
+                                     currency=data['currency'], delivery_conditions=data['delivery_conditions'],
                                      delivery_time=data['delivery_time'], delivery_address=data['delivery_address'],
                                      payment_conditions=data['payment_conditions'],)
         if commit:

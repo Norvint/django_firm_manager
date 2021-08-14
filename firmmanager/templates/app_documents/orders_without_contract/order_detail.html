@@ -38,13 +38,17 @@
 
             <li class="list-group-item">
                 {% if object.to_delete %}
-                <a href="{% url 'order_without_contract_to_delete' object.id %}" class="btn btn-danger">
-                    Снять пометку на удаление
-                </a>
+                <form method="post" action="{% url 'order_without_contract_to_delete' object.id %}">
+                    {% csrf_token %}
+                    <input type="submit" name="unmark-to-delete" value="Снять пометку на удаление"
+                           class="btn btn-outline-danger">
+                </form>
                 {% else %}
-                <a href="{% url 'order_without_contract_to_delete' object.id %}" class="btn btn-danger">
-                    Пометить на удаление
-                </a>
+                <form method="post" action="{% url 'order_without_contract_to_delete' object.id %}">
+                    {% csrf_token %}
+                    <input type="submit" name="mark-to-delete" value="Пометить на удаление"
+                           class="btn btn-outline-danger">
+                </form>
                 {% endif %}
             </li>
         </ul>
@@ -126,11 +130,6 @@
         </ul>
 
         <ul class="list-group list-group-horizontal">
-            <li class="list-group-item">
-                <a href="{% url 'order_without_contract_booking' object.id %}" class="btn btn-primary">
-                    Выпустить продукцию
-                </a>
-            </li>
 
             <li class="list-group-item">
                 {% if contractor_requisites %}
@@ -205,9 +204,11 @@
             </a>
         </td>
         <td>
-            <a href="{% url 'order_without_contract_booking_delete' document.id %}">
-                <img src="{% static 'app_documents/images/delete.png' %}" alt="delete icon">
-            </a>
+            <form method="post" action="{% url 'order_without_contract_booking_delete' document.id %}">
+                {% csrf_token %}
+                <input type="submit" name="delete" value="Удалить"
+                       class="btn btn-outline-danger">
+            </form>
         </td>
     </tr>
     {% endfor %}

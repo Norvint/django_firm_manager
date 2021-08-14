@@ -11,8 +11,9 @@ from app_storage.models import ProductStoreOrderBooking
 class SpecificationCreator:
     BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
-    def __init__(self, context, template):
-        self.template = os.path.join(self.BASE_DIR, 'static', 'app_documents', 'layouts', template)
+    def __init__(self, context):
+        template_path = os.path.join('foreign', 'specification_template.docx')
+        self.template = os.path.join(self.BASE_DIR, 'static', 'app_documents', 'layouts', template_path)
         self.output_file_path = os.path.join(self.BASE_DIR, 'static', 'app_documents', 'tmp', 'specification.docx')
         self.order = context
 

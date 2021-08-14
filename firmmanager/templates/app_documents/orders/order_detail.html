@@ -44,13 +44,17 @@
 
             <li class="list-group-item">
                 {% if object.to_delete %}
-                <a href="{% url 'order_to_delete' object.id %}" class="btn btn-danger">
-                    Снять пометку на удаление
-                </a>
+                <form method="post" action="{% url 'order_to_delete' object.id %}">
+                    {% csrf_token %}
+                    <input type="submit" name="unmark-to-delete" value="Снять пометку на удаление"
+                           class="btn btn-outline-danger">
+                </form>
                 {% else %}
-                <a href="{% url 'order_to_delete' object.id %}" class="btn btn-danger">
-                    Пометить на удаление
-                </a>
+                <form method="post" action="{% url 'order_to_delete' object.id %}">
+                    {% csrf_token %}
+                    <input type="submit" name="mark-to-delete" value="Пометить на удаление"
+                           class="btn btn-outline-danger">
+                </form>
                 {% endif %}
             </li>
         </ul>
@@ -138,15 +142,9 @@
         </ul>
 
         <ul class="list-group list-group-horizontal">
-            <li class="list-group-item">
-                <a href="{% url 'order_booking' object.id %}" class="btn btn-primary">
-                    Выпустить продукцию
-                </a>
-            </li>
-
             {% ifequal "Россия" object.contract.contractor.country %}
             <li class="list-group-item">
-                {% if contractor_requisites %}
+                {% if object.contract.contractor.russian_requisites %}
                 <a href="{% url 'download_invoice' object.id %}" class="btn btn-success d-block">Скачать счет</a>
                 {% else %}
                 <a tabindex="0" class="btn btn-danger invoice-popover"
@@ -162,7 +160,7 @@
                 {% endif %}
             </li>
             <li class="list-group-item">
-                {% if contractor_requisites %}
+                {% if object.contract.contractor.russian_requisites %}
                 <a href="{% url 'download_upd' object.id %}" download class="btn btn-success col-offset-2">
                     Скачать УПД
                 </a>
@@ -215,7 +213,7 @@
     </tr>
     </thead>
     <tbody>
-    {% for document in order_booking.all %}
+    {% for document in object.bookings.all %}
     <tr>
         <td>
             <a href="{% url 'product_detail' document.product.id %}" class="text-reset">{{ document.product }}</a>

@@ -2,18 +2,17 @@ from django.urls import path, include
 
 from app_documents.views import DeliveryConditionsDetailView, DeliveryConditionsListView, ContractCreateView, \
     ContractDetailView, ContractListView, ContractTypeDetailView, ContractTypeListView, CurrencyDetailView, \
-    CurrencyListView, OrderCreateView, OrderBookingCreateView, OrderDetailView, OrderListView, \
+    CurrencyListView, OrderCreateView, OrderDetailView, OrderListView, \
     PaymentConditionsListView, OrderBookingDeleteView, OrderBookingEditView, \
     ContractToDeleteView, OrderToDeleteView, CurrencyUpdate, ContractEditView, OrderWCListView, \
     OrderWCCreateView, OrderWCDetailView, OrderWCToDeleteView, \
-    OrderWCBookingDeleteView, OrderWCBookingEditView, OrderWCBookingCreateView, \
-    OrderEditView
-
+    OrderWCBookingDeleteView, OrderWCBookingEditView, \
+    OrderEditView, OrderWCEditView
 
 urlpatterns = [
     path('contracts/', include([
         path('list/', ContractListView.as_view(), name='contracts_list'),
-        path('create-contract/<int:contractor_id>/', ContractCreateView.as_view(), name='contract_create'),
+        path('create-contract/<int:contractor_pk>/', ContractCreateView.as_view(), name='contract_create'),
         path('<int:pk>/', include([
             path('detail/', ContractDetailView.as_view(), name='contract_detail'),
             path('edit/', ContractEditView.as_view(), name='contract_edit'),
@@ -32,7 +31,7 @@ urlpatterns = [
     ])),
     path('orders/', include([
         path('list/', OrderListView.as_view(), name='orders_list'),
-        path('create-order/<int:contract_id>/contractor/<int:contractor_id>', OrderCreateView.as_view(),
+        path('create-order/<int:contract_pk>/contractor/<int:contractor_pk>', OrderCreateView.as_view(),
              name='order_create'),
         path('<int:pk>/', include([
             path('detail/', OrderDetailView.as_view(), name='order_detail'),
@@ -43,9 +42,8 @@ urlpatterns = [
             path('download-goods-acceptance/', OrderDetailView.download_goods_acceptance,
                  name='download_goods_acceptance'),
             path('download-upd/', OrderDetailView.download_upd, name='download_upd'),
-            path('create-booking/', OrderBookingCreateView.as_view(), name='order_booking'),
         ])),
-        path('bookings/<int:pk>/', include([
+        path('bookings/<int:booking_pk>/', include([
                 path('delete/', OrderBookingDeleteView.as_view(), name='order_booking_delete'),
                 path('edit/', OrderBookingEditView.as_view(), name='order_booking_edit'),
         ])),
@@ -55,17 +53,17 @@ urlpatterns = [
         ])),
         path('payment-conditions/', PaymentConditionsListView.as_view(), name='payment_conditions_list'),
     ])),
-    path('orders-without-contract/', include([
+    path('orders-wc/', include([
         path('list/', OrderWCListView.as_view(), name='orders_without_contract_list'),
-        path('create/<int:contractor_id>', OrderWCCreateView.as_view(), name='order_without_contract_create'),
+        path('create/<int:contractor_pk>', OrderWCCreateView.as_view(), name='order_without_contract_create'),
         path('<int:pk>/', include([
+            path('edit/', OrderWCEditView.as_view(), name='order_without_contract_edit'),
             path('detail/', OrderWCDetailView.as_view(), name='order_without_contract_detail'),
             path('to-delete/', OrderWCToDeleteView.as_view(), name='order_without_contract_to_delete'),
             path('download-upd/', OrderWCDetailView.download_upd, name='download_upd_wc'),
             path('download-invoice/', OrderWCDetailView.download_invoice, name='download_invoice_wc'),
-            path('create-booking/', OrderWCBookingCreateView.as_view(), name='order_without_contract_booking'),
         ])),
-        path('bookings/<int:pk>/', include([
+        path('bookings/<int:booking_pk>/', include([
             path('delete/', OrderWCBookingDeleteView.as_view(), name='order_without_contract_booking_delete'),
             path('edit/', OrderWCBookingEditView.as_view(), name='order_without_contract_booking_edit'),
         ]))

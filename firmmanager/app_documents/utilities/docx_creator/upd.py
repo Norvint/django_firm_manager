@@ -6,14 +6,19 @@ import pymorphy2
 from docxtpl import DocxTemplate
 
 from app_crm.models import ContractorRequisites
+from app_documents.models import Order
 from app_storage.models import ProductStoreOrderBooking, ProductStoreOrderWCBooking
 
 
 class UpdCreator:
     BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
-    def __init__(self, context, template):
-        self.template = os.path.join(self.BASE_DIR, 'static', 'app_documents', 'layouts', template)
+    def __init__(self, context: Order):
+        if context.created.year == 2021 and context.created.month < 7:
+            template_path = os.path.join('russian', 'upd_template.docx')
+        else:
+            template_path = os.path.join('russian', 'upd_template_2021.docx')
+        self.template = os.path.join(self.BASE_DIR, 'static', 'app_documents', 'layouts', template_path)
         self.output_file_path = os.path.join(self.BASE_DIR, 'static', 'app_documents', 'tmp', 'upd.docx')
         self.order = context
 

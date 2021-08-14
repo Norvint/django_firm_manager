@@ -4,12 +4,22 @@ from pathlib import Path
 import pymorphy2
 from docxtpl import DocxTemplate
 
+from app_documents.models import Contract
+
 
 class ContractCreator:
     BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
-    def __init__(self, context, template):
-        self.template = os.path.join(self.BASE_DIR, 'static', 'app_documents', 'layouts', template)
+    def __init__(self, context: Contract):
+        if context.type.title == 'Экскл. Дистриб-во (Экспорт)':
+            template_path = os.path.join('foreign', 'contract_template_distr_export.docx')
+        elif context.type.title == 'Поставка (Косвенный Реэкспорт)':
+            template_path = os.path.join('foreign', 'contract_template.docx')
+        elif context.type.title == 'Экскл. Дистриб-во (Косв. Реэкспорт)':
+            template_path = os.path.join('foreign', 'contract_template_distr_reexport.docx')
+        elif context.type.title == 'Поставка (Экспорт)':
+            template_path = os.path.join('foreign', 'contract_template_export.docx')
+        self.template = os.path.join(self.BASE_DIR, 'static', 'app_documents', 'layouts', template_path)
         self.output_file_path = os.path.join(self.BASE_DIR, 'static', 'app_documents', 'tmp', 'contract.docx')
         self.contract = context
 

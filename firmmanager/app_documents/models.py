@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import QuerySet
@@ -88,8 +90,8 @@ class Contract(models.Model):
 
 
 class Order(models.Model):
-    number = models.CharField('Номер заказа', max_length=30, blank=True)
-    contract = models.ForeignKey(Contract, on_delete=models.CASCADE, verbose_name='Договор')
+    number = models.CharField('Номер заказа', max_length=30, default='auto')
+    contract = models.ForeignKey(Contract, on_delete=models.CASCADE, verbose_name='Договор', related_name='orders')
     created = models.DateField(auto_now_add=True)
     delivery_conditions = models.ForeignKey(DeliveryConditions, on_delete=models.CASCADE,
                                             verbose_name='Условия поставки')
@@ -99,10 +101,12 @@ class Order(models.Model):
                                            verbose_name='Условия оплаты')
     shipment_mark = models.ForeignKey(ShipmentMark, on_delete=models.CASCADE, verbose_name='Отгрузочная метка',
                                       blank=True, null=True)
-    counted_sum = models.DecimalField('Расчетная сумма', max_digits=20, decimal_places=4, default=0)
-    currency_counted_sum = models.DecimalField('Расчетная сумма в валюте', max_digits=20, decimal_places=2, default=0)
-    total_sum = models.DecimalField('Итоговая сумма', max_digits=20, decimal_places=4, default=0)
-    currency_total_sum = models.DecimalField('Итоговая сумма в валюте', max_digits=20, decimal_places=2, default=0)
+    counted_sum = models.DecimalField('Расчетная сумма', max_digits=20, decimal_places=4, default=Decimal(0))
+    currency_counted_sum = models.DecimalField('Расчетная сумма в валюте', max_digits=20, decimal_places=2,
+                                               default=Decimal(0))
+    total_sum = models.DecimalField('Итоговая сумма', max_digits=20, decimal_places=4, default=Decimal(0))
+    currency_total_sum = models.DecimalField('Итоговая сумма в валюте', max_digits=20, decimal_places=2,
+                                             default=Decimal(0))
     to_delete = models.BooleanField('К удалению', default=False)
     responsible = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
 
@@ -127,16 +131,9 @@ class Order(models.Model):
         if form_data.get('payment_conditions'):
             self.payment_conditions = form_data.get('payment_conditions')
 
-    def recalculate_amounts(self, bookings: QuerySet):
-        self.total_sum = 0
-        self.counted_sum = 0
-        for booking in bookings:
-            self.total_sum += booking.total_sum
-            self.counted_sum += booking.counted_sum
-
 
 class OrderWithoutContract(models.Model):
-    number = models.CharField('Номер заказа', max_length=30, blank=True)
+    number = models.CharField('Номер заказа', max_length=30, default='auto')
     created = models.DateField(auto_now_add=True)
     contractor = models.ForeignKey(Contractor, on_delete=models.CASCADE, verbose_name='Клиент')
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, verbose_name='Организация поставщик')
@@ -161,11 +158,21 @@ class OrderWithoutContract(models.Model):
     def __str__(self):
         return f'№{self.number} - {self.contractor.title}'
 
-    def recalculate_amounts(self, bookings: QuerySet):
-        self.total_sum = 0
-        self.counted_sum = 0
-        for booking in bookings:
-            self.total_sum += booking.total_sum
-            self.counted_sum += booking.counted_sum
-
+    def update_order(self, form_data: dict):
+        if form_data.get('number'):
+            self.number = form_data.get('number')
+        if form_data.get('contractor'):
+            self.contract = form_data.get('contractor')
+        if form_data.get('organization'):
+            self.contract = form_data.get('organization')
+        if form_data.get('currency'):
+            self.contract = form_data.get('currency')
+        if form_data.get('delivery_conditions'):
+            self.delivery_conditions = form_data.get('delivery_conditions')
+        if form_data.get('delivery_time'):
+            self.delivery_time = form_data.get('delivery_time')
+        if form_data.get('delivery_address'):
+            self.delivery_address = form_data.get('delivery_address')
+        if form_data.get('payment_conditions'):
+            self.payment_conditions = form_data.get('payment_conditions')
 
