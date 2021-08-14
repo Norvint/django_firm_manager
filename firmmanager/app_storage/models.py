@@ -1,5 +1,9 @@
+from decimal import Decimal
+
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models.signals import post_save, pre_save
+from django.dispatch import receiver
 
 from app_documents.models import Order, OrderWithoutContract
 
@@ -145,18 +149,14 @@ class ProductStoreOutcome(models.Model):
 
 class ProductStoreOrderBooking(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, verbose_name='Заказ',
-                              related_name='orders_bookings', related_query_name='order_bookings')
+                              related_name='bookings')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Продукция')
     store = models.ForeignKey(Store, on_delete=models.CASCADE, verbose_name='Склад')
     quantity = models.PositiveIntegerField('Количество')
-    total_price = models.DecimalField('Итоговая цена', decimal_places=2, max_digits=18, null=True, blank=True)
-    standard_price = models.DecimalField('Стандартная цена', decimal_places=2, max_digits=18, null=True, blank=True)
-    counted_sum = models.DecimalField('Расчетная сумма', decimal_places=2, max_digits=18, null=True, blank=True)
-    currency_counted_sum = models.DecimalField('Расчетная сумма в валюте', decimal_places=2, max_digits=18,
-                                               null=True, blank=True)
-    total_sum = models.DecimalField('Итоговая сумма', decimal_places=2, max_digits=18, null=True, blank=True)
-    currency_total_sum = models.DecimalField('Итоговая сумма в валюте', decimal_places=2, max_digits=18,
-                                             null=True, blank=True)
+    total_price = models.DecimalField('Итоговая цена', decimal_places=2, max_digits=18, default=Decimal(0))
+    standard_price = models.DecimalField('Стандартная цена', decimal_places=2, max_digits=18, default=Decimal(0))
+    counted_sum = models.DecimalField('Расчетная сумма', decimal_places=2, max_digits=18, default=Decimal(0))
+    total_sum = models.DecimalField('Итоговая сумма', decimal_places=2, max_digits=18, default=Decimal(0))
 
     class Meta:
         verbose_name = 'Бронь продукции по заказу'
@@ -165,32 +165,17 @@ class ProductStoreOrderBooking(models.Model):
     def __str__(self):
         return f'{self.product} - {self.store} - {self.quantity}'
 
-    def update_booking(self, form_data: dict):
-        if form_data.get('order'):
-            self.order = form_data.get('order')
-        if form_data.get('product'):
-            self.product = form_data.get('product')
-        if form_data.get('store'):
-            self.store = form_data.get('store')
-        if form_data.get('quantity'):
-            self.quantity = form_data.get('quantity')
-        if form_data.get('total_price'):
-            self.total_price = form_data.get('total_price')
-        if form_data.get('standard_price'):
-            self.standard_price = form_data.get('standard_price')
-        self.counted_sum = self.product.cost * self.quantity
-        self.total_sum = self.total_price * self.quantity
-
 
 class ProductStoreOrderWCBooking(models.Model):
-    order = models.ForeignKey(OrderWithoutContract, on_delete=models.CASCADE, verbose_name='Заказ')
+    order = models.ForeignKey(OrderWithoutContract, on_delete=models.CASCADE, verbose_name='Заказ',
+                              related_name='bookings')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Продукция')
     store = models.ForeignKey(Store, on_delete=models.CASCADE, verbose_name='Склад')
     quantity = models.PositiveIntegerField('Количество')
-    total_price = models.DecimalField('Итоговая цена', decimal_places=2, max_digits=18, null=True, blank=True)
-    standard_price = models.DecimalField('Стандартная цена', decimal_places=2, max_digits=18, null=True, blank=True)
-    counted_sum = models.DecimalField('Расчетная сумма', decimal_places=2, max_digits=18, null=True, blank=True)
-    total_sum = models.DecimalField('Итоговая сумма', decimal_places=2, max_digits=18, null=True, blank=True)
+    total_price = models.DecimalField('Итоговая цена', decimal_places=2, max_digits=18, default=Decimal(0))
+    standard_price = models.DecimalField('Стандартная цена', decimal_places=2, max_digits=18, default=Decimal(0))
+    counted_sum = models.DecimalField('Расчетная сумма', decimal_places=2, max_digits=18, default=Decimal(0))
+    total_sum = models.DecimalField('Итоговая сумма', decimal_places=2, max_digits=18, default=Decimal(0))
 
     class Meta:
         verbose_name = 'Бронь продукции по заказу без договора'
@@ -210,5 +195,3 @@ class ProductStoreOrderWCBooking(models.Model):
             self.total_price = form_data.get('total_price')
         if form_data.get('standard_price'):
             self.standard_price = form_data.get('standard_price')
-        self.counted_sum = self.product.cost * self.quantity
-        self.total_sum = self.total_price * self.quantity

@@ -7,14 +7,22 @@ from docxtpl import DocxTemplate
 from num2words import num2words
 
 from app_crm.models import ContractorRequisites
+from app_documents.models import Order
 from app_storage.models import ProductStoreOrderBooking, ProductStoreOrderWCBooking
 
 
 class InvoiceCreator:
     BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 
-    def __init__(self, context, template):
-        self.template = os.path.join(self.BASE_DIR, 'static', 'app_documents', 'layouts', template)
+    def __init__(self, context: Order):
+        if 'Россия' in context.contract.contractor.country:
+            if 'Геркен П.В.' in context.contract.organization.title:
+                template_path = os.path.join('russian', 'invoice_gerkenpv_template.docx')
+            else:
+                template_path = os.path.join('russian', 'invoice_gerkenea_template.docx')
+        else:
+            template_path = os.path.join('foreign', 'invoice_template.docx')
+        self.template = os.path.join(self.BASE_DIR, 'static', 'app_documents', 'layouts', template_path)
         self.output_file_path = os.path.join(self.BASE_DIR, 'static', 'app_documents', 'tmp', 'invoice.docx')
         self.order = context
 

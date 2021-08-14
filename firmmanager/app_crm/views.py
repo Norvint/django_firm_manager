@@ -54,16 +54,7 @@ class ContractorDetailView(LoginRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ContractorDetailView, self).get_context_data(**kwargs)
-        comments = ContractorComment.objects.filter(contractor=self.get_object()).order_by('-created')
         files_categories = ContractorFileCategory.objects.all()
-        try:
-            requisites = ContractorRequisites.objects.get(contractor=self.get_object())
-            context['requisites'] = requisites
-        except ObjectDoesNotExist:
-            context['requisites'] = None
-        contact_persons = ContractorContactPerson.objects.filter(contractor=self.get_object())
-        context['contact_persons'] = contact_persons
-        context['comments'] = comments
         comment_form = ContractorCommentForm()
         context['files_categories'] = files_categories
         context['comment_form'] = comment_form
@@ -152,7 +143,7 @@ class ContractorEditView(LoginRequiredMixin, TemplateView):
         context = self.get_context_data(**kwargs)
         form = ContractorForm(request.POST)
         if form.is_valid():
-            contractor = Contractor.objects.filter(pk=kwargs.get('pk')).update(**form.cleaned_data)
+            Contractor.objects.filter(pk=kwargs.get('pk')).update(**form.cleaned_data)
             return redirect('contractor_detail', pk=kwargs.get('pk'))
         else:
             context['form'] = form
@@ -321,12 +312,9 @@ class ContractorContactPersonEditView(LoginRequiredMixin, TemplateView):
         contact_person = ContractorContactPerson.objects.get(pk=kwargs.get('contact_person_pk'))
         contact_person_form = ContractorContactPersonForm(
             initial={**model_to_dict(contact_person)})
-        contact_person_contacts = ContractorContactPersonContact.objects.filter(
-            contact_person=kwargs.get('contact_person_pk'))
-        contacts_data = []
-        for contact_person_contact in contact_person_contacts:
-            contacts_data.append(
-                {'type_of_contact': contact_person_contact.type_of_contact, 'contact': contact_person_contact.contact})
+        contacts_data = [{'type_of_contact': contact_person_contact.type_of_contact,
+                          'contact': contact_person_contact.contact}
+                         for contact_person_contact in contact_person.contacts.all()]
         contacts_formset = formset_factory(ContactForm)
         formset = contacts_formset(initial=contacts_data)
         context['formset'] = formset
