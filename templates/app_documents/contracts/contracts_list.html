@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Договоры{% endblock %}
+
+{% block content %}
+
+<ul class="nav nav-pills pt-2 pb-2">
+    <li class="nav-item">
+        <a class="nav-link active" aria-current="page" href="{% url 'contracts_list' %}">Договоры</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'contract_types_list' %}">Типы договоров</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'currencies_list' %}">Валюты</a>
+    </li>
+</ul>
+
+<form action="" method="post" class="mb-2">
+    {% csrf_token %}
+    <div class="d-flex flex-row col-6 justify-content-between mb-2">
+        <div class="d-flex flex-column col-3">
+            {{ filter.created_after.errors }}
+            {{ filter.created_after.label }}
+            {{ filter.created_after }}
+        </div>
+
+        <div class="d-flex flex-column col-3">
+            {{ filter.created_before.errors }}
+            {{ filter.created_before.label }}
+            {{ filter.created_before }}
+        </div>
+
+        <div class="d-flex flex-column col-4">
+            {{ filter.contractor.errors }}
+            {{ filter.contractor.label }}
+            {{ filter.contractor }}
+        </div>
+
+        <div class="col-1 mt-3">
+            <button type="submit" class="btn btn-secondary">Отсортировать</button>
+        </div>
+    </div>
+</form>
+<a href="{% url 'contract_create' 0 %}" class="btn btn-primary mb-3">Добавить договор</a>
+<h1>Договоры</h1>
+{% if contracts %}
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th scope="col">Контрагент</th>
+        <th scope="col">Номер</th>
+        <th scope="col">Дата создания</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for contract in contracts %}
+    <tr class="{% if contract.to_delete %} text-white bg-secondary {% endif %}">
+        <td>
+            <a class="{% if contract.to_delete %} text-white {% else %} text-reset {% endif %}"
+               href="{% url 'contract_detail' contract.id %}">{{ contract.contractor }}</a>
+        </td>
+        <td>{{ contract.number }}</td>
+        <td>{{ contract.created }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}

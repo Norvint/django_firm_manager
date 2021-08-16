@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ object.title }}{% endblock %}
+
+{% block content %}
+
+<form method="post" name="product-edit" class="card col-12 mt-2">
+    {% csrf_token %}
+    <div class="card-body">
+        <h3>Редактирование продукции</h3>
+    </div>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item d-flex justify-content-between">
+            <div>
+                {{ form.number.errors }}
+                {{ form.number.label }}
+                {{ form.number }}
+            </div>
+
+            <div>
+                {{ form.type_of_product.errors }}
+                {{ form.type_of_product.label }}
+                {{ form.type_of_product }}
+            </div>
+
+            <div>
+                {{ form.model.errors }}
+                {{ form.model.label }}
+                {{ form.model }}
+            </div>
+        </li>
+
+        <li class="list-group-item d-flex justify-content-between">
+            <div>
+                {{ form.size.errors }}
+                {{ form.size.label }}
+                {{ form.size }}
+            </div>
+
+            <div>
+                {{ form.version.errors }}
+                {{ form.version.label }}
+                {{ form.version }}
+            </div>
+
+            <div>
+                {{ form.materials.errors }}
+                {{ form.materials.label }}
+                {{ form.materials }}
+            </div>
+        </li>
+
+        <li class="list-group-item d-flex justify-content-between">
+            <div>
+                {{ form.color.errors }}
+                {{ form.color.label }}
+                {{ form.color }}
+            </div>
+
+            <div>
+                {{ form.country.errors }}
+                {{ form.country.label }}
+                {{ form.country }}
+            </div>
+
+            <div>
+                {{ form.cost.errors }}
+                {{ form.cost.label }}
+                {{ form.cost }}
+            </div>
+        </li>
+
+        <li class="list-group-item d-flex justify-content-between">
+            <div>
+                {{ form.packing_inside.errors }}
+                {{ form.packing_inside.label }}
+                {{ form.packing_inside }}
+            </div>
+
+            <div>
+                {{ form.packing_outside.errors }}
+                {{ form.packing_outside.label }}
+                {{ form.packing_outside }}
+            </div>
+        </li>
+    </ul>
+    <ul class="list-group list-group-horizontal">
+        <li class="list-group-item">
+            <input type="submit" value="Сохранить" class="btn btn-primary">
+        </li>
+        <li class="list-group-item">
+            <a href="{% url 'product_detail' object.id %}" class="btn btn-danger">Отмена</a>
+        </li>
+    </ul>
+</form>
+
+{% endblock %}

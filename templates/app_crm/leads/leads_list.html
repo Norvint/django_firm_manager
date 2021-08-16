@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Все лиды{% endblock %}
+
+{% block content %}
+<form action="" method="post">
+    {% csrf_token %}
+    <table class="mt-1">
+        <thead>
+            <tr>
+                <th class="ps-2 pe-2 border-start border-end border-top">
+                    {{ filter.status.label }}
+                </th>
+
+                <th class="ps-2 pe-2 border-start border-end border-top">
+                    {{ filter.responsible.label }}
+                </th>
+
+                <th class="ps-2 pe-2 border-start border-end border-top">
+                    {{ filter.field_of_activity.label }}
+                </th>
+
+                <th class="ps-2 pe-2 border-start border-end border-top">
+                    {{ filter.tag.label }}
+                </th>
+
+                <th class="ps-2 pe-2 border-start border-end border-top"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="ps-2 pe-2 border-start border-end border-bottom">
+                    {{ filter.status }}
+                </td>
+
+                <td class="w-auto ps-2 pe-2 border-start border-end border-bottom">
+                    {{ filter.responsible }}
+                </td>
+
+                <td class="ps-2 pe-2 border-start border-end border-bottom">
+                    {{ filter.field_of_activity }}
+                </td>
+
+                <td class="ps-2 pe-2 border-start border-end border-bottom">
+                    {{ filter.tag }}
+                </td>
+
+                <td class="border-start border-end border-bottom">
+                    <button class="btn btn-secondary mt-3 mb-3" type="submit">Отсортировать</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>
+<h1>Лиды</h1>
+<a href="{% url 'lead_create' %}" class="btn btn-primary mb-3">Добавить лид</a>
+
+{% if leads %}
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th scope="col">Название</th>
+        <th scope="col">Статус</th>
+        <th scope="col">Цель сотрудничества</th>
+        <th scope="col">Ответсвенный</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for lead in leads %}
+    <tr class="">
+        <td>
+            <a class="text-reset" href="{% url 'lead_detail' lead.id %}">
+                {{ lead.title }}
+            </a>
+        </td>
+
+        <td>
+            {{ lead.status }}
+        </td>
+
+        <td>
+            {{ lead.purpose }}
+        </td>
+
+        <td>
+            {{ lead.responsible }}
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}

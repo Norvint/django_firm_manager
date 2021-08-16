@@ -1,0 +1,219 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ object.title }}{% endblock %}
+{% block content %}
+<h1>Информация о лиде</h1>
+<div class="card col-12">
+    <ul class="list-group list-group-horizontal">
+        <li class="list-group-item">
+            <a href="{% url 'lead_edit' object.id %}" class="btn btn-primary">Редактировать</a>
+        </li>
+    </ul>
+    <div class="card-body d-flex justify-content-between">
+        <h5 class="card-title">{{ object.title }}</h5>
+        <a class="nav-link dropdown-toggle btn btn-outline-primary" href="#" id="navbarDropdown" role="button"
+           data-bs-toggle="dropdown" aria-expanded="false">
+            {{ object.status }}
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            {% ifnotequal object.status.title 'Конвертирован' %}
+            <li><a class="dropdown-item" href="{% url 'lead_contractor_create' object.id %}">Перевсти в контрагенты</a></li>
+            {% endifnotequal %}
+
+            {% ifnotequal object.status.title 'Некачественный' %}
+            <li><a class="dropdown-item" href="{% url 'lead_status_substandard' object.id %}">Некачественный</a></li>
+            {% endifnotequal %}
+
+            {% ifnotequal object.status.title 'Отложенный' %}
+            <li><a class="dropdown-item" href="{% url 'lead_status_deferred' object.id %}">Отложенный</a></li>
+            {% endifnotequal %}
+        </ul>
+    </div>
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button"
+                    role="tab" aria-controls="home" aria-selected="true">Основная информация
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="more-tab" data-bs-toggle="tab" data-bs-target="#more" type="button"
+                    role="tab" aria-controls="more" aria-selected="false">Дополнительно
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="contact-person-tab" data-bs-toggle="tab" data-bs-target="#contact-person" type="button"
+                    role="tab" aria-controls="contact-person" aria-selected="false">Контактные лица
+            </button>
+        </li>
+
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="contacts-tab" data-bs-toggle="tab" data-bs-target="#contacts" type="button"
+                    role="tab" aria-controls="contacts" aria-selected="false">Контакты
+            </button>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between">
+                    <div>
+                        Имя: {{ object.name }}
+                    </div>
+
+                    <div>
+                        Отчество: {{ object.second_name }}
+                    </div>
+
+                    <div>
+                        Фамилия: {{ object.last_name }}
+                    </div>
+                </li>
+
+                <li class="list-group-item d-flex justify-content-between">
+                    <div>
+                        Должность: {{ object.position }}
+                    </div>
+
+                   <div>
+                       Страна: {{ object.country }}
+                   </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="tab-pane fade" id="more" role="tabpanel" aria-labelledby="more-tab">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Сфера деятельности: {{ object.field_of_activity }}</li>
+                <li class="list-group-item">Цель сотрудничества: {{ object.purpose }}</li>
+                <li class="list-group-item">Ответственный: {{ object.responsible }}</li>
+                <li class="list-group-item">Тэги: {{ object.tag }}</li>
+            </ul>
+        </div>
+
+        <div class="tab-pane fade" id="contact-person" role="tabpanel" aria-labelledby="contact-person-tab">
+            <div class="card-body">
+                {% if contact_persons %}
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Имя</th>
+                        <th scope="col">Отчество</th>
+                        <th scope="col">Фамилия</th>
+                        <th scope="col">Должность</th>
+                        <th scope="col">Редактировать</th>
+                        <th scope="col">Поставить/убрать пометку на удаление</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for contact_person in contact_persons %}
+                    <tr class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}">
+
+                        <td>
+                            <a class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}"
+                               href="{% url 'lead_contact_person_detail' object.id contact_person.id %}">
+                                {{ contact_person.name }}
+                            </a>
+                        </td>
+
+                        <td>
+                            {{ contact_person.second_name }}
+                        </td>
+
+                        <td>
+                            {{ contact_person.last_name }}
+                        </td>
+
+                        <td>
+                            {{ contact_person.position }}
+                        </td>
+
+                        <td class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}">
+                            <a class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}"
+                               href="{% url 'lead_contact_person_edit' object.id contact_person.id %}">
+                                Кнопка
+                            </a>
+                        </td>
+
+                        <td class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}">
+                            <a class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}"
+                               href="{% url 'lead_contact_person_to_delete' object.id contact_person.id %}">
+                                Кнопка
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>
+                    Похоже вы еще не добавили контактных лиц к этому лиду.
+                </p>
+                {% endif %}
+                <a href="{% url 'lead_contact_person_create' object.id %}" class="btn btn-primary">
+                    Добавить контактное лицо
+                </a>
+            </div>
+        </div>
+
+        <div class="tab-pane fade" id="contacts" role="tabpanel" aria-labelledby="contact-person-tab">
+            <div class="card-body">
+                {% if contacts %}
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Вид контакта</th>
+                        <th scope="col">Контакт</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for lead_contact in contacts %}
+                    <tr class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}">
+                        <td>
+                            {{ lead_contact.type_of_contact }}
+                        </td>
+
+                        <td>
+                            {{ lead_contact.contact }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>
+                    Похоже вы еще не добавили контактны к этому лиду.
+                </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="col-12">
+    <div class="card">
+        <h4 class="border-top text-center">Комментарии к лиду</h4>
+        {% if comments %}
+        {% for comment in comments %}
+        <div class="card-body border-top lh-1 {% ifequal comment.user request.user %} text-end {% endifequal %} ">
+            <p class="">{{ comment.text }}</p>
+            <p class="text-black-50">{{ comment.user }} \ {{ comment.created }}</p>
+            {% ifequal comment.user request.user %}
+            <a href="{% url 'lead_comment_edit' object.id comment.id %}">Ред.</a>
+            <a href="{% url 'lead_comment_delete' object.id comment.id %}">Удалить</a>
+            {% endifequal %}
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+    <form class="card d-flex flex-row" name="comment-form" method="post"
+          action="{% url 'lead_detail' object.id %}">
+        {% csrf_token %}
+        {{ comment_form.text.errors }}
+        {{ comment_form.text }}
+        <input class="btn btn-secondary" type="submit" value="Отправить">
+    </form>
+</div>
+
+
+{% endblock %}

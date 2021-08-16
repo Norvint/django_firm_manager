@@ -1,0 +1,250 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ object.title }}{% endblock %}
+
+{% block content %}
+<div class="dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+       data-bs-toggle="dropdown" aria-expanded="false">
+        Навигация по контрагенту
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+        <li>
+            <a href="{% url 'contractor_contracts_list' object.id %}" class="dropdown-item">Договоры</a>
+        </li>
+
+        <li>
+            <a href="{% url 'contractor_orders_list' object.id %}"
+               class="dropdown-item">Заказы</a>
+        </li>
+    </ul>
+</div>
+
+<a href="{% url 'contractor_files_list' object.id %}" class="text-reset">Прикрепленные файлы</a>
+
+
+<h1>Информация о контрагенте</h1>
+<div class="card col-12">
+    <ul class="list-group list-group-horizontal">
+        <li class="list-group-item">
+            <a href="{% url 'contractor_edit' object.id %}" class="btn btn-outline-dark">Редактировать</a>
+        </li>
+        {% if contractor.to_delete %}
+        <li class="list-group-item">
+            <a href="{% url 'contractor_to_delete' object.id %}" class="btn btn-outline-danger">Снять пометку на удаление</a>
+        </li>
+        {% else %}
+        <li class="list-group-item">
+            <a href="{% url 'contractor_to_delete' object.id %}" class="btn btn-outline-danger">Пометить на удаление</a>
+        </li>
+        {% endif %}
+
+        {% ifequal "Россия" object.country %}
+        <li class="list-group-item">
+            {% if object.russian_requisites %}
+            <a href="{% url 'contractor_requisites_edit' object.id object.russian_requisites.id %}" class="btn btn-outline-dark">
+                Редактировать реквизиты
+            </a>
+            {% else %}
+            <a href="{% url 'contractor_requisites_create' object.id %}" class="btn btn-outline-dark">
+                Добавить реквизиты
+            </a>
+            {% endif %}
+        </li>
+        {% endifequal %}
+
+    </ul>
+    <div class="card-body d-flex justify-content-between">
+        <h5 class="card-title">{{ object.title }}</h5>
+        {% if contractor.to_delete %}
+        <p class="text-danger fw-bold">Помечен на удаление</p>
+        {% endif %}
+        <p class="text-success">{{ object.status }}</p>
+    </div>
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button"
+                    role="tab" aria-controls="home" aria-selected="true">Основная информация
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button"
+                    role="tab" aria-controls="profile" aria-selected="false">Контактные данные и реквизиты
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="more-tab" data-bs-toggle="tab" data-bs-target="#more" type="button"
+                    role="tab" aria-controls="more" aria-selected="false">Дополнительно
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="contacts-tab" data-bs-toggle="tab" data-bs-target="#contacts" type="button"
+                    role="tab" aria-controls="contacts" aria-selected="false">Контакты контрагента
+            </button>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Должность: {{ object.position }} ({{ object.position_en }})</li>
+                <li class="list-group-item">Обращение: {{ object.appeal }} ({{ object.appeal_en }})</li>
+                <li class="list-group-item">Имя: {{ object.name }}</li>
+                <li class="list-group-item">Отчество: {{ object.second_name }}</li>
+                <li class="list-group-item">Фамилия: {{ object.last_name }}</li>
+            </ul>
+        </div>
+        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Страна: {{ object.country }}</li>
+                <li class="list-group-item">Юр. адрес: {{ object.legal_address }}</li>
+                <li class="list-group-item">Факт. адрес: {{ object.actual_address }}</li>
+                {% if object.russian_requisites %}
+                <li class="list-group-item d-flex justify-content-between">
+                    <div>
+                        Краткое наименование: {{ object.russian_requisites.short_title }}
+                    </div>
+
+                    <div>
+                        Почтовый адрес: {{ object.russian_requisites.mailing_address }}
+                    </div>
+                </li>
+
+                <li class="list-group-item d-flex justify-content-between">
+                    <div>
+                        ИНН: {{ object.russian_requisites.tin }}
+                    </div>
+
+                    <div>
+                        КПП: {{ object.russian_requisites.kpp }}
+                    </div>
+
+                    <div>
+                        ИГРН(ИП): {{ object.russian_requisites.pprnie }}
+                    </div>
+                </li>
+
+                <li class="list-group-item d-flex justify-content-between">
+                    <div>
+                        Расчетный счет: {{ object.russian_requisites.checking_account }}
+                    </div>
+
+                    <div>
+                        Корреспондентный счет: {{ object.russian_requisites.correspondent_account }}
+                    </div>
+                </li>
+
+                <li class="list-group-item d-flex justify-content-between">
+                    <div>
+                        Банк: {{ object.russian_requisites.bank_title }}
+                    </div>
+
+                    <div>
+                        БИК банка: {{ object.russian_requisites.bank_bik }}
+                    </div>
+                </li>
+                {% else %}
+                <li class="list-group-item">Реквизиты: {{ object.russian_requisites }}</li>
+                {% endif %}
+            </ul>
+        </div>
+        <div class="tab-pane fade" id="more" role="tabpanel" aria-labelledby="more-tab">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">Ответственный: {{ object.responsible }}</li>
+                <li class="list-group-item">Тэги: {{ object.tag }}</li>
+            </ul>
+
+        </div>
+        <div class="tab-pane fade" id="contacts" role="tabpanel" aria-labelledby="contacts-tab">
+            <div class="card-body">
+                {% if object.contact_persons.all %}
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Имя</th>
+                        <th scope="col">Отчество</th>
+                        <th scope="col">Фамилия</th>
+                        <th scope="col">Должность</th>
+                        <th scope="col">Редактировать</th>
+                        <th scope="col">Поставить/убрать пометку на удаление</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for contact_person in object.contact_persons.all %}
+                    <tr class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}">
+
+                        <td>
+                            <a class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}"
+                               href="{% url 'contractor_contact_person_detail' object.id contact_person.id %}">
+                                {{ contact_person.name }}
+                            </a>
+                        </td>
+
+                        <td>
+                            {{ contact_person.second_name }}
+                        </td>
+
+                        <td>
+                            {{ contact_person.last_name }}
+                        </td>
+
+                        <td>
+                            {{ contact_person.position }}
+                        </td>
+
+                        <td class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}">
+                            <a class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}"
+                               href="{% url 'contractor_contact_person_edit' object.id contact_person.id %}">
+                                Кнопка
+                            </a>
+                        </td>
+
+                        <td class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}">
+                            <a class="{% if contact_person.to_delete %}text-white bg-secondary{% endif %}"
+                               href="{% url 'contractor_contact_person_to_delete' object.id contact_person.id %}">
+                                Кнопка
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <p>
+                    Похоже вы еще не добавили контактных лиц к этому контрагенту.
+                </p>
+                {% endif %}
+                <a href="{% url 'contractor_contact_person_create' object.id %}" class="btn btn-primary">
+                    Добавить контактное лицо
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="col-12">
+    <div class="card">
+        <h4 class="border-top text-center">Комментарии к контрагенту</h4>
+        {% if object.comments.all %}
+        {% for comment in object.comments.all %}
+        <div class="card-body border-top lh-1 {% ifequal comment.user request.user %} text-end {% endifequal %} ">
+            <p class="">{{ comment.text }}</p>
+            <p class="text-black-50">{{ comment.user }} \ {{ comment.created }}</p>
+            {% ifequal comment.user request.user %}
+            <a href="{% url 'contractor_comment_edit' object.id comment.id %}">Ред.</a>
+            <a href="{% url 'contractor_comment_delete' object.id comment.id %}">Удалить</a>
+            {% endifequal %}
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+    <form class="card d-flex flex-row" name="comment-form" method="post">
+        {% csrf_token %}
+        {{ comment_form.text.errors }}
+        {{ comment_form.text }}
+        <input class="btn btn-secondary" type="submit" value="Отправить">
+    </form>
+</div>
+
+
+{% endblock %}

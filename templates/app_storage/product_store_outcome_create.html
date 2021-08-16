@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Приход продукции на склад{% endblock %}
+{% load static %}
+{% block content %}
+{{ product_on_store_error }}
+<h1>Списание продукции со склада</h1>
+<form name="product-outcome-create-form" method="post" action="{% url 'store_outcome_create' store_id %}" class="card col-12 row">
+    {{ formset.management_form }}
+    {% csrf_token %}
+    <div class="card-body">
+        {{ form.as_p }}
+    </div>
+    <table class="table" id="product-outcome-form-wrapper">
+        <thead>
+        <tr>
+            <th scope="col">Склад</th>
+            <th scope="col">Продукция</th>
+            <th scope="col">Количество</th>
+            <th scope="col">Причина</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for product_outcome_form in formset %}
+        <tr class="product-outcome-form-container">
+            <td>{{ product_outcome_form.store.errors }}{{ product_outcome_form.store }}</td>
+            <td>{{ product_outcome_form.product.errors }}{{ product_outcome_form.product }}</td>
+            <td>{{ product_outcome_form.quantity.errors }}{{ product_outcome_form.quantity }}</td>
+            <td>{{ product_outcome_form.reason.errors }}{{ product_outcome_form.reason }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr>
+            <td>
+                <a href="#" id="add_product_outcome" class="btn btn-success col-1 mt-2 fw-bold">
+                    +
+                </a>
+            </td>
+
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        </tfoot>
+    </table>
+    <input type="submit" value="Применить" class="btn btn-primary">
+</form>
+
+{% block extrascripts %}
+<script type="text/JavaScript" src="{%  static 'app_storage/js/product_outcome.js' %}"></script>
+{% endblock %}
+
+{% endblock %}

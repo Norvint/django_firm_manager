@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}Добавить нового контрагента{% endblock %}
+{% load static %}
+{% block content %}
+
+<form name="client-create-form" method="post" action="{% url 'lead_create' %}">
+    {% csrf_token %}
+    <div class="card col-12 mt-2">
+        <div class="card-body">
+            <h3>Новый лид</h3>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item d-flex justify-content-between">
+                <div>
+                    {{ form.title.errors }}
+                    <label class="fw-bold">
+                        {{ form.title.label }}
+                    </label>
+                    {{ form.title }}
+                </div>
+
+                <div>
+                    {{ form.status.errors }}
+                    <label class="fw-bold">
+                        {{ form.status.label }}
+                    </label>
+                    {{ form.status }}
+                </div>
+
+                <div>
+                    {{ form.field_of_activity.errors }}
+                    <label class="fw-bold">
+                        {{ form.field_of_activity.label }}
+                    </label>
+                    {{ form.field_of_activity }}
+                </div>
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between">
+                <div>
+                    {{ form.name.errors }}
+                    <label class="">
+                        {{ form.name.label }}
+                    </label>
+                    {{ form.name }}
+                </div>
+
+                <div>
+                    {{ form.second_name.errors }}
+                    <label class="">
+                        {{ form.second_name.label }}
+                    </label>
+                    {{ form.second_name }}
+                </div>
+
+                <div>
+                    {{ form.last_name.errors }}
+                    <label class="">
+                        {{ form.last_name.label }}
+                    </label>
+                    {{ form.last_name }}
+                </div>
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between">
+                <div>
+                    {{ form.position.errors }}
+                    <label class="">
+                        {{ form.position.label }}
+                    </label>
+                    {{ form.position }}
+                </div>
+
+                <div>
+                    {{ form.country.errors }}
+                    <label class="fw-bold">
+                        {{ form.country.label }}
+                    </label>
+                    {{ form.country }}
+                </div>
+
+                <div>
+                    {{ form.city.errors }}
+                    <label class="fw-bold">
+                        {{ form.city.label }}
+                    </label>
+                    {{ form.city }}
+                </div>
+
+                <div>
+                    {{ form.purpose.errors }}
+                    <label class="fw-bold">
+                        {{ form.purpose.label }}
+                    </label>
+                    {{ form.purpose }}
+                </div>
+            </li>
+
+            <li class="list-group-item d-flex justify-content-between">
+                {{ form.tag.errors }}
+                <label class="">
+                    {{ form.tag.label }}
+                </label>
+                {{ form.tag }}
+            </li>
+        </ul>
+        <div class="card-body text-center border-bottom">
+            <h3>Контакты лида</h3>
+        </div>
+        <table class="table" id="contact-form-wrapper">
+            {{ formset.management_form }}
+            <thead>
+            <tr>
+                <th scope="col">Тип контакта</th>
+                <th scope="col">Контактные данные</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for contact_form in formset %}
+            <tr class="contact-form-container">
+                <td>
+                    {{ contact_form.type_of_contact.errors }}
+                    {{ contact_form.type_of_contact }}
+                </td>
+
+                <td>
+                    {{ contact_form.errors }}
+                    {{ contact_form.contact }}
+                </td>
+            </tr>
+            {% endfor %}
+
+            </tbody>
+            <tfoot>
+            <tr>
+                <td>
+                    <a href="#" id="add_contact" class="btn btn-success mt-2 fw-bold">
+                        +
+                    </a>
+                </td>
+
+                <td>
+
+                </td>
+            </tr>
+            </tfoot>
+        </table>
+        <div class="card-body border-top">
+            <input type="submit" value="Сохранить лид" class="btn btn-primary mt-2">
+        </div>
+    </div>
+</form>
+
+{% block extrascripts %}
+<script type="text/JavaScript" src="{%  static 'app_crm/js/contact.js' %}"></script>
+{% endblock %}
+
+
+{% endblock %}

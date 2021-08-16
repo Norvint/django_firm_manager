@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Редактировать комментарий{% endblock %}
+
+{% block content %}
+<h1>Редактировать комментарий</h1>
+{{ errors }}
+
+<form method="post" name="comment-edit-form">
+    <div class="card col-6">
+        {% csrf_token %}
+        {{ comment_form.as_table }}
+        <input class="btn btn-primary col-3" type="submit" value="Сохранить">
+    </div>
+</form>
+
+{% endblock %}

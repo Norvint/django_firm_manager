@@ -264,16 +264,16 @@ class CRMViewsTests(TestCase):
                                                kwargs={'pk': lead.pk, 'contact_person_pk': contact_person.pk}))
 
     def test_lead_contact_person_edit_view(self):
-        lead = Lead.objects.first()
-        contact_person = LeadContactPerson.objects.first()
-        type_of_contact = ContactPersonContactType.objects.first()
+        lead = Lead.objects.all().first()
+        contact_person = LeadContactPerson.objects.all().first()
+        type_of_contact = ContactPersonContactType.objects.all().first()
         url = reverse('lead_contact_person_edit', kwargs={'pk': lead.pk,
                                                           'contact_person_pk': contact_person.pk})
         response = self.client.post(url, {'name': 'Андрей', 'lead': f'{lead.pk}',
                                           'form-0-type_of_contact': f'{type_of_contact.pk}',
                                           'form-0-contact': '@norvint',
                                           'form-TOTAL_FORMS': 1, 'form-INITIAL_FORMS': 0})
-        edited_contact_person = LeadContactPerson.objects.first()
+        edited_contact_person = LeadContactPerson.objects.all().first()
         contacts = LeadContactPersonContact.objects.filter(contact_person=edited_contact_person).first()
         self.assertNotEqual(contact_person.name, edited_contact_person.name)
         self.assertEqual(model_to_dict(contacts),

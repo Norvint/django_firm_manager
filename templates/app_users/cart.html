@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Корзина пользователя{% endblock %}
+
+{% block content %}
+<h1>Корзина пользователя</h1>
+{% if products_in_cart %}
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th scope="col">Продукт</th>
+        <th scope="col">Описание продукта</th>
+        <th scope="col">Склад</th>
+        <th scope="col">Количество</th>
+        <th scope="col"></th>
+        <th scope="col"></th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for product_in_cart in products_in_cart %}
+    <tr>
+        <td>{{ product_in_cart.product }}</td>
+
+        <td>{{ product_in_cart.product.description }}</td>
+
+        <td>{{ product_in_cart.store }}</td>
+
+        <td>{{ product_in_cart.quantity }}</td>
+
+        <td>
+            <form action="{% url 'add_product_to_cart' product_in_cart.product.id product_in_cart.store.id product_in_cart.cart.id %}" method="post">
+                {% csrf_token %}
+                <input class="btn btn-outline-success" type="submit" name="add" value="+" />
+            </form>
+        </td>
+
+       <td>
+           <form action="{% url 'dismiss_product_from_cart' product_in_cart.product.id product_in_cart.store.id product_in_cart.cart.id %}" method="post">
+                {% csrf_token %}
+                <input class="btn btn-outline-danger" type="submit" name="dismiss" value="-" />
+           </form>
+       </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}

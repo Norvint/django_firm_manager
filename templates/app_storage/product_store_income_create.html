@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Приход продукции на склад{% endblock %}
+{% load static %}
+{% block content %}
+
+<h1>Приход продукции на склад</h1>
+<form name="product-income-create-form" method="post" action="{% url 'store_income_create' store_id %}" class="card col-12 row">
+    {{ formset.management_form }}
+    {% csrf_token %}
+    <table class="table" id="product-income-form-wrapper">
+        <thead>
+        <tr>
+            <th scope="col">Склад</th>
+            <th scope="col">Продукция</th>
+            <th scope="col">Количество</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for product_income_form in formset %}
+        <tr class="product-income-form-container">
+            <td>{{ product_income_form.store }}</td>
+            <td>{{ product_income_form.product }}</td>
+            <td>{{ product_income_form.quantity }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+        <tr>
+            <td>
+                <a href="#" id="add_product_income" class="btn btn-success col-1 mt-2 fw-bold">
+                    +
+                </a>
+            </td>
+
+            <td></td>
+
+            <td></td>
+        </tr>
+        </tfoot>
+    </table>
+    <input type="submit" value="Применить" class="btn btn-primary">
+</form>
+
+{% block extrascripts %}
+<script type="text/JavaScript" src="{%  static 'app_storage/js/product_income.js' %}"></script>
+{% endblock %}
+
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Спецификации{% endblock %}
+
+{% block content %}
+<div class="dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+       data-bs-toggle="dropdown" aria-expanded="false">
+        Навигация по контрагенту
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+        <li>
+            <a href="{% url 'contractor_detail' pk %}"
+               class="dropdown-item">Контрагент</a>
+        </li>
+
+        <li>
+            <a href="{% url 'contractor_contracts_list' pk %}" class="dropdown-item">Договоры</a>
+        </li>
+    </ul>
+</div>
+
+<h1>Заказы</h1>
+<div class="dropdown">
+  <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+    Добавить
+  </a>
+
+  <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+    <li><a class="dropdown-item" href="{% url 'order_create' 0 pk %}">Заказ</a></li>
+
+    <li>
+        <a class="dropdown-item" href="{% url 'order_without_contract_create' pk %}">Заказ без договора</a>
+    </li>
+  </ul>
+</div>
+{% if orders %}
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th scope="col">Номер</th>
+        <th scope="col">Договор</th>
+        <th scope="col">Контрагент</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for order in orders %}
+    <tr class="{% if order.to_delete %} text-white bg-secondary {% endif %}">
+        <td>
+            <a class="{% if order.to_delete %} text-white {% else %} text-reset {% endif %}"
+               href="{% url 'order_detail' order.id %}">{{ order.number }}</a>
+        </td>
+        <td>
+            <a class="{% if order.to_delete %} text-white {% else %} text-reset {% endif %}"
+               href="{% url 'contract_detail' order.contract.id %}">{{ order.contract }}</a>
+        </td>
+        <td>
+            <a class="{% if order.to_delete %} text-white {% else %} text-reset {% endif %}"
+               href="{% url 'contractor_detail' order.contract.contractor.id %}">{{ order.contract.contractor }}</a>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endif %}
+{% endblock %}

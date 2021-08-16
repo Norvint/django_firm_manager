@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block title %}Выпуски продукции{% endblock %}
+{% load static %}
+{% block content %}
+
+<h2>Выпуски продукции</h2>
+
+<div class="card col-12 mt-2">
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home" type="button"
+                    role="tab" aria-controls="home" aria-selected="true">Без заказа
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="order-tab" data-bs-toggle="tab" data-bs-target="#order" type="button"
+                    role="tab" aria-controls="order" aria-selected="false">По заказам
+            </button>
+        </li>
+
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="orderwc-tab" data-bs-toggle="tab" data-bs-target="#orderwc" type="button"
+                    role="tab" aria-controls="orderwc" aria-selected="false">По заказам без договора
+            </button>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">Склад</th>
+                    <th scope="col">Продукция</th>
+                    <th scope="col">Количество</th>
+                    <th scope="col">Дата</th>
+                    <th scope="col">Ответственный</th>
+                    <th scope="col">Причина</th>
+                    <th scope="col">Комментарий</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for product_store_outcome in product_store_outcome_list %}
+                <tr>
+                    <td>
+                        <a class="text-reset" href="{% url 'store_detail' product_store_outcome.store.id %}">
+                            {{ product_store_outcome.store }}
+                        </a>
+                    </td>
+
+                    <td>
+                        <a class="text-reset" href="{% url 'product_detail' product_store_outcome.product.id %}">
+                            {{ product_store_outcome.product }}
+                        </a>
+                    </td>
+
+                    <td>
+                        {{ product_store_outcome.quantity }}
+                    </td>
+
+                    <td>
+                        {{ product_store_outcome.date }}
+                    </td>
+
+                    <td>
+                        {{ product_store_outcome.responsible }}
+                    </td>
+
+                    <td>
+                        {{ product_store_outcome.reason }}
+                    </td>
+
+                    <td>
+                        {{ product_store_outcome.comment }}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="tab-pane fade" id="order" role="tabpanel" aria-labelledby="order-tab">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">Склад</th>
+                    <th scope="col">Продукция</th>
+                    <th scope="col">Количество</th>
+                    <th scope="col">Дата</th>
+                    <th scope="col">Ответственный</th>
+                    <th scope="col">Заказ</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for product_store_order_outcome in product_store_orders_outcome_list %}
+                <tr>
+                    <td>
+                        <a class="text-reset" href="{% url 'store_detail' product_store_order_outcome.store.id %}">
+                            {{ product_store_order_outcome.store }}
+                        </a>
+                    </td>
+
+                    <td>
+                        <a class="text-reset" href="{% url 'product_detail' product_store_order_outcome.product.id %}">
+                            {{ product_store_order_outcome.product }}
+                        </a>
+                    </td>
+
+                    <td>
+                        {{ product_store_order_outcome.quantity }}
+                    </td>
+
+                    <td>
+                        {{ product_store_order_outcome.order.created }}
+                    </td>
+
+                    <td>
+                        {{ product_store_order_outcome.order.responsible }}
+                    </td>
+                    <td>
+                        <a class="text-reset" href="{% url 'order_detail' product_store_order_outcome.order.id %}">
+                            {{ product_store_order_outcome.order.number }}
+                        </a>
+
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="tab-pane fade" id="orderwc" role="tabpanel" aria-labelledby="orderwc-tab">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">Склад</th>
+                    <th scope="col">Продукция</th>
+                    <th scope="col">Количество</th>
+                    <th scope="col">Дата</th>
+                    <th scope="col">Ответственный</th>
+                    <th scope="col">Заказ</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for product_store_order_outcome in product_store_orderswc_outcome_list %}
+                <tr>
+                    <td>
+                        <a class="text-reset" href="{% url 'store_detail' product_store_order_outcome.store.id %}">
+                            {{ product_store_order_outcome.store }}
+                        </a>
+                    </td>
+
+                    <td>
+                        <a class="text-reset" href="{% url 'product_detail' product_store_order_outcome.product.id %}">
+                            {{ product_store_order_outcome.product }}
+                        </a>
+                    </td>
+
+                    <td>
+                        {{ product_store_order_outcome.quantity }}
+                    </td>
+
+                    <td>
+                        {{ product_store_order_outcome.order.created }}
+                    </td>
+
+                    <td>
+                        {{ product_store_order_outcome.order.responsible }}
+                    </td>
+
+                    <td>
+                        <a class="text-reset"
+                           href="{% url 'order_without_contract_detail' product_store_order_outcome.order.id %}">
+                            {{ product_store_order_outcome.order.number }}
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
