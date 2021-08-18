@@ -69,7 +69,7 @@ class Contractor(models.Model):
 
     class Meta:
         verbose_name = 'Контрагент'
-        verbose_name_plural = 'Контрагент'
+        verbose_name_plural = 'Контрагенты'
 
     def __str__(self):
         return f'{self.title} - {self.country}'

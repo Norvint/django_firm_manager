@@ -1,3 +1,7 @@
+[![Django CI](https://github.com/Norvint/django_firm_manager/actions/workflows/django.yml/badge.svg)](https://github.com/Norvint/django_firm_manager/actions/workflows/django.yml)
+
+[![Pylint](https://github.com/Norvint/django_firm_manager/actions/workflows/pylint.yml/badge.svg)](https://github.com/Norvint/django_firm_manager/actions/workflows/pylint.yml)
+
 # Django firm manager (Рабочее название)
 
 Небольшая CRM система для работы в небольшом предприятии.

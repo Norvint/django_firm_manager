@@ -1,9 +1,8 @@
-from django.db.models import Sum
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 
-from app_documents.models import OrderWithoutContract
-from app_storage.models import Order, ProductStoreOrderBooking, ProductStoreOrderWCBooking
+from app_documents.models import Order, OrderWithoutContract
+from app_storage.models import ProductStoreOrderBooking, ProductStoreOrderWCBooking
 
 
 @receiver(pre_save, sender=Order)
