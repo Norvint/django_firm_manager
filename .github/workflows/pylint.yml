@@ -20,4 +20,4 @@ jobs:
         pip install pylint-django
     - name: Analysing the code with pylint
       run: |
-        pylint `ls -R|grep .py$|xargs --load-plugins pylint_django`
+        pylint `ls -R|grep .py$|xargs --load-plugins=pylint_django`
