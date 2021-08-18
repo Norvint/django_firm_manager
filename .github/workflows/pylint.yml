@@ -21,4 +21,4 @@ jobs:
         pip install pylint-django
     - name: Analysing the code with pylint
       run: |
-        pylint --load-plugins=pylint_django init-hook="from pylint.config import find_pylintrc;import os, sys; sys.path.append(os.path.dirname(find_pylintrc()))" `ls -R|grep .py$|xargs`
+        pylint --load-plugins=pylint_django init-hook="from pylint.config import find_pylintrc;import os, sys; sys.path.append('..')" `ls -R|grep .py$|xargs`
