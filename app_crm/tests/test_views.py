@@ -92,29 +92,6 @@ class CRMViewsTests(TestCase):
         self.assertEqual(contractor.to_delete, True)
         self.assertRedirects(response, reverse('contractor_detail', kwargs={'pk': contractor.pk}))
 
-    def test_contractor_file_create_view(self):
-        contractor = Contractor.objects.all().first()
-        url = reverse('contractor_file_create', kwargs={'pk': contractor.pk})
-        file_path = os.path.join(BASE_DIR, 'app_crm', 'tests', 'files', 'probe.txt')
-        with open(file_path, 'r', encoding='utf-8') as file:
-            response = self.client.post(url, {'title': 'Пробный документ', 'contractor': f'{contractor.pk}',
-                                              'file': file, 'description': 'Описание файла', 'category': '1'})
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(len(ContractorFile.objects.filter(contractor=contractor.pk)), 1)
-        self.assertRedirects(response, reverse('contractor_files_list', kwargs={'pk': contractor.pk}))
-
-    def test_contractor_file_download_view(self):
-        contractor = Contractor.objects.all().first()
-        url = reverse('contractor_file_create', kwargs={'pk': contractor.pk})
-        file_path = os.path.join(BASE_DIR, 'app_crm', 'tests', 'files', 'probe.txt')
-        with open(file_path, 'r', encoding='utf-8') as file:
-            self.client.post(url, {'title': 'Пробный документ', 'contractor': f'{contractor.pk}', 'file': file,
-                                   'description': 'Описание файла', 'category': '1'})
-        contractor_file = ContractorFile.objects.get(contractor=contractor.pk)
-        url = reverse('contractor_file_download', kwargs={'pk': contractor.pk, 'file_pk': contractor_file.pk})
-        response = self.client.get(url)
-        self.assertEqual(type(response), FileResponse)
-
     def test_contractor_comment_edit_view(self):
         contractor = Contractor.objects.all().first()
         url = reverse('contractor_detail', kwargs={'pk': contractor.pk})
