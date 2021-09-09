@@ -4,7 +4,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.views.generic import TemplateView, ListView
 
 from app_organizations.models import Worker
-from app_users.models import Cart, CartProduct
+from app_storage.models import Cart, CartProduct
 
 
 class CustomLoginView(LoginView):

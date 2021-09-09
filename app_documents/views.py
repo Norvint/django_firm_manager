@@ -22,8 +22,7 @@ from app_documents.utilities.docx_creator.invoice import InvoiceCreator, Russian
 from app_documents.utilities.docx_creator.specification import SpecificationCreator
 from app_documents.utilities.docx_creator.contract import ContractCreator
 from app_documents.utilities.docx_creator.upd import UpdCreator, UpdWithoutContractCreator
-from app_storage.models import ProductStore, ProductStoreOrderBooking, ProductStoreOrderWCBooking
-from app_users.models import CartProduct
+from app_storage.models import ProductStore, ProductStoreOrderBooking, ProductStoreOrderWCBooking, CartProduct
 from firmmanager.settings import BASE_DIR
 
 

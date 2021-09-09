@@ -6,7 +6,7 @@ from app_storage.views import ProductCreateView, ProductListView, ProductDetailV
 
 urlpatterns = [
     path('products/', include([
-        path('list/', ProductListView.as_view(), name='products_list'),
+        path('', ProductListView.as_view(), name='products_list'),
         path('create-product/', ProductCreateView.as_view(), name='product_create'),
         path('<int:pk>/', include([
             path('detail/', ProductDetailView.as_view(), name='product_detail'),
@@ -19,9 +19,9 @@ urlpatterns = [
         ])),
     ])),
     path('stores/', include([
-        path('list/', StoreListView.as_view(), name='stores_list'),
+        path('', StoreListView.as_view(), name='stores_list'),
         path('<int:pk>/', include([
-            path('detail/', StoreDetailView.as_view(), name='store_detail'),
+            path('', StoreDetailView.as_view(), name='store_detail'),
             path('product-outcome/', include([
                 path('create/', ProductStoreOutcomeCreateView.as_view(), name='store_outcome_create'),
                 path('list/', ProductStoreOutcomeListView.as_view(), name='store_outcome_list'),

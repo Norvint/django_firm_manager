@@ -12,8 +12,7 @@ from app_documents.models import ContractType, Currency, Contract, DeliveryCondi
     OrderWithoutContract
 from app_organizations.models import Organization
 from app_storage.models import ProductType, PackageInsideType, PackageOutsideType, Product, Store, \
-    ProductStoreOrderBooking, ProductStoreOrderWCBooking, ProductStore
-from app_users.models import Cart, CartProduct
+    ProductStoreOrderBooking, ProductStoreOrderWCBooking, ProductStore, Cart, CartProduct
 
 
 class DocumentsViewsTest(TestCase):

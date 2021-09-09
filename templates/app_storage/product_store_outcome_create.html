@@ -5,7 +5,7 @@
 {% block content %}
 {{ product_on_store_error }}
 <h1>Списание продукции со склада</h1>
-<form name="product-outcome-create-form" method="post" action="{% url 'store_outcome_create' store_id %}" class="card col-12 row">
+<form name="product-outcome-create-form" method="post" action="{% url 'store_outcome_create' pk %}" class="card col-12 row">
     {{ formset.management_form }}
     {% csrf_token %}
     <div class="card-body">

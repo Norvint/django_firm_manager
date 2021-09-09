@@ -6,11 +6,10 @@ from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView, TemplateView
 from django.views.generic.base import View
 
-from app_storage.forms import ProductStoreForm, ProductForm, ProductFilterForm, ProductStoreOutcomeForm, \
-    ProductStoreOutcomeAdditionForm
+from app_storage.forms import ProductForm, ProductFilterForm, ProductStoreOutcomeForm, \
+    ProductStoreOutcomeAdditionForm, ProductStoreIncomeForm
 from app_storage.models import Product, ProductStore, Store, ProductStoreIncome, ProductStoreOutcome, \
-    ProductStoreOrderBooking, ProductStoreOrderWCBooking
-from app_users.models import Cart, CartProduct
+    ProductStoreOrderBooking, ProductStoreOrderWCBooking, Cart, CartProduct
 
 
 class ProductListView(LoginRequiredMixin, ListView):
@@ -89,16 +88,13 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
             for i, form in enumerate(formset):
                 data = formset.cleaned_data[i]
                 if form.is_valid() and data:
-                    context['answer'] += f'{data["number"]}, '
                     form.save()
                 else:
                     context['formset'] = formset
-                    context['errors'] = formset.errors
                     return self.render_to_response(context)
             return redirect('products_list')
         else:
             context['formset'] = formset
-            context['errors'] = formset.errors
         return self.render_to_response(context)
 
 
@@ -115,14 +111,14 @@ class ProductStoreIncomeCreateView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(ProductStoreIncomeCreateView, self).get_context_data(**kwargs)
-        store_income_formset = formset_factory(ProductStoreForm, extra=0)
+        store_income_formset = formset_factory(ProductStoreIncomeForm, extra=0)
         formset = store_income_formset(initial=[{'store': kwargs.get('pk')}])
         context['formset'] = formset
         return context
 
     def post(self, request, *args, **kwargs):
         context = self.get_context_data(**kwargs)
-        store_income_formset = formset_factory(ProductStoreForm)
+        store_income_formset = formset_factory(ProductStoreIncomeForm)
         formset = store_income_formset(request.POST)
         if formset.is_valid():
             for i, form in enumerate(formset):
@@ -185,7 +181,7 @@ class ProductStoreOutcomeCreateView(LoginRequiredMixin, TemplateView):
                     context['product_on_store_error'] = f'На {form_data["store"]} нет продукции {form_data["product"]}'
                     context['formset'] = formset
                     return self.render_to_response(context)
-            return redirect('store_outcome_list', store_id=form_data['store'].id)
+            return redirect('store_outcome_list', pk=form_data['store'].id)
         else:
             context['formset'] = formset
         return self.render_to_response(context)

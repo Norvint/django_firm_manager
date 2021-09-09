@@ -5,7 +5,7 @@
 {% block content %}
 
 <h1>Приход продукции на склад</h1>
-<form name="product-income-create-form" method="post" action="{% url 'store_income_create' store_id %}" class="card col-12 row">
+<form name="product-income-create-form" method="post" action="{% url 'store_income_create' pk %}" class="card col-12 row">
     {{ formset.management_form }}
     {% csrf_token %}
     <table class="table" id="product-income-form-wrapper">

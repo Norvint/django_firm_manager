@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from app_storage.models import Product, ProductType, PackageOutsideType, PackageInsideType, Store, ProductStore, \
-    ProductStoreIncome, ProductStoreOutcome, ProductStoreOutcomeReason
+    ProductStoreIncome, ProductStoreOutcome, ProductStoreOutcomeReason, Cart
 
 
 @admin.register(Product)
@@ -46,4 +46,9 @@ class ProductStoreOutcomeAdmin(admin.ModelAdmin):
 
 @admin.register(ProductStoreOutcomeReason)
 class ProductStoreOutcomeReasonAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Cart)
+class CartAdmin(admin.ModelAdmin):
     pass
