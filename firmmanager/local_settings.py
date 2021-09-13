@@ -3,9 +3,9 @@ LOCAL_ALLOWED_HOSTS = []
 
 LOCAL_DATABASE = {
     'ENGINE': 'django.db.backends.postgresql_psycopg2',
-    'NAME': 'kogleser',
-    'USER': 'kogleser',
-    'PASSWORD': 'Marvel!96!',
+    'NAME': 'postgres',
+    'USER': 'postgres',
+    'PASSWORD': 'postgres',
     'HOST': '127.0.0.1',
     'PORT': '5432',
 }
