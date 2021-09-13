@@ -12,7 +12,20 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import os
 from pathlib import Path
 
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
 from firmmanager.local_settings import LOCAL_ALLOWED_HOSTS, LOCAL_KEY, LOCAL_DATABASE
+
+
+sentry_sdk.init(
+    dsn="https://7a6ae63805cb423296cd7d593a718f28@o997875.ingest.sentry.io/5956238",
+    integrations=[DjangoIntegration()],
+
+    traces_sample_rate=1.0,
+
+    send_default_pii=True
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

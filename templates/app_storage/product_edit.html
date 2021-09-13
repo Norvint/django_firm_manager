@@ -4,7 +4,7 @@
 
 {% block content %}
 
-<form method="post" name="product-edit" class="card col-12 mt-2">
+<form method="post" name="product-edit" class="card col-12 mt-2"  enctype="multipart/form-data">
     {% csrf_token %}
     <div class="card-body">
         <h3>Редактирование продукции</h3>
@@ -81,6 +81,24 @@
                 {{ form.packing_outside.errors }}
                 {{ form.packing_outside.label }}
                 {{ form.packing_outside }}
+            </div>
+        </li>
+        <li class="list-group-item d-flex justify-content-start">
+            <div class="me-5 d-flex flex-column">
+                {{ form.description.errors }}
+                {{ form.description.label }}
+                {{ form.description }}
+            </div>
+            <div class="me-5 d-flex flex-column">
+                {{ form.description_en.errors }}
+                {{ form.description_en.label }}
+                {{ form.description_en }}
+            </div>
+        </li>
+        <li class="list-group-item d-flex justify-content-start">
+            <div class="me-5 d-flex flex-column">
+                Добавить изображения товара
+                {{ image_form.file }}
             </div>
         </li>
     </ul>

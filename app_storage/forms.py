@@ -1,4 +1,5 @@
 from django import forms
+from django.core.validators import FileExtensionValidator
 
 from app_storage.models import Product, ProductType, ProductStoreIncome, ProductStoreOutcome
 
@@ -24,8 +25,14 @@ class ProductStoreOutcomeAdditionForm(forms.ModelForm):
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['number', 'type_of_product', 'model', 'size', 'version', 'materials', 'color', 'packing_inside',
-                  'packing_outside', 'country', 'cost']
+        fields = '__all__'
+
+
+class ProductImageForm(forms.Form):
+    file = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}),
+                           validators=[FileExtensionValidator(allowed_extensions=['png, jpeg', 'jpg', 'svg',
+                                                                                        'jpeg'])],
+                           label='Изображения товара', required=False)
 
 
 class ProductFilterForm(forms.Form):

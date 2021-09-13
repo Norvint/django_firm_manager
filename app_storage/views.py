@@ -1,15 +1,14 @@
-import os
-
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import formset_factory
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView, TemplateView
 from django.views.generic.base import View
 
 from app_storage.forms import ProductForm, ProductFilterForm, ProductStoreOutcomeForm, \
-    ProductStoreOutcomeAdditionForm, ProductStoreIncomeForm
+    ProductStoreOutcomeAdditionForm, ProductStoreIncomeForm, ProductImageForm
 from app_storage.models import Product, ProductStore, Store, ProductStoreIncome, ProductStoreOutcome, \
-    ProductStoreOrderBooking, ProductStoreOrderWCBooking, Cart, CartProduct
+    ProductStoreOrderBooking, ProductStoreOrderWCBooking, Cart, CartProduct, ProductImage
 
 
 class ProductListView(LoginRequiredMixin, ListView):
@@ -65,45 +64,52 @@ class ProductDetailView(LoginRequiredMixin, DetailView):
         return self.render_to_response(context)
 
 
-class ProductCreateView(LoginRequiredMixin, CreateView):
+class ProductCreateView(LoginRequiredMixin, FormView):
     template_name = 'app_storage/product_create.html'
-    model = Product
-    fields = ['number', 'type_of_product', 'model', 'size', 'version', 'materials', 'color',
-              'packing_inside', 'packing_outside', 'country']
+    form_class = ProductForm
+    success_url = 'products_list'
 
     def get(self, request, *args, **kwargs):
         super(ProductCreateView, self).get(request, *args, **kwargs)
         context = self.get_context_data()
-        ProductFormSet = formset_factory(ProductForm)
-        formset = ProductFormSet
-        context['formset'] = formset
+        context['image_form'] = ProductImageForm()
         return self.render_to_response(context)
 
     def post(self, request, *args, **kwargs):
         super(ProductCreateView, self).post(request, *args, **kwargs)
         context = self.get_context_data()
-        ProductFormSet = formset_factory(ProductForm)
-        formset = ProductFormSet(request.POST)
-        if formset.is_valid():
-            for i, form in enumerate(formset):
-                data = formset.cleaned_data[i]
-                if form.is_valid() and data:
-                    form.save()
-                else:
-                    context['formset'] = formset
-                    return self.render_to_response(context)
+        form = ProductForm(request.POST)
+        image_form = ProductImageForm(request.POST, request.FILES)
+        if form.is_valid() and image_form.is_valid():
+            product = form.save()
+            images = request.FILES.getlist('file')
+            for i in images:
+                product_image = ProductImage(product=product, image=i)
+                product_image.save()
             return redirect('products_list')
         else:
-            context['formset'] = formset
+            context['form'] = form
+            context['image_form'] = image_form
         return self.render_to_response(context)
 
 
 class ProductEditView(LoginRequiredMixin, UpdateView):
     template_name = 'app_storage/product_edit.html'
     model = Product
-    fields = ['number', 'type_of_product', 'model', 'size', 'version', 'materials', 'color',
-              'packing_inside', 'packing_outside', 'country', 'cost']
-    success_url = '/storage/products'
+    fields = '__all__'
+    # success_url = '/storage/products/'
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductEditView, self).get_context_data(**kwargs)
+        context['image_form'] = ProductImageForm()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        images = request.FILES.getlist('file')
+        for i in images:
+            product_image = ProductImage(product=self.get_object(), image=i)
+            product_image.save()
+        return super(ProductEditView, self).post(self, request, *args, **kwargs)
 
 
 class ProductStoreIncomeCreateView(LoginRequiredMixin, TemplateView):

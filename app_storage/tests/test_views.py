@@ -20,13 +20,12 @@ class StorageViewsTests(TestCase):
 
     def test_product_create_view(self):
         url = reverse('product_create')
-        response = self.client.post(url, data={'form-0-number': '001', 'form-0-model': '045', 'form-0-size': 'Большой',
-                                               'form-0-version': '2', 'form-0-materials': 'Сталь',
-                                               'form-0-type_of_product': 4,
-                                               'form-0-color': 'Черный', 'form-0-packing_inside': 4,
-                                               'form-0-packing_outside': 4, 'form-0-country': 'Россия',
-                                               'form-0-cost': 1000, 'form-TOTAL_FORMS': 1,
-                                               'form-INITIAL_FORMS': 0})
+        response = self.client.post(url, data={'number': '001', 'model': '045', 'size': 'Большой',
+                                               'version': '2', 'materials': 'Сталь',
+                                               'type_of_product': 4,
+                                               'color': 'Черный', 'packing_inside': 4,
+                                               'packing_outside': 4, 'country': 'Россия',
+                                               'cost': 1000})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(len(Product.objects.all()), 2)
 

@@ -3,18 +3,12 @@
 {% load static %}
 <head>
     <meta charset="UTF-8">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
-            crossorigin="anonymous"></script>
+    {% include 'includes.html' %}
     <title>{% block title %}Главная страница{% endblock %}</title>
 </head>
 <body>
 <header>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid container">
             <a class="navbar-brand" href="{% url 'main' %}">Hookah retrofit</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
@@ -80,17 +74,16 @@
 
             {% if request.user.is_authenticated %}
                 {% if request.user.cart %}
-                    <a href="{% url 'cart' %}" class="btn btn-outline-dark">Корзина</a>
+                    <a href="{% url 'cart' %}" class="btn btn-outline-light me-2">Корзина</a>
                 {% endif %}
-            <a href="{% url 'account' %}" class="btn btn-secondary">Профиль</a>
-            <span>&nbsp;</span>
-            <a href="{% url 'logout' %}" class="btn btn-warning">Выйти</a>
+            <a href="{% url 'account' %}" class="btn btn-outline-secondary me-2">Профиль</a>
+            <a href="{% url 'logout' %}" class="btn btn-outline-warning">Выйти</a>
             {% endif %}
         </div>
     </nav>
 </header>
 
-<main>
+<main class="bg-light">
     <div class="container">
         {% block content %}
 

@@ -1,11 +1,25 @@
+import os
+from datetime import datetime
 from decimal import Decimal
 
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models.signals import post_save, pre_save
-from django.dispatch import receiver
+from django.urls import reverse
+from django.utils.deconstruct import deconstructible
 
 from app_documents.models import Order, OrderWithoutContract
+from firmmanager.settings import MEDIA_ROOT
+
+
+@deconstructible
+class UploadToPathAndRename(object):
+
+    def __init__(self, path):
+        self.sub_path = path
+
+    def __call__(self, instance, filename):
+        filename = f'{datetime.now().strftime("%m%d%Y-%H-%M-%S")}_{filename}'
+        return os.path.join(MEDIA_ROOT, self.sub_path, filename)
 
 
 class ProductType(models.Model):
@@ -50,11 +64,12 @@ class Product(models.Model):
     materials = models.CharField('Материалы', max_length=100)
     color = models.CharField('Цвет', max_length=30)
     packing_inside = models.ForeignKey(PackageInsideType, on_delete=models.CASCADE, verbose_name='Внутренняя упаковка')
-    packing_outside = models.ForeignKey(PackageOutsideType, on_delete=models.CASCADE, verbose_name='Внешнняя упаковка')
+    packing_outside = models.ForeignKey(PackageOutsideType, on_delete=models.CASCADE, verbose_name='Внешняя упаковка')
     country = models.CharField('Страна', max_length=50)
     cost = models.DecimalField('Цена за 1 ед. в рублях', decimal_places=2, max_digits=15)
-    description = models.TextField('Описание', max_length=1000, blank=True)
-    description_en = models.TextField('Описание(англ)', max_length=1000, blank=True)
+    description = models.TextField('Описание', max_length=1000, blank=True, null=True, help_text='Описание')
+    description_en = models.TextField('Описание(англ)', max_length=1000, blank=True, null=True,
+                                      help_text='Описание на английском языке')
 
     class Meta:
         verbose_name = 'Продукция'
@@ -62,6 +77,9 @@ class Product(models.Model):
 
     def __str__(self):
         return f'{self.type_of_product}. {self.number}'
+
+    def get_absolute_url(self):
+        return reverse('product_detail', kwargs={'pk': self.pk})
 
 
 class Store(models.Model):
@@ -83,8 +101,8 @@ class ProductStore(models.Model):
     booked = models.IntegerField('Забронировано')
 
     class Meta:
-        verbose_name = 'Колисчество продукции на складе'
-        verbose_name_plural = 'Колисчество продукции на складах'
+        verbose_name = 'Количество продукции на складе'
+        verbose_name_plural = 'Количество продукции на складах'
 
     def __str__(self):
         return f'{self.store} / {self.product} / {self.quantity} / {self.booked}'
@@ -101,6 +119,18 @@ class ProductStore(models.Model):
         return f'На складе {self.store} всего продукции {self.product}' \
                f' - {self.quantity} шт. (с учетом забронированой),' \
                f' требуется - {quantity} шт.'
+
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, verbose_name='Товар', related_name='images')
+    image = models.FileField('Изображение', upload_to=UploadToPathAndRename('app_storage/products/'))
+
+    class Meta:
+        verbose_name = 'Изображение товара'
+        verbose_name_plural = 'Изображения товара'
+
+    def __str__(self):
+        return f'{self.image} - {self.product}'
 
 
 class ProductStoreIncome(models.Model):
@@ -196,6 +226,7 @@ class ProductStoreOrderWCBooking(models.Model):
         if form_data.get('standard_price'):
             self.standard_price = form_data.get('standard_price')
 
+
 class Cart(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Корзина')
     items = models.IntegerField('Количество позиций')
@@ -207,13 +238,6 @@ class Cart(models.Model):
 
     def __str__(self):
         return f'Корзина пользователя {self.user}'
-
-    @receiver(post_save, sender=User)
-    def _create_new_cart_if_needed(sender, instance, **kwargs):
-        try:
-            cart = Cart.objects.get(user=instance)
-        except Cart.DoesNotExist:
-            Cart.objects.create(user=instance, items=0, total_sum=0)
 
 
 class CartProduct(models.Model):

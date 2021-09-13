@@ -6,7 +6,25 @@
 <div class="mt-1 col-12">
     <div class="card">
         <div class="card-body">
-            <h3 class="card-title">{{ object.type_of_product.title }}</h3>
+            <h1 class="card-title">Карточка продукции</h1>
+        </div>
+        <div class="card-img-top">
+            <div class="swiper">
+                <div class="swiper-wrapper">
+                    {% for product_image in object.images.all %}
+                    <div class="swiper-slide align-center">
+                        <img src="{{ product_image.image.url }}" class="mx-auto d-block" width="300px">
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="swiper-pagination"></div>
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
+                <div class="swiper-scrollbar"></div>
+            </div>
+        </div>
+        <div class="card-body">
+            <h3 class="card-text">{{ object.type_of_product.title }}</h3>
         </div>
         <ul class="list-group list-group-flush">
             <li class="list-group-item d-flex justify-content-between">
@@ -50,9 +68,15 @@
                     Внешняя упаковка: {{ object.packing_outside }}
                 </div>
             </li>
+            {% if object.description %}
+            <li class="list-group-item">{{ object.description }}</li>
+            {% endif %}
+            {% if object.description_en %}
+            <li class="list-group-item">{{ object.description_en }}</li>
+            {% endif %}
         </ul>
         <div class="card-body">
-            <a href="{% url 'product_edit' object.id %}" class="btn btn-primary">Редактировать</a>
+            <a href="{% url 'product_edit' object.id %}" class="btn btn-outline-primary">Редактировать</a>
         </div>
     </div>
 </div>
@@ -82,7 +106,7 @@
             <td>
                 <form action="{% url 'add_product_to_cart' object.pk store_with_product.store.pk 0 %}" method="post">
                     {% csrf_token %}
-                    <input class="btn btn-outline-success" type="submit" name="add" value="+" />
+                    <input class="btn btn-outline-success" type="submit" name="add" value="+"/>
                 </form>
             </td>
         </tr>
@@ -115,7 +139,7 @@
             <td>
                 <form action="{% url 'dismiss_product_from_cart' object.pk product_in_cart.store.pk 0 %}" method="post">
                     {% csrf_token %}
-                    <input class="btn btn-outline-danger" type="submit" name="dismiss" value="-" />
+                    <input class="btn btn-outline-danger" type="submit" name="dismiss" value="-"/>
                 </form>
             </td>
         </tr>
@@ -124,5 +148,24 @@
     </table>
 </div>
 {% endif %}
+
+<script>
+const swiper = new Swiper('.swiper', {
+  // Optional parameters
+  loop: true,
+
+  // If we need pagination
+  pagination: {
+    el: '.swiper-pagination',
+  },
+
+  // Navigation arrows
+  navigation: {
+    nextEl: '.swiper-button-next',
+    prevEl: '.swiper-button-prev',
+  },
+});
+</script>
+
 
 {% endblock %}

@@ -6,11 +6,26 @@ from app_crm.models import Contractor, TypeOfContractor, FieldOfActivity, Contra
     LeadContactType, ContractorContactType, ContractorContact
 
 
+class ContractorContactInline(admin.TabularInline):
+    model = ContractorContact
+
+
+class ContractorCommentInline(admin.TabularInline):
+    model = ContractorComment
+    extra = 0
+
+
+class ContractorFileInline(admin.StackedInline):
+    model = ContractorFile
+    extra = 0
+
+
 @admin.register(Contractor)
 class ContractorAdmin(admin.ModelAdmin):
     list_display = ('id', 'title', 'type_of_contractor', 'position', 'name', 'second_name', 'last_name', 'country',
                     'to_delete')
     list_filter = ['type_of_contractor', ]
+    inlines = [ContractorContactInline, ContractorCommentInline, ContractorFileInline]
 
 
 @admin.register(ContractorContactType)
@@ -21,11 +36,6 @@ class ContractorContactTypeAdmin(admin.ModelAdmin):
 @admin.register(ContractorRequisites)
 class ContractorRequisitesAdmin(admin.ModelAdmin):
     pass
-
-
-@admin.register(ContractorContact)
-class ContractorContactAdmin(admin.ModelAdmin):
-    list_display = ['contractor', 'type_of_contact', 'contact']
 
 
 @admin.register(TypeOfContractor)
@@ -43,24 +53,19 @@ class ContractorStatusAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(ContractorComment)
-class ContractorCommentAdmin(admin.ModelAdmin):
-    pass
-
-
 @admin.register(ContactPersonContactType)
 class ContactPersonContactTypeAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(ContractorContactPersonContact)
-class ContactAdmin(admin.ModelAdmin):
-    list_display = ['contact_person', 'type_of_contact', 'contact']
+class ContractorContactPersonContactInline(admin.TabularInline):
+    model = ContractorContactPersonContact
 
 
 @admin.register(ContractorContactPerson)
 class ContractorContactPersonAdmin(admin.ModelAdmin):
     list_display = ['pk', 'contractor', 'last_name', 'name', 'position']
+    inlines = [ContractorContactPersonContactInline]
 
 
 @admin.register(ContractorFileCategory)
@@ -68,36 +73,28 @@ class ContractorFileCategoryAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(ContractorFile)
-class ContractorFileAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'contractor', 'description', 'category')
-    list_filter = ['category',]
-    search_fields = ('contractor__title', 'title')
-
-
 @admin.register(LeadStatus)
 class LeadStatusAdmin(admin.ModelAdmin):
     list_display = ['title', ]
 
 
+class LeadContactInline(admin.TabularInline):
+    model = LeadContact
+
+
 @admin.register(Lead)
 class LeadAdmin(admin.ModelAdmin):
-    pass
+    inlines = [LeadContactInline]
 
 
-@admin.register(LeadContact)
-class LeadContactAdmin(admin.ModelAdmin):
-    list_display = ['lead', 'type_of_contact', 'contact']
+class LeadContactPersonContactInline(admin.TabularInline):
+    model = LeadContactPersonContact
 
 
 @admin.register(LeadContactPerson)
 class LeadContactPersonAdmin(admin.ModelAdmin):
     list_display = ['lead', 'last_name', 'name', 'position']
-
-
-@admin.register(LeadContactPersonContact)
-class LeadContactPersonContactAdmin(admin.ModelAdmin):
-    list_display = ['contact_person', 'type_of_contact', 'contact']
+    inlines = [LeadContactPersonContactInline]
 
 
 @admin.register(LeadContactType)

@@ -1,12 +1,17 @@
 from django.contrib import admin
 
 from app_storage.models import Product, ProductType, PackageOutsideType, PackageInsideType, Store, ProductStore, \
-    ProductStoreIncome, ProductStoreOutcome, ProductStoreOutcomeReason, Cart
+    ProductStoreIncome, ProductStoreOutcome, ProductStoreOutcomeReason, Cart, CartProduct, ProductImage
+
+
+class ProductStoreInLine(admin.TabularInline):
+    model = ProductStore
 
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ['type_of_product', 'number', 'model', 'size', 'version', 'color']
+    inlines = [ProductStoreInLine]
 
 
 @admin.register(ProductType)
@@ -27,11 +32,7 @@ class PackageOutsideTypeAdmin(admin.ModelAdmin):
 @admin.register(Store)
 class StoreAdmin(admin.ModelAdmin):
     list_display = ['title', 'address']
-
-
-@admin.register(ProductStore)
-class ProductStoreAdmin(admin.ModelAdmin):
-    list_display = ['store', 'product', 'quantity']
+    inlines = [ProductStoreInLine]
 
 
 @admin.register(ProductStoreIncome)
@@ -49,6 +50,16 @@ class ProductStoreOutcomeReasonAdmin(admin.ModelAdmin):
     pass
 
 
+class CartProductInline(admin.TabularInline):
+    model = CartProduct
+
+
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
+    list_display = ['id', 'user', 'total_sum']
+    inlines = [CartProductInline]
+
+
+@admin.register(ProductImage)
+class ProductImageAdmin(admin.ModelAdmin):
     pass
