@@ -3,7 +3,6 @@ import os
 from datetime import datetime
 
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.exceptions import ObjectDoesNotExist
 from django.forms import formset_factory, model_to_dict
 from django.http import HttpResponse
 from django.shortcuts import redirect
@@ -18,7 +17,7 @@ from app_documents.models import Contract, ContractType, Currency, DeliveryCondi
     OrderWithoutContract
 from app_documents.utilities.currencies_parser import CurrenciesUpdater
 from app_documents.utilities.docx_creator.goods_acceptance import GoodsAcceptanceCreator
-from app_documents.utilities.docx_creator.invoice import InvoiceCreator, RussianInvoiceCreator, RussianInvoiceWCCreator
+from app_documents.utilities.docx_creator.invoice import InvoiceCreator, RussianInvoiceWCCreator
 from app_documents.utilities.docx_creator.specification import SpecificationCreator
 from app_documents.utilities.docx_creator.contract import ContractCreator
 from app_documents.utilities.docx_creator.upd import UpdCreator, UpdWithoutContractCreator
@@ -90,7 +89,7 @@ class ContractDetailView(LoginRequiredMixin, DetailView):
     template_name = 'app_documents/contracts/contract_detail.html'
     model = Contract
 
-    def download_contract(request, **kwargs):
+    async def download_contract(request, **kwargs):
         contract = Contract.objects.get(pk=kwargs.get('pk'))
         contract_creator = ContractCreator(contract)
         contract_creator.create_contract()
@@ -160,11 +159,9 @@ class CurrencyDetailView(LoginRequiredMixin, DetailView):
     model = Currency
 
 
-class CurrencyUpdate(LoginRequiredMixin, TemplateView):
-    template_name = ''
+class CurrencyUpdate(LoginRequiredMixin, View):
 
-    def get(self, request, *args, **kwargs):
-        context = self.get_context_data(**kwargs)
+    def post(self, request, *args, **kwargs):
         currencies_updater = CurrenciesUpdater()
         currencies_updater.get_currencies()
         currencies_updater.update_currencies()
@@ -648,19 +645,19 @@ class OrderWCBookingEditView(LoginRequiredMixin, TemplateView):
         booking = ProductStoreOrderWCBooking.objects.get(pk=kwargs.get('booking_pk'))
         order = booking.order
         if form.is_valid():
-            data = form.cleaned_data
             product_on_store = ProductStore.objects.get(product=booking.product, store=booking.store)
             product_on_store.cancel_book_product(quantity=booking.quantity)
-            if product_on_store.quantity > data['quantity']:
-                product_on_store.book_product(data['quantity'])
+            if product_on_store.quantity > form.cleaned_data['quantity']:
+                product_on_store.book_product(form.cleaned_data['quantity'])
                 product_on_store.save()
-                booking.update_booking(data)
+                booking.update_booking(form.cleaned_data)
                 booking.save()
                 order.save()
                 return redirect('order_without_contract_detail', pk=booking.order.pk)
             else:
                 context['form'] = form
-                context['products_on_store_error'] = product_on_store.less_then_needed_error(quantity=data['quantity'])
+                context['products_on_store_error'] = product_on_store.less_then_needed_error(
+                    quantity=form.cleaned_data['quantity'])
         else:
             context['form'] = form
         return self.render_to_response(context)

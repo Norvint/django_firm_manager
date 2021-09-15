@@ -15,7 +15,10 @@
     <a class="nav-link active" aria-current="page" href="{% url 'currencies_list' %}">Валюты</a>
   </li>
 </ul>
-<!--<a href="{% url 'currencies_update' %}" class="btn btn-primary">Синхронизировать валюты</a>-->
+<form method="post" action="{% url 'currencies_update' %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-outline-dark">Синхронизировать валюты</button>
+</form>
 <h1>Валюты</h1>
 
 {% if currencies %}

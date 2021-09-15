@@ -17,15 +17,30 @@
         </a>
         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
             {% ifnotequal object.status.title 'Конвертирован' %}
-            <li><a class="dropdown-item" href="{% url 'lead_contractor_create' object.id %}">Перевсти в контрагенты</a></li>
+            <li>
+                <form method="post" action="{% url 'lead_contractor_create' object.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="dropdown-item">Перевести с контрагенты</button>
+                </form>
+            </li>
             {% endifnotequal %}
 
             {% ifnotequal object.status.title 'Некачественный' %}
-            <li><a class="dropdown-item" href="{% url 'lead_status_substandard' object.id %}">Некачественный</a></li>
+            <li>
+                <form method="post" action="{% url 'lead_status_substandard' object.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="dropdown-item">Некачественный</button>
+                </form>
+            </li>
             {% endifnotequal %}
 
             {% ifnotequal object.status.title 'Отложенный' %}
-            <li><a class="dropdown-item" href="{% url 'lead_status_deferred' object.id %}">Отложенный</a></li>
+            <li>
+                <form method="post" action="{% url 'lead_status_deferred' object.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="dropdown-item">Отложенный</button>
+                </form>
+            </li>
             {% endifnotequal %}
         </ul>
     </div>

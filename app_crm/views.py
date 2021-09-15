@@ -710,7 +710,7 @@ class LeadContractorCreateView(LoginRequiredMixin, TemplateView):
 
 class LeadStatusSubstandard(LoginRequiredMixin, View):
 
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         obj = Lead.objects.get(pk=kwargs.get('pk'))
         if obj:
             obj.status = LeadStatus.objects.get(title__icontains='Некачественный')
@@ -720,7 +720,7 @@ class LeadStatusSubstandard(LoginRequiredMixin, View):
 
 class LeadStatusDeferred(LoginRequiredMixin, View):
 
-    def get(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         obj = Lead.objects.get(pk=kwargs.get('pk'))
         if obj:
             obj.status = LeadStatus.objects.get(title__icontains='Отложенный')
