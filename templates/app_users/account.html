@@ -3,17 +3,17 @@
 {% block title %}Профиль пользователя{% endblock %}
 
 {% block content %}
-<h1>Профиль пользователя</h1>
-<div class="mb-5 col-6">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">{{ request.user.username }}</h5>
-      </div>
-      <ul class="list-group list-group-flush">
+<h1>Личный кабинет пользователя</h1>
+
+<div class="card mb-5 col-6">
+    <div class="card-body">
+        <h5 class="card-title">Информация</h5>
+    </div>
+    <ul class="list-group list-group-flush">
+        <li class="list-group-item">Логин: {{ request.user.username }}</li>
         <li class="list-group-item">Электронная почта: {{ request.user.email }}</li>
         <li class="list-group-item">Имя: {{ request.user.first_name }}</li>
         <li class="list-group-item">Фамилия: {{ request.user.last_name }}</li>
-      </ul>
-    </div>
+    </ul>
 </div>
 {% endblock %}

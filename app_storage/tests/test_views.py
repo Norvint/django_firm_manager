@@ -33,6 +33,10 @@ class StorageViewsTests(TestCase):
         url = reverse('product_edit', kwargs={'pk': Product.objects.first().pk})
         product = model_to_dict(Product.objects.first())
         product['cost'] = 999
+        if not product['description']:
+            product['description'] = ""
+        if not product['description_en']:
+            product['description_en'] = ""
         response = self.client.post(url, data=product)
         changed_product = Product.objects.first()
         self.assertEqual(response.status_code, 302)

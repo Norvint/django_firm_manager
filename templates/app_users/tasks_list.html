@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Мои задачи{% endblock %}
+
+{% block content %}
+{% if tasks %}
+<h1>Список задач</h1>
+<table class="table table-light table-hover">
+    <thead>
+        <tr>
+            <td>Название</td>
+        </tr>
+    </thead>
+</table>
+{% endif %}
+{% endblock %}
